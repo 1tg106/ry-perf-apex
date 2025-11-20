@@ -5,6 +5,7 @@
 /build/
 !gradle/wrapper/gradle-wrapper.jar
 
+node_modules/
 target/
 !.mvn/wrapper/maven-wrapper.jar
 
