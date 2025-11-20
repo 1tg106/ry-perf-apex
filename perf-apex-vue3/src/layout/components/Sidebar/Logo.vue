@@ -14,7 +14,9 @@
 </template>
 
 <script setup>
-import logo from '@/assets/logo/logo.png'
+// import logo from '@/assets/logo/logo.png'
+import logo from '@/assets/logo/logos.jpg'
+
 import useSettingsStore from '@/store/modules/settings'
 import variables from '@/assets/styles/variables.module.scss'
 
@@ -70,19 +72,20 @@ const getLogoTextColor = computed(() => {
     width: 100%;
 
     & .sidebar-logo {
-      width: 32px;
-      height: 32px;
+      width: 35px;
+      height: 35px;
       vertical-align: middle;
       margin-right: 12px;
+      border-radius: 50%;
     }
 
     & .sidebar-title {
       display: inline-block;
       margin: 0;
       color: v-bind(getLogoTextColor);
-      font-weight: 600;
+      font-weight: bold;
       line-height: 50px;
-      font-size: 14px;
+      font-size: 16px;
       font-family: Avenir, Helvetica Neue, Arial, Helvetica, sans-serif;
       vertical-align: middle;
     }

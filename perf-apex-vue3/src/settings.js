@@ -7,17 +7,17 @@ export default {
   /**
    * 侧边栏主题 深色主题theme-dark，浅色主题theme-light
    */
-  sideTheme: 'theme-dark',
+  sideTheme: 'theme-light',
 
   /**
    * 是否系统布局配置
    */
-  showSettings: true,
+  showSettings: false,
 
   /**
    * 是否显示顶部导航
    */
-  topNav: false,
+  topNav: true,
 
   /**
    * 是否显示 tagsView
@@ -47,11 +47,11 @@ export default {
   /**
    * 是否显示底部版权
    */
-  footerVisible: false,
+  footerVisible: true,
 
   /**
    * 底部版权文本内容
    */
-  footerContent: 'Copyright © 2018-2025 RuoYi. All Rights Reserved.'
+  footerContent: 'Copyright © 2025 底格里斯（深圳）品牌有限公司'
 }
 
