@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.bean.BeanUtils;
 import com.ruoyi.system.vo.SysPeriodVO;
@@ -20,7 +21,7 @@ import com.ruoyi.system.service.ISysPeriodService;
  * @date 2025-11-21
  */
 @Service
-public class SysPeriodServiceImpl implements ISysPeriodService 
+public class SysPeriodServiceImpl extends ServiceImpl<SysPeriodMapper, SysPeriod> implements ISysPeriodService
 {
     @Autowired
     private SysPeriodMapper sysPeriodMapper;
@@ -101,6 +102,7 @@ public class SysPeriodServiceImpl implements ISysPeriodService
     @Override
     public int deleteSysPeriodByPeriodId(Long periodId)
     {
-        return sysPeriodMapper.deleteSysPeriodByPeriodId(periodId);
+        SysPeriod sysPeriod = sysPeriodMapper.selectById(periodId);
+        return sysPeriodMapper.deleteById(periodId);
     }
 }

@@ -1,6 +1,8 @@
 package com.ruoyi.system.service;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.ruoyi.system.domain.SysPeriod;
 import com.ruoyi.system.vo.SysPeriodVO;
 
@@ -10,7 +12,7 @@ import com.ruoyi.system.vo.SysPeriodVO;
  * @author 柒喜
  * @date 2025-11-21
  */
-public interface ISysPeriodService 
+public interface ISysPeriodService extends IService<SysPeriod>
 {
     /**
      * 查询绩效周期

@@ -1,6 +1,8 @@
 package com.ruoyi.system.mapper;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ruoyi.system.domain.SysPeriod;
 
 /**
@@ -9,7 +11,7 @@ import com.ruoyi.system.domain.SysPeriod;
  * @author 柒喜
  * @date 2025-11-21
  */
-public interface SysPeriodMapper 
+public interface SysPeriodMapper extends BaseMapper<SysPeriod>
 {
     /**
      * 查询绩效周期
