@@ -2,6 +2,8 @@ package com.ruoyi.web.controller.performance;
 
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
+
+import com.ruoyi.system.vo.SysPeriodVO;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,7 +44,7 @@ public class SysPeriodController extends BaseController
     public TableDataInfo list(SysPeriod sysPeriod)
     {
         startPage();
-        List<SysPeriod> list = sysPeriodService.selectSysPeriodList(sysPeriod);
+        List<SysPeriodVO> list = sysPeriodService.selectSysPeriodList(sysPeriod);
         return getDataTable(list);
     }
 
@@ -54,9 +56,9 @@ public class SysPeriodController extends BaseController
     @PostMapping("/export")
     public void export(HttpServletResponse response, SysPeriod sysPeriod)
     {
-        List<SysPeriod> list = sysPeriodService.selectSysPeriodList(sysPeriod);
-        ExcelUtil<SysPeriod> util = new ExcelUtil<SysPeriod>(SysPeriod.class);
-        util.exportExcel(response, list, "绩效周期数据");
+//        List<SysPeriod> list = sysPeriodService.selectSysPeriodList(sysPeriod);
+//        ExcelUtil<SysPeriod> util = new ExcelUtil<SysPeriod>(SysPeriod.class);
+//        util.exportExcel(response, list, "绩效周期数据");
     }
 
     /**

@@ -1,7 +1,12 @@
 package com.ruoyi.system.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.common.utils.bean.BeanUtils;
+import com.ruoyi.system.vo.SysPeriodVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.system.mapper.SysPeriodMapper;
@@ -39,9 +44,14 @@ public class SysPeriodServiceImpl implements ISysPeriodService
      * @return 绩效周期
      */
     @Override
-    public List<SysPeriod> selectSysPeriodList(SysPeriod sysPeriod)
+    public List<SysPeriodVO> selectSysPeriodList(SysPeriod sysPeriod)
     {
-        return sysPeriodMapper.selectSysPeriodList(sysPeriod);
+        List<SysPeriod> sysPeriods = sysPeriodMapper.selectSysPeriodList(sysPeriod);
+        return sysPeriods.stream().map(period -> {
+            SysPeriodVO vo = new SysPeriodVO();
+            BeanUtils.copyProperties(period, vo);
+            return vo;
+        }).collect(Collectors.toList());
     }
 
     /**

@@ -2,6 +2,7 @@ package com.ruoyi.system.service;
 
 import java.util.List;
 import com.ruoyi.system.domain.SysPeriod;
+import com.ruoyi.system.vo.SysPeriodVO;
 
 /**
  * 绩效周期Service接口
@@ -25,7 +26,7 @@ public interface ISysPeriodService
      * @param sysPeriod 绩效周期
      * @return 绩效周期集合
      */
-    public List<SysPeriod> selectSysPeriodList(SysPeriod sysPeriod);
+    public List<SysPeriodVO> selectSysPeriodList(SysPeriod sysPeriod);
 
     /**
      * 新增绩效周期
