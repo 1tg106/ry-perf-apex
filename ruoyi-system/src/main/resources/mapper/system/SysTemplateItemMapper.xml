@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysTemplateItemMapper">
+    
+    <resultMap type="SysTemplateItem" id="SysTemplateItemResult">
+        <result property="itemId"    column="item_id"    />
+        <result property="templateId"    column="template_id"    />
+        <result property="parentId"    column="parent_id"    />
+        <result property="itemName"    column="item_name"    />
+        <result property="itemType"    column="item_type"    />
+        <result property="weight"    column="weight"    />
+        <result property="scoreStandard"    column="score_standard"    />
+        <result property="minScore"    column="min_score"    />
+        <result property="maxScore"    column="max_score"    />
+        <result property="sortOrder"    column="sort_order"    />
+        <result property="remark"    column="remark"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectSysTemplateItemVo">
+        select item_id, template_id, parent_id, item_name, item_type, weight, score_standard, min_score, max_score, sort_order, remark, del_flag, create_by, create_time, update_by, update_time from sys_template_item
+    </sql>
+
+    <select id="selectSysTemplateItemList" parameterType="SysTemplateItem" resultMap="SysTemplateItemResult">
+        <include refid="selectSysTemplateItemVo"/>
+        <where>  
+            <if test="templateId != null "> and template_id = #{templateId}</if>
+            <if test="parentId != null "> and parent_id = #{parentId}</if>
+            <if test="itemName != null  and itemName != ''"> and item_name like concat('%', #{itemName}, '%')</if>
+            <if test="itemType != null  and itemType != ''"> and item_type = #{itemType}</if>
+            <if test="weight != null "> and weight = #{weight}</if>
+            <if test="scoreStandard != null  and scoreStandard != ''"> and score_standard = #{scoreStandard}</if>
+            <if test="minScore != null "> and min_score = #{minScore}</if>
+            <if test="maxScore != null "> and max_score = #{maxScore}</if>
+            <if test="sortOrder != null "> and sort_order = #{sortOrder}</if>
+        </where>
+    </select>
+    
+    <select id="selectSysTemplateItemByItemId" parameterType="Long" resultMap="SysTemplateItemResult">
+        <include refid="selectSysTemplateItemVo"/>
+        where item_id = #{itemId}
+    </select>
+
+    <insert id="insertSysTemplateItem" parameterType="SysTemplateItem" useGeneratedKeys="true" keyProperty="itemId">
+        insert into sys_template_item
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="templateId != null">template_id,</if>
+            <if test="parentId != null">parent_id,</if>
+            <if test="itemName != null and itemName != ''">item_name,</if>
+            <if test="itemType != null and itemType != ''">item_type,</if>
+            <if test="weight != null">weight,</if>
+            <if test="scoreStandard != null">score_standard,</if>
+            <if test="minScore != null">min_score,</if>
+            <if test="maxScore != null">max_score,</if>
+            <if test="sortOrder != null">sort_order,</if>
+            <if test="remark != null">remark,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="templateId != null">#{templateId},</if>
+            <if test="parentId != null">#{parentId},</if>
+            <if test="itemName != null and itemName != ''">#{itemName},</if>
+            <if test="itemType != null and itemType != ''">#{itemType},</if>
+            <if test="weight != null">#{weight},</if>
+            <if test="scoreStandard != null">#{scoreStandard},</if>
+            <if test="minScore != null">#{minScore},</if>
+            <if test="maxScore != null">#{maxScore},</if>
+            <if test="sortOrder != null">#{sortOrder},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysTemplateItem" parameterType="SysTemplateItem">
+        update sys_template_item
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="templateId != null">template_id = #{templateId},</if>
+            <if test="parentId != null">parent_id = #{parentId},</if>
+            <if test="itemName != null and itemName != ''">item_name = #{itemName},</if>
+            <if test="itemType != null and itemType != ''">item_type = #{itemType},</if>
+            <if test="weight != null">weight = #{weight},</if>
+            <if test="scoreStandard != null">score_standard = #{scoreStandard},</if>
+            <if test="minScore != null">min_score = #{minScore},</if>
+            <if test="maxScore != null">max_score = #{maxScore},</if>
+            <if test="sortOrder != null">sort_order = #{sortOrder},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where item_id = #{itemId}
+    </update>
+
+    <delete id="deleteSysTemplateItemByItemId" parameterType="Long">
+        delete from sys_template_item where item_id = #{itemId}
+    </delete>
+
+    <delete id="deleteSysTemplateItemByItemIds" parameterType="String">
+        delete from sys_template_item where item_id in 
+        <foreach item="itemId" collection="array" open="(" separator="," close=")">
+            #{itemId}
+        </foreach>
+    </delete>
+</mapper>
