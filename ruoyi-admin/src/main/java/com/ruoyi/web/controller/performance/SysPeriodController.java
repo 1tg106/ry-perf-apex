@@ -104,13 +104,4 @@ public class SysPeriodController extends BaseController
         return toAjax(sysPeriodService.deleteSysPeriodByPeriodIds(periodIds));
     }
 
-    /**
-     * 删除绩效周期
-     */
-    @Log(title = "绩效周期", businessType = BusinessType.DELETE)
-    @DeleteMapping("/{periodId}")
-    public AjaxResult removeById(@PathVariable Long periodId)
-    {
-        return toAjax(sysPeriodService.deleteSysPeriodByPeriodId(periodId));
-    }
 }

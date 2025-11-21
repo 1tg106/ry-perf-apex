@@ -1,23 +1,29 @@
 package com.ruoyi.system.domain;
 
 import java.util.Date;
+
+import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import com.ruoyi.common.annotation.Excel;
 import com.ruoyi.common.core.domain.BaseEntity;
 
 /**
  * 绩效周期对象 sys_period
- * 
+ *
  * @author 柒喜
  * @date 2025-11-21
  */
+@Data
+@EqualsAndHashCode(callSuper = true)
+@TableName("sys_period")
 public class SysPeriod extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
 
     /** 绩效周期ID */
+    @TableId(type = IdType.AUTO)
     private Long periodId;
 
     /** 周期名称(如：2024年Q1) */
@@ -53,115 +59,6 @@ public class SysPeriod extends BaseEntity
     private String status;
 
     /** 删除标志（0:存在 1:删除） */
+    @TableLogic
     private String delFlag;
-
-    public void setPeriodId(Long periodId) 
-    {
-        this.periodId = periodId;
-    }
-
-    public Long getPeriodId() 
-    {
-        return periodId;
-    }
-
-    public void setPeriodName(String periodName) 
-    {
-        this.periodName = periodName;
-    }
-
-    public String getPeriodName() 
-    {
-        return periodName;
-    }
-
-    public void setPeriodType(String periodType) 
-    {
-        this.periodType = periodType;
-    }
-
-    public String getPeriodType() 
-    {
-        return periodType;
-    }
-
-    public void setStartDate(Date startDate) 
-    {
-        this.startDate = startDate;
-    }
-
-    public Date getStartDate() 
-    {
-        return startDate;
-    }
-
-    public void setEndDate(Date endDate) 
-    {
-        this.endDate = endDate;
-    }
-
-    public Date getEndDate() 
-    {
-        return endDate;
-    }
-
-    public void setSubmitDeadline(Date submitDeadline) 
-    {
-        this.submitDeadline = submitDeadline;
-    }
-
-    public Date getSubmitDeadline() 
-    {
-        return submitDeadline;
-    }
-
-    public void setScoreDeadline(Date scoreDeadline) 
-    {
-        this.scoreDeadline = scoreDeadline;
-    }
-
-    public Date getScoreDeadline() 
-    {
-        return scoreDeadline;
-    }
-
-    public void setStatus(String status) 
-    {
-        this.status = status;
-    }
-
-    public String getStatus() 
-    {
-        return status;
-    }
-
-    public void setDelFlag(String delFlag) 
-    {
-        this.delFlag = delFlag;
-    }
-
-    public String getDelFlag() 
-    {
-        return delFlag;
-    }
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
-            .append("periodId", getPeriodId())
-            .append("periodName", getPeriodName())
-            .append("periodType", getPeriodType())
-            .append("startDate", getStartDate())
-            .append("endDate", getEndDate())
-            .append("submitDeadline", getSubmitDeadline())
-            .append("scoreDeadline", getScoreDeadline())
-            .append("status", getStatus())
-            .append("remark", getRemark())
-            .append("delFlag", getDelFlag())
-            .append("createBy", getCreateBy())
-            .append("createTime", getCreateTime())
-            .append("updateBy", getUpdateBy())
-            .append("updateTime", getUpdateTime())
-            .toString();
-    }
 }

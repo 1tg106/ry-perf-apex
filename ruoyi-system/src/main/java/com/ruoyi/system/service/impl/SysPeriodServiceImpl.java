@@ -102,7 +102,6 @@ public class SysPeriodServiceImpl extends ServiceImpl<SysPeriodMapper, SysPeriod
     @Override
     public int deleteSysPeriodByPeriodId(Long periodId)
     {
-        SysPeriod sysPeriod = sysPeriodMapper.selectById(periodId);
-        return sysPeriodMapper.deleteById(periodId);
+        return sysPeriodMapper.deleteSysPeriodByPeriodId(periodId);
     }
 }
