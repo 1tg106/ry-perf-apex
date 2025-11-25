@@ -9,22 +9,6 @@
           @keyup.enter="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="开始日期" prop="startDate">
-        <el-date-picker clearable
-          v-model="queryParams.startDate"
-          type="date"
-          value-format="YYYY-MM-DD"
-          placeholder="请选择开始日期">
-        </el-date-picker>
-      </el-form-item>
-      <el-form-item label="结束日期" prop="endDate">
-        <el-date-picker clearable
-          v-model="queryParams.endDate"
-          type="date"
-          value-format="YYYY-MM-DD"
-          placeholder="请选择结束日期">
-        </el-date-picker>
-      </el-form-item>
       <el-form-item label="提交时间" prop="submitDeadline">
         <el-date-picker clearable
           v-model="queryParams.submitDeadline"
@@ -92,15 +76,12 @@
     <el-table v-loading="loading" :data="periodList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="周期名称" align="center" prop="periodName" />
-      <el-table-column label="周期类型" align="center" prop="periodType" />
-      <el-table-column label="开始日期" align="center" prop="startDate" width="180">
+      <el-table-column label="周期类型" align="center" prop="periodType">
         <template #default="scope">
-          <span>{{ parseTime(scope.row.startDate, '{y}-{m}-{d}') }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="结束日期" align="center" prop="endDate" width="180">
-        <template #default="scope">
-          <span>{{ parseTime(scope.row.endDate, '{y}-{m}-{d}') }}</span>
+          <el-tag type="primary" v-if="scope.row.periodType === PERF_PERIOD_TYPE.MONTH">{{ PERF_PERIOD_TYPE_LIST[0].label }}</el-tag>
+          <el-tag type="success" v-if="scope.row.periodType === PERF_PERIOD_TYPE.QUARTER">{{ PERF_PERIOD_TYPE_LIST[1].label }}</el-tag>
+          <el-tag type="warning" v-if="scope.row.periodType === PERF_PERIOD_TYPE.HALF_YEAR">{{ PERF_PERIOD_TYPE_LIST[2].label }}</el-tag>
+          <el-tag type="danger" v-if="scope.row.periodType === PERF_PERIOD_TYPE.YEAR">{{ PERF_PERIOD_TYPE_LIST[3].label }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column label="提交截止时间" align="center" prop="submitDeadline" width="180">
@@ -113,7 +94,13 @@
           <span>{{ parseTime(scope.row.scoreDeadline, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="状态" align="center" prop="status" />
+      <el-table-column label="状态" align="center" prop="periodType">
+        <template #default="scope">
+          <el-tag type="primary" v-if="scope.row.status === PERF_PERIOD_STATUS.PREPARE">{{ PERF_PERIOD_STATUS_LIST[0].label }}</el-tag>
+          <el-tag type="success" v-if="scope.row.status === PERF_PERIOD_STATUS.UNDERWAY">{{ PERF_PERIOD_STATUS_LIST[1].label }}</el-tag>
+          <el-tag type="info" v-if="scope.row.status === PERF_PERIOD_STATUS.FINISHED">{{ PERF_PERIOD_STATUS_LIST[2].label }}</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column label="备注" align="center" prop="remark" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width" fixed="right" width="180">
         <template #default="scope">
@@ -137,21 +124,15 @@
         <el-form-item label="周期名称" prop="periodName">
           <el-input v-model="form.periodName" placeholder="请输入周期名称(如：2024年Q1)" />
         </el-form-item>
-        <el-form-item label="开始日期" prop="startDate">
-          <el-date-picker clearable
-            v-model="form.startDate"
-            type="date"
-            value-format="YYYY-MM-DD"
-            placeholder="请选择开始日期">
-          </el-date-picker>
-        </el-form-item>
-        <el-form-item label="结束日期" prop="endDate">
-          <el-date-picker clearable
-            v-model="form.endDate"
-            type="date"
-            value-format="YYYY-MM-DD"
-            placeholder="请选择结束日期">
-          </el-date-picker>
+        <el-form-item label="周期类型" prop="periodType">
+          <el-select v-model="form.periodType" placeholder="请选择类型" style="width: 220px">
+            <el-option
+              v-for="(item,index) in PERF_PERIOD_TYPE_LIST"
+              :key="index"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item label="提交时间" prop="submitDeadline">
           <el-date-picker clearable
@@ -169,6 +150,16 @@
             placeholder="请选择评分截止时间">
           </el-date-picker>
         </el-form-item>
+        <el-form-item label="状态" prop="periodType">
+          <el-select v-model="form.status" placeholder="请选择类型" style="width: 220px">
+            <el-option
+              v-for="(item,index) in PERF_PERIOD_STATUS_LIST"
+              :key="index"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
+        </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
         </el-form-item>
@@ -185,6 +176,7 @@
 
 <script setup name="Period">
 import { listPeriod, getPeriod, delPeriod, addPeriod, updatePeriod } from "@/api/perf/period"
+import { PERF_PERIOD_TYPE, PERF_PERIOD_STATUS, PERF_PERIOD_STATUS_LIST, PERF_PERIOD_TYPE_LIST } from "@/utils/perf/periodEnum"
 
 const { proxy } = getCurrentInstance()
 
@@ -217,12 +209,6 @@ const data = reactive({
     ],
     periodType: [
       { required: true, message: "周期类型(QUARTER:季度, HALF_YEAR:半年度, YEAR:年度)不能为空", trigger: "change" }
-    ],
-    startDate: [
-      { required: true, message: "开始日期不能为空", trigger: "blur" }
-    ],
-    endDate: [
-      { required: true, message: "结束日期不能为空", trigger: "blur" }
     ],
     submitDeadline: [
       { required: true, message: "提交截止时间不能为空", trigger: "blur" }

@@ -12,7 +12,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="scoreDeadline"    column="score_deadline"    />
         <result property="status"    column="status"    />
         <result property="remark"    column="remark"    />
-        <result property="delFlag"    column="del_flag"    />
         <result property="createBy"    column="create_by"    />
         <result property="createTime"    column="create_time"    />
         <result property="updateBy"    column="update_by"    />
@@ -25,7 +24,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="selectPerfPeriodList" parameterType="PerfPeriod" resultMap="PerfPeriodResult">
         <include refid="selectPerfPeriodVo"/>
-        <where>  
+        <where>
+            del_flag = '0'
             <if test="periodName != null  and periodName != ''"> and period_name like concat('%', #{periodName}, '%')</if>
             <if test="periodType != null  and periodType != ''"> and period_type = #{periodType}</if>
             <if test="submitDeadline != null "> and submit_deadline = #{submitDeadline}</if>
@@ -88,11 +88,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </update>
 
     <delete id="deletePerfPeriodByPeriodId" parameterType="Long">
-        delete from perf_period where period_id = #{periodId}
+        update perf_period set del_flag = '2' where period_id = #{periodId}
     </delete>
 
     <delete id="deletePerfPeriodByPeriodIds" parameterType="String">
-        delete from perf_period where period_id in 
+        update perf_period set del_flag = '2' where period_id in
         <foreach item="periodId" collection="array" open="(" separator="," close=")">
             #{periodId}
         </foreach>
