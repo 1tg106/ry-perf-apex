@@ -184,7 +184,7 @@
 </template>
 
 <script setup name="Period">
-import { listPeriod, getPeriod, delPeriod, addPeriod, updatePeriod } from "@/api/performance/period"
+import { listPeriod, getPeriod, delPeriod, addPeriod, updatePeriod } from "@/api/perf/period"
 
 const { proxy } = getCurrentInstance()
 
