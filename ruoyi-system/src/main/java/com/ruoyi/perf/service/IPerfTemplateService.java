@@ -29,7 +29,7 @@ public interface IPerfTemplateService extends IService<PerfTemplate>
      * @param perfTemplate 绩效模板
      * @return 绩效模板集合
      */
-    public List<PerfTemplate> selectPerfTemplateList(PerfTemplate perfTemplate);
+    public List<PerfTemplateVO> selectPerfTemplateList(PerfTemplate perfTemplate);
 
     /**
      * 新增绩效模板
@@ -45,7 +45,7 @@ public interface IPerfTemplateService extends IService<PerfTemplate>
      * @param perfTemplate 绩效模板
      * @return 结果
      */
-    public int updatePerfTemplate(PerfTemplate perfTemplate);
+    public int updatePerfTemplate(PerfTemplateSaveDTO perfTemplate);
 
     /**
      * 批量删除绩效模板

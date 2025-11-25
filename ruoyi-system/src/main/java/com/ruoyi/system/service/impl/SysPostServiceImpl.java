@@ -1,5 +1,6 @@
 package com.ruoyi.system.service.impl;
 
+import java.util.Collections;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -174,5 +175,16 @@ public class SysPostServiceImpl implements ISysPostService
     public int updatePost(SysPost post)
     {
         return postMapper.updatePost(post);
+    }
+
+    @Override
+    public List<String> selectPostNamByIds(List<Long> postIds) {
+        List<String> strings = postMapper.selectPostNameByIds(postIds);
+        return strings.isEmpty()? Collections.emptyList():strings;
+    }
+
+    @Override
+    public List<SysPost> selectPostListByIds(List<Long> postIds) {
+        return postMapper.selectPostListByIds(postIds);
     }
 }

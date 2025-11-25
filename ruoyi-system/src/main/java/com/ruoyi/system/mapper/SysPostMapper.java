@@ -2,6 +2,7 @@ package com.ruoyi.system.mapper;
 
 import java.util.List;
 import com.ruoyi.system.domain.SysPost;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 岗位信息 数据层
@@ -96,4 +97,20 @@ public interface SysPostMapper
      * @return 结果
      */
     public SysPost checkPostCodeUnique(String postCode);
+
+    /**
+     * 通过岗位ID查询岗位名称
+     *
+     * @param postIds 岗位ID串
+     * @return 岗位列表
+     */
+    public List<String> selectPostNameByIds(@Param("postIds") List<Long> postIds);
+
+    /**
+     * 通过岗位IDS查询岗位使用数量
+     *
+     * @param postIds 岗位ID
+     * @return 岗位列表
+     */
+    public List<SysPost> selectPostListByIds(@Param("postIds") List<Long> postIds);
 }

@@ -9,7 +9,7 @@ import java.util.List;
 @Data
 public class PerfTemplateSaveDTO implements Serializable {
 
-    private Long templateId;
+    private Long id;
 
     /** 模板名称 */
     private String templateName;
@@ -25,4 +25,7 @@ public class PerfTemplateSaveDTO implements Serializable {
 
     /** 状态(0:正常 1:停用) */
     private String status;
+
+    /** 备注 */
+    private String remark;
 }

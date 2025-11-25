@@ -121,4 +121,12 @@ public interface ISysDeptService
      * @return 结果
      */
     public int deleteDeptById(Long deptId);
+
+    /**
+     * 根据部门IDS查询所有部门（正常状态）
+     *
+     * @param deptIds 部门ID组
+     * @return
+     */
+    public List<SysDept> selectDeptListByIds(List<Long> deptIds);
 }

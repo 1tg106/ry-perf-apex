@@ -5,7 +5,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 <mapper namespace="com.ruoyi.perf.mapper.PerfTemplateMapper">
     
     <resultMap type="PerfTemplate" id="PerfTemplateResult">
-        <result property="templateId"    column="template_id"    />
+        <result property="id"    column="id"    />
         <result property="templateName"    column="template_name"    />
         <result property="templateType"    column="template_type"    />
         <result property="deptId"    column="dept_id"    />
@@ -20,7 +20,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectPerfTemplateVo">
-        select template_id, template_name, template_type, dept_id, post_ids, status, remark, del_flag, create_by, create_time, update_by, update_time from perf_template
+        select id, template_name, template_type, dept_id, post_ids, status, remark, del_flag, create_by, create_time, update_by, update_time from perf_template
     </sql>
 
     <select id="selectPerfTemplateList" parameterType="PerfTemplate" resultMap="PerfTemplateResult">
@@ -36,7 +36,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     
     <select id="selectPerfTemplateByTemplateId" parameterType="Long" resultMap="PerfTemplateResult">
         <include refid="selectPerfTemplateVo"/>
-        where template_id = #{templateId}
+        where id = #{templateId}
     </select>
 
     <insert id="insertPerfTemplate" parameterType="PerfTemplate" useGeneratedKeys="true" keyProperty="templateId">
@@ -84,15 +84,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="updateBy != null">update_by = #{updateBy},</if>
             <if test="updateTime != null">update_time = #{updateTime},</if>
         </trim>
-        where template_id = #{templateId}
+        where id = #{templateId}
     </update>
 
     <delete id="deletePerfTemplateByTemplateId" parameterType="Long">
-        delete from perf_template where template_id = #{templateId}
+        delete from perf_template where id = #{templateId}
     </delete>
 
     <delete id="deletePerfTemplateByTemplateIds" parameterType="String">
-        delete from perf_template where template_id in 
+        delete from perf_template where id in 
         <foreach item="templateId" collection="array" open="(" separator="," close=")">
             #{templateId}
         </foreach>

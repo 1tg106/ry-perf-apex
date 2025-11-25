@@ -4,6 +4,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 
 import com.ruoyi.perf.dto.PerfTemplateSaveDTO;
+import com.ruoyi.perf.vo.PerfTemplateVO;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,7 +45,7 @@ public class PerfTemplateController extends BaseController
     public TableDataInfo list(PerfTemplate perfTemplate)
     {
         startPage();
-        List<PerfTemplate> list = perfTemplateService.selectPerfTemplateList(perfTemplate);
+        List<PerfTemplateVO> list = perfTemplateService.selectPerfTemplateList(perfTemplate);
         return getDataTable(list);
     }
 
@@ -56,8 +57,8 @@ public class PerfTemplateController extends BaseController
     @PostMapping("/export")
     public void export(HttpServletResponse response, PerfTemplate perfTemplate)
     {
-        List<PerfTemplate> list = perfTemplateService.selectPerfTemplateList(perfTemplate);
-        ExcelUtil<PerfTemplate> util = new ExcelUtil<PerfTemplate>(PerfTemplate.class);
+        List<PerfTemplateVO> list = perfTemplateService.selectPerfTemplateList(perfTemplate);
+        ExcelUtil<PerfTemplateVO> util = new ExcelUtil<PerfTemplateVO>(PerfTemplateVO.class);
         util.exportExcel(response, list, "绩效模板数据");
     }
 
@@ -88,7 +89,7 @@ public class PerfTemplateController extends BaseController
     @PreAuthorize("@ss.hasPermi('perf:template:edit')")
     @Log(title = "绩效模板", businessType = BusinessType.UPDATE)
     @PutMapping
-    public AjaxResult edit(@RequestBody PerfTemplate perfTemplate)
+    public AjaxResult edit(@RequestBody PerfTemplateSaveDTO perfTemplate)
     {
         return toAjax(perfTemplateService.updatePerfTemplate(perfTemplate));
     }

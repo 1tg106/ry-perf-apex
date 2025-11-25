@@ -71,7 +71,20 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		<include refid="selectPostVo"/>
 		 where post_code=#{postCode} limit 1
 	</select>
-	
+    <select id="selectPostNameByIds" resultType="java.lang.String">
+		select post_name from sys_post where post_id in
+		<foreach item="postId" collection="postIds" open="(" separator="," close=")">
+			#{postId}
+		</foreach>
+	</select>
+	<select id="selectPostListByIds" resultType="com.ruoyi.system.domain.SysPost">
+		<include refid="selectPostVo"/>
+		 where post_id in
+		<foreach item="postId" collection="postIds" open="(" separator="," close=")">
+			#{postId}
+		</foreach>
+	</select>
+
 	<update id="updatePost" parameterType="SysPost">
  		update sys_post
  		<set>

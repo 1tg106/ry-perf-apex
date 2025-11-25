@@ -10,7 +10,7 @@
         />
       </el-form-item>
       <el-form-item label="模板类型" prop="templateType">
-        <el-select v-model="queryParams.templateType" placeholder="请选择模板类型" clearable>
+        <el-select v-model="queryParams.templateType" placeholder="请选择模板类型" clearable style="width: 200px">
           <el-option label="关键指标" value="KPI" />
           <el-option label="目标与成果" value="OKR" />
           <el-option label="能力素质" value="COMPETENCY" />
@@ -25,10 +25,11 @@
           placeholder="请选择适用部门"
           clearable
           check-strictly
+          style="width: 200px"
         />
       </el-form-item>
       <el-form-item label="适用岗位" prop="postIds">
-        <el-select v-model="queryParams.postIds" multiple placeholder="请选择适用岗位" clearable>
+        <el-select v-model="queryParams.postIds" multiple placeholder="请选择适用岗位" clearable style="width: 200px">
           <el-option
             v-for="item in postOptions"
             :key="item.postId"
@@ -91,7 +92,12 @@
       <el-table-column label="模板类型" align="center" prop="templateType" />
       <el-table-column label="适用部门" align="center" prop="deptName" />
       <el-table-column label="适用岗位" align="center" prop="postNames" />
-      <el-table-column label="状态" align="center" prop="status" />
+      <el-table-column label="状态" align="center" prop="status">
+        <template #default="scope">
+          <el-tag type="primary" v-if="scope.row.status === COMMON_STATUS.NORMAL">{{ COMMON_STATUS_LIST[0].label }}</el-tag>
+          <el-tag type="info" v-if="scope.row.status === COMMON_STATUS.DISABLE">{{ COMMON_STATUS_LIST[1].label }}</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column label="备注" align="center" prop="remark" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template #default="scope">
@@ -143,6 +149,16 @@
             />
           </el-select>
         </el-form-item>
+        <el-form-item label="状态" prop="periodType">
+          <el-select v-model="form.status" placeholder="请选择类型" style="width: 220px">
+            <el-option
+              v-for="(item,index) in COMMON_STATUS_LIST"
+              :key="index"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
+        </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
         </el-form-item>
@@ -162,6 +178,7 @@ import { onMounted, ref, reactive, toRefs, getCurrentInstance } from "vue"
 import { listTemplate, getTemplate, delTemplate, addTemplate, updateTemplate } from "@/api/perf/template"
 import { deptTreeSelect } from "@/api/system/user"
 import { listPost } from "@/api/system/post"
+import { COMMON_STATUS_LIST, COMMON_STATUS } from "@/utils/perf/commonStatus"
 
 const { proxy } = getCurrentInstance()
 
@@ -230,7 +247,7 @@ function cancel() {
 // 表单重置
 function reset() {
   form.value = {
-    templateId: null,
+    id: null,
     templateName: null,
     templateType: null,
     deptId: null,
@@ -262,7 +279,7 @@ function resetQuery() {
 
 // 多选框选中数据
 function handleSelectionChange(selection) {
-  ids.value = selection.map(item => item.templateId)
+  ids.value = selection.map(item => item.id)
   single.value = selection.length != 1
   multiple.value = !selection.length
 }
@@ -281,8 +298,8 @@ function handleUpdate(row) {
   reset()
   getDeptTree()
   getPostList()
-  const _templateId = row.templateId || ids.value
-  getTemplate(_templateId).then(response => {
+  const _id = row.id || ids.value
+  getTemplate(_id).then(response => {
     form.value = response.data
     open.value = true
     title.value = "修改绩效模板"
@@ -293,18 +310,20 @@ function handleUpdate(row) {
 function submitForm() {
   proxy.$refs["templateRef"].validate(valid => {
     if (valid) {
-      if (form.value.templateId != null) {
+      console.log(form.value);
+      
+      if (form.value.id != null) {
         updateTemplate(form.value).then(response => {
           proxy.$modal.msgSuccess("修改成功")
           open.value = false
           getList()
         })
       } else {
-        addTemplate(form.value).then(response => {
-          proxy.$modal.msgSuccess("新增成功")
-          open.value = false
-          getList()
-        })
+        // addTemplate(form.value).then(response => {
+        //   proxy.$modal.msgSuccess("新增成功")
+        //   open.value = false
+        //   getList()
+        // })
       }
     }
   })
@@ -312,9 +331,9 @@ function submitForm() {
 
 /** 删除按钮操作 */
 function handleDelete(row) {
-  const _templateIds = row.templateId || ids.value
-  proxy.$modal.confirm('是否确认删除绩效模板编号为"' + _templateIds + '"的数据项？').then(function() {
-    return delTemplate(_templateIds)
+  const _ids = row.id || ids.value
+  proxy.$modal.confirm('是否确认删除绩效模板编号为"' + _ids + '"的数据项？').then(function() {
+    return delTemplate(_ids)
   }).then(() => {
     getList()
     proxy.$modal.msgSuccess("删除成功")

@@ -96,4 +96,20 @@ public interface ISysPostService
      * @return 结果
      */
     public int updatePost(SysPost post);
+
+    /**
+     * 通过岗位IDS查询岗位使用数量
+     *
+     * @param postIds 岗位ID
+     * @return 结果
+     */
+    public List<String> selectPostNamByIds(List<Long> postIds);
+
+    /**
+     * 通过岗位IDS查询岗位使用数量
+     *
+     * @param postIds 岗位ID
+     * @return 岗位列表
+     */
+    public List<SysPost> selectPostListByIds(List<Long> postIds);
 }

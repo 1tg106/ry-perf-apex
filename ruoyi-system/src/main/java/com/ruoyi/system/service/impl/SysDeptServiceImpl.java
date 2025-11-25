@@ -1,6 +1,7 @@
 package com.ruoyi.system.service.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -291,6 +292,11 @@ public class SysDeptServiceImpl implements ISysDeptService
     public int deleteDeptById(Long deptId)
     {
         return deptMapper.deleteDeptById(deptId);
+    }
+
+    @Override
+    public List<SysDept> selectDeptListByIds(List<Long> deptIds) {
+        return deptMapper.selectDeptListByIds(deptIds);
     }
 
     /**
