@@ -9,21 +9,33 @@
           @keyup.enter="handleQuery"
         />
       </el-form-item>
+      <el-form-item label="模板类型" prop="templateType">
+        <el-select v-model="queryParams.templateType" placeholder="请选择模板类型" clearable>
+          <el-option label="关键指标" value="KPI" />
+          <el-option label="目标与成果" value="OKR" />
+          <el-option label="能力素质" value="COMPETENCY" />
+        </el-select>
+      </el-form-item>
       <el-form-item label="适用部门" prop="deptId">
-        <el-input
+        <el-tree-select
           v-model="queryParams.deptId"
-          placeholder="请输入适用部门"
+          :data="deptOptions"
+          :props="{ value: 'id', label: 'label', children: 'children' }"
+          value-key="id"
+          placeholder="请选择适用部门"
           clearable
-          @keyup.enter="handleQuery"
+          check-strictly
         />
       </el-form-item>
       <el-form-item label="适用岗位" prop="postIds">
-        <el-input
-          v-model="queryParams.postIds"
-          placeholder="请输入适用岗位"
-          clearable
-          @keyup.enter="handleQuery"
-        />
+        <el-select v-model="queryParams.postIds" multiple placeholder="请选择适用岗位" clearable>
+          <el-option
+            v-for="item in postOptions"
+            :key="item.postId"
+            :label="item.postName"
+            :value="item.postId"
+          />
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
@@ -77,8 +89,8 @@
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="模板名称" align="center" prop="templateName" />
       <el-table-column label="模板类型" align="center" prop="templateType" />
-      <el-table-column label="适用部门" align="center" prop="deptId" />
-      <el-table-column label="适用岗位" align="center" prop="postIds" />
+      <el-table-column label="适用部门" align="center" prop="deptName" />
+      <el-table-column label="适用岗位" align="center" prop="postNames" />
       <el-table-column label="状态" align="center" prop="status" />
       <el-table-column label="备注" align="center" prop="remark" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
@@ -103,17 +115,36 @@
         <el-form-item label="模板名称" prop="templateName">
           <el-input v-model="form.templateName" placeholder="请输入模板名称" />
         </el-form-item>
-        <el-form-item label="适用部门ID" prop="deptId">
-          <el-input v-model="form.deptId" placeholder="请输入适用部门ID" />
+        <el-form-item label="模板类型" prop="templateType">
+          <el-select v-model="form.templateType" placeholder="请选择模板类型">
+            <el-option label="关键指标" value="KPI" />
+            <el-option label="目标与成果" value="OKR" />
+            <el-option label="能力素质" value="COMPETENCY" />
+          </el-select>
         </el-form-item>
-        <el-form-item label="适用岗位IDS" prop="postIds">
-          <el-input v-model="form.postIds" placeholder="请输入适用岗位IDS" />
+        <el-form-item label="适用部门" prop="deptId">
+          <el-tree-select
+            v-model="form.deptId"
+            :data="enabledDeptOptions"
+            :props="{ value: 'id', label: 'label', children: 'children' }"
+            value-key="id"
+            placeholder="请选择适用部门"
+            clearable
+            check-strictly
+          />
+        </el-form-item>
+        <el-form-item label="适用岗位" prop="postIds">
+          <el-select v-model="form.postIds" multiple placeholder="请选择适用岗位">
+            <el-option
+              v-for="item in postOptions"
+              :key="item.postId"
+              :label="item.postName"
+              :value="item.postId"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
-        </el-form-item>
-        <el-form-item label="删除标志" prop="delFlag">
-          <el-input v-model="form.delFlag" placeholder="请输入删除标志" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -127,7 +158,10 @@
 </template>
 
 <script setup name="Template">
+import { onMounted, ref, reactive, toRefs, getCurrentInstance } from "vue"
 import { listTemplate, getTemplate, delTemplate, addTemplate, updateTemplate } from "@/api/perf/template"
+import { deptTreeSelect } from "@/api/system/user"
+import { listPost } from "@/api/system/post"
 
 const { proxy } = getCurrentInstance()
 
@@ -141,6 +175,10 @@ const multiple = ref(true)
 const total = ref(0)
 const title = ref("")
 
+const deptOptions = ref(undefined)
+const enabledDeptOptions = ref(undefined)
+const postOptions = ref([])
+
 const data = reactive({
   form: {},
   queryParams: {
@@ -149,7 +187,7 @@ const data = reactive({
     templateName: null,
     templateType: null,
     deptId: null,
-    postIds: null,
+    postIds: [],
     status: null,
   },
   rules: {
@@ -157,7 +195,13 @@ const data = reactive({
       { required: true, message: "模板名称不能为空", trigger: "blur" }
     ],
     templateType: [
-      { required: true, message: "模板类型(KPI:关键指标, OKR:目标与成果, COMPETENCY:能力素质)不能为空", trigger: "change" }
+      { required: true, message: "模板类型不能为空", trigger: "change" }
+    ],
+    deptId: [
+      { required: true, message: "适用部门不能为空", trigger: "change" }
+    ],
+    postIds: [
+      { required: true, message: "适用岗位不能为空", trigger: "change" }
     ],
     status: [
       { required: true, message: "状态(0:正常 1:停用)不能为空", trigger: "change" }
@@ -190,7 +234,7 @@ function reset() {
     templateName: null,
     templateType: null,
     deptId: null,
-    postIds: null,
+    postIds: [],
     status: null,
     remark: null,
     delFlag: null,
@@ -211,6 +255,8 @@ function handleQuery() {
 /** 重置按钮操作 */
 function resetQuery() {
   proxy.resetForm("queryRef")
+  queryParams.value.deptId = undefined
+  queryParams.value.postIds = []
   handleQuery()
 }
 
@@ -224,6 +270,8 @@ function handleSelectionChange(selection) {
 /** 新增按钮操作 */
 function handleAdd() {
   reset()
+  getDeptTree()
+  getPostList()
   open.value = true
   title.value = "添加绩效模板"
 }
@@ -231,6 +279,8 @@ function handleAdd() {
 /** 修改按钮操作 */
 function handleUpdate(row) {
   reset()
+  getDeptTree()
+  getPostList()
   const _templateId = row.templateId || ids.value
   getTemplate(_templateId).then(response => {
     form.value = response.data
@@ -271,6 +321,34 @@ function handleDelete(row) {
   }).catch(() => {})
 }
 
+/** 查询部门下拉树结构 */
+function getDeptTree() {
+  deptTreeSelect().then(response => {
+    deptOptions.value = response.data
+    enabledDeptOptions.value = filterDisabledDept(JSON.parse(JSON.stringify(response.data)))
+  })
+}
+
+/** 过滤禁用的部门 */
+function filterDisabledDept(deptList) {
+  return deptList.filter(dept => {
+    if (dept.disabled) {
+      return false
+    }
+    if (dept.children && dept.children.length) {
+      dept.children = filterDisabledDept(dept.children)
+    }
+    return true
+  })
+}
+
+/** 查询岗位列表 */
+function getPostList() {
+  listPost().then(response => {
+    postOptions.value = response.rows
+  })
+}
+
 /** 导出按钮操作 */
 function handleExport() {
   proxy.download('perf/template/export', {
@@ -278,5 +356,9 @@ function handleExport() {
   }, `template_${new Date().getTime()}.xlsx`)
 }
 
-getList()
+onMounted(() => {
+  getDeptTree()
+  getPostList()
+  getList()
+})
 </script>

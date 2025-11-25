@@ -1,7 +1,16 @@
 package com.ruoyi.perf.service.impl;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.utils.bean.BeanUtils;
+import com.ruoyi.perf.dto.PerfTemplateSaveDTO;
+import com.ruoyi.perf.vo.PerfTemplateVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.perf.mapper.PerfTemplateMapper;
@@ -28,9 +37,26 @@ public class PerfTemplateServiceImpl extends ServiceImpl<PerfTemplateMapper,Perf
      * @return 绩效模板
      */
     @Override
-    public PerfTemplate selectPerfTemplateByTemplateId(Long templateId)
+    public PerfTemplateVO selectPerfTemplateByTemplateId(Long templateId)
     {
-        return perfTemplateMapper.selectPerfTemplateByTemplateId(templateId);
+        PerfTemplate perfTemplate = this.getById(templateId);
+        if(perfTemplate == null){
+            return null;
+        }
+        PerfTemplateVO perfTemplateVO = new PerfTemplateVO();
+        BeanUtils.copyProperties(perfTemplate,perfTemplateVO);
+
+        if (StringUtils.isNotEmpty(perfTemplate.getPostIds())) {
+            List<Integer> postIds = Arrays.stream(perfTemplate.getPostIds().split(","))
+                    .map(String::trim)
+                    .filter(s -> !s.isEmpty())
+                    .map(Integer::valueOf)
+                    .collect(Collectors.toList());
+            perfTemplateVO.setPostIds(postIds);
+        } else {
+            perfTemplateVO.setPostIds(new ArrayList<>());
+        }
+        return perfTemplateVO;
     }
 
     /**
@@ -52,10 +78,26 @@ public class PerfTemplateServiceImpl extends ServiceImpl<PerfTemplateMapper,Perf
      * @return 结果
      */
     @Override
-    public int insertPerfTemplate(PerfTemplate perfTemplate)
+    public int insertPerfTemplate(PerfTemplateSaveDTO perfTemplate)
     {
-        perfTemplate.setCreateTime(DateUtils.getNowDate());
-        return perfTemplateMapper.insertPerfTemplate(perfTemplate);
+        if(StringUtils.isEmpty(perfTemplate.getTemplateName())){
+            throw new RuntimeException("模板名称不能为空");
+        }
+        if(StringUtils.isEmpty(perfTemplate.getTemplateType())){
+            throw new RuntimeException("模板类型不能为空");
+        }
+        if(perfTemplate.getDeptId() == null){
+            throw new RuntimeException("适用部门不能为空");
+        }
+        if(perfTemplate.getPostIds().isEmpty()){
+            throw new RuntimeException("适用岗位不能为空");
+        }
+        PerfTemplate template = new PerfTemplate();
+        BeanUtils.copyProperties(perfTemplate,template);
+        template.setCreateTime(DateUtils.getNowDate());
+        template.setPostIds(StringUtils.join(perfTemplate.getPostIds(), ","));
+        template.setCreateBy(SecurityUtils.getUserId().toString());
+        return this.save(template) ? 1 : 0;
     }
 
     /**

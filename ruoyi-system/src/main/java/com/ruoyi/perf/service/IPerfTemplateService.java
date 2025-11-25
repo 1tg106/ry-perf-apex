@@ -3,6 +3,8 @@ package com.ruoyi.perf.service;
 import java.util.List;
 import com.ruoyi.perf.domain.PerfTemplate;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.ruoyi.perf.dto.PerfTemplateSaveDTO;
+import com.ruoyi.perf.vo.PerfTemplateVO;
 
 /**
  * 绩效模板Service接口
@@ -19,7 +21,7 @@ public interface IPerfTemplateService extends IService<PerfTemplate>
      * @param templateId 绩效模板主键
      * @return 绩效模板
      */
-    public PerfTemplate selectPerfTemplateByTemplateId(Long templateId);
+    public PerfTemplateVO selectPerfTemplateByTemplateId(Long templateId);
 
     /**
      * 查询绩效模板列表
@@ -35,7 +37,7 @@ public interface IPerfTemplateService extends IService<PerfTemplate>
      * @param perfTemplate 绩效模板
      * @return 结果
      */
-    public int insertPerfTemplate(PerfTemplate perfTemplate);
+    public int insertPerfTemplate(PerfTemplateSaveDTO perfTemplate);
 
     /**
      * 修改绩效模板
