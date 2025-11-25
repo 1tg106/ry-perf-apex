@@ -1,4 +1,4 @@
-package com.ruoyi.web.controller.performance;
+package com.ruoyi.web.controller.perf;
 
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
@@ -16,89 +16,89 @@ import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.enums.BusinessType;
-import com.ruoyi.system.domain.SysTemplateItem;
-import com.ruoyi.system.service.ISysTemplateItemService;
+import com.ruoyi.perf.domain.PerfTemplateItem;
+import com.ruoyi.perf.service.IPerfTemplateItemService;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.page.TableDataInfo;
 
 /**
  * 模板指标Controller
  * 
- * @author 柒喜
- * @date 2025-11-21
+ * @author liudahua
+ * @date 2025-11-25
  */
 @RestController
-@RequestMapping("/system/item")
-public class SysTemplateItemController extends BaseController
+@RequestMapping("/perf/templateItem")
+public class PerfTemplateItemController extends BaseController
 {
     @Autowired
-    private ISysTemplateItemService sysTemplateItemService;
+    private IPerfTemplateItemService perfTemplateItemService;
 
     /**
      * 查询模板指标列表
      */
-    @PreAuthorize("@ss.hasPermi('system:item:list')")
+    @PreAuthorize("@ss.hasPermi('perf:templateItem:list')")
     @GetMapping("/list")
-    public TableDataInfo list(SysTemplateItem sysTemplateItem)
+    public TableDataInfo list(PerfTemplateItem perfTemplateItem)
     {
         startPage();
-        List<SysTemplateItem> list = sysTemplateItemService.selectSysTemplateItemList(sysTemplateItem);
+        List<PerfTemplateItem> list = perfTemplateItemService.selectPerfTemplateItemList(perfTemplateItem);
         return getDataTable(list);
     }
 
     /**
      * 导出模板指标列表
      */
-    @PreAuthorize("@ss.hasPermi('system:item:export')")
+    @PreAuthorize("@ss.hasPermi('perf:templateItem:export')")
     @Log(title = "模板指标", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
-    public void export(HttpServletResponse response, SysTemplateItem sysTemplateItem)
+    public void export(HttpServletResponse response, PerfTemplateItem perfTemplateItem)
     {
-        List<SysTemplateItem> list = sysTemplateItemService.selectSysTemplateItemList(sysTemplateItem);
-        ExcelUtil<SysTemplateItem> util = new ExcelUtil<SysTemplateItem>(SysTemplateItem.class);
+        List<PerfTemplateItem> list = perfTemplateItemService.selectPerfTemplateItemList(perfTemplateItem);
+        ExcelUtil<PerfTemplateItem> util = new ExcelUtil<PerfTemplateItem>(PerfTemplateItem.class);
         util.exportExcel(response, list, "模板指标数据");
     }
 
     /**
      * 获取模板指标详细信息
      */
-    @PreAuthorize("@ss.hasPermi('system:item:query')")
+    @PreAuthorize("@ss.hasPermi('perf:templateItem:query')")
     @GetMapping(value = "/{itemId}")
     public AjaxResult getInfo(@PathVariable("itemId") Long itemId)
     {
-        return success(sysTemplateItemService.selectSysTemplateItemByItemId(itemId));
+        return success(perfTemplateItemService.selectPerfTemplateItemByItemId(itemId));
     }
 
     /**
      * 新增模板指标
      */
-    @PreAuthorize("@ss.hasPermi('system:item:add')")
+    @PreAuthorize("@ss.hasPermi('perf:templateItem:add')")
     @Log(title = "模板指标", businessType = BusinessType.INSERT)
     @PostMapping
-    public AjaxResult add(@RequestBody SysTemplateItem sysTemplateItem)
+    public AjaxResult add(@RequestBody PerfTemplateItem perfTemplateItem)
     {
-        return toAjax(sysTemplateItemService.insertSysTemplateItem(sysTemplateItem));
+        return toAjax(perfTemplateItemService.insertPerfTemplateItem(perfTemplateItem));
     }
 
     /**
      * 修改模板指标
      */
-    @PreAuthorize("@ss.hasPermi('system:item:edit')")
+    @PreAuthorize("@ss.hasPermi('perf:templateItem:edit')")
     @Log(title = "模板指标", businessType = BusinessType.UPDATE)
     @PutMapping
-    public AjaxResult edit(@RequestBody SysTemplateItem sysTemplateItem)
+    public AjaxResult edit(@RequestBody PerfTemplateItem perfTemplateItem)
     {
-        return toAjax(sysTemplateItemService.updateSysTemplateItem(sysTemplateItem));
+        return toAjax(perfTemplateItemService.updatePerfTemplateItem(perfTemplateItem));
     }
 
     /**
      * 删除模板指标
      */
-    @PreAuthorize("@ss.hasPermi('system:item:remove')")
+    @PreAuthorize("@ss.hasPermi('perf:templateItem:remove')")
     @Log(title = "模板指标", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{itemIds}")
     public AjaxResult remove(@PathVariable Long[] itemIds)
     {
-        return toAjax(sysTemplateItemService.deleteSysTemplateItemByItemIds(itemIds));
+        return toAjax(perfTemplateItemService.deletePerfTemplateItemByItemIds(itemIds));
     }
 }

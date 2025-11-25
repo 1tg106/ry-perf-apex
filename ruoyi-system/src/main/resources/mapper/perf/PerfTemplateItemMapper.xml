@@ -2,9 +2,9 @@
 <!DOCTYPE mapper
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.ruoyi.system.mapper.SysTemplateItemMapper">
+<mapper namespace="com.ruoyi.perf.mapper.PerfTemplateItemMapper">
     
-    <resultMap type="SysTemplateItem" id="SysTemplateItemResult">
+    <resultMap type="PerfTemplateItem" id="PerfTemplateItemResult">
         <result property="itemId"    column="item_id"    />
         <result property="templateId"    column="template_id"    />
         <result property="parentId"    column="parent_id"    />
@@ -23,12 +23,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="updateTime"    column="update_time"    />
     </resultMap>
 
-    <sql id="selectSysTemplateItemVo">
-        select item_id, template_id, parent_id, item_name, item_type, weight, score_standard, min_score, max_score, sort_order, remark, del_flag, create_by, create_time, update_by, update_time from sys_template_item
+    <sql id="selectPerfTemplateItemVo">
+        select item_id, template_id, parent_id, item_name, item_type, weight, score_standard, min_score, max_score, sort_order, remark, del_flag, create_by, create_time, update_by, update_time from perf_template_item
     </sql>
 
-    <select id="selectSysTemplateItemList" parameterType="SysTemplateItem" resultMap="SysTemplateItemResult">
-        <include refid="selectSysTemplateItemVo"/>
+    <select id="selectPerfTemplateItemList" parameterType="PerfTemplateItem" resultMap="PerfTemplateItemResult">
+        <include refid="selectPerfTemplateItemVo"/>
         <where>  
             <if test="templateId != null "> and template_id = #{templateId}</if>
             <if test="parentId != null "> and parent_id = #{parentId}</if>
@@ -42,13 +42,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </where>
     </select>
     
-    <select id="selectSysTemplateItemByItemId" parameterType="Long" resultMap="SysTemplateItemResult">
-        <include refid="selectSysTemplateItemVo"/>
+    <select id="selectPerfTemplateItemByItemId" parameterType="Long" resultMap="PerfTemplateItemResult">
+        <include refid="selectPerfTemplateItemVo"/>
         where item_id = #{itemId}
     </select>
 
-    <insert id="insertSysTemplateItem" parameterType="SysTemplateItem" useGeneratedKeys="true" keyProperty="itemId">
-        insert into sys_template_item
+    <insert id="insertPerfTemplateItem" parameterType="PerfTemplateItem" useGeneratedKeys="true" keyProperty="itemId">
+        insert into perf_template_item
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="templateId != null">template_id,</if>
             <if test="parentId != null">parent_id,</if>
@@ -85,8 +85,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
          </trim>
     </insert>
 
-    <update id="updateSysTemplateItem" parameterType="SysTemplateItem">
-        update sys_template_item
+    <update id="updatePerfTemplateItem" parameterType="PerfTemplateItem">
+        update perf_template_item
         <trim prefix="SET" suffixOverrides=",">
             <if test="templateId != null">template_id = #{templateId},</if>
             <if test="parentId != null">parent_id = #{parentId},</if>
@@ -107,12 +107,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where item_id = #{itemId}
     </update>
 
-    <delete id="deleteSysTemplateItemByItemId" parameterType="Long">
-        delete from sys_template_item where item_id = #{itemId}
+    <delete id="deletePerfTemplateItemByItemId" parameterType="Long">
+        delete from perf_template_item where item_id = #{itemId}
     </delete>
 
-    <delete id="deleteSysTemplateItemByItemIds" parameterType="String">
-        delete from sys_template_item where item_id in 
+    <delete id="deletePerfTemplateItemByItemIds" parameterType="String">
+        delete from perf_template_item where item_id in 
         <foreach item="itemId" collection="array" open="(" separator="," close=")">
             #{itemId}
         </foreach>

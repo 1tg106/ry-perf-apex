@@ -2,9 +2,9 @@
 <!DOCTYPE mapper
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.ruoyi.system.mapper.SysTemplateMapper">
+<mapper namespace="com.ruoyi.perf.mapper.PerfTemplateMapper">
     
-    <resultMap type="SysTemplate" id="SysTemplateResult">
+    <resultMap type="PerfTemplate" id="PerfTemplateResult">
         <result property="templateId"    column="template_id"    />
         <result property="templateName"    column="template_name"    />
         <result property="templateType"    column="template_type"    />
@@ -19,12 +19,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="updateTime"    column="update_time"    />
     </resultMap>
 
-    <sql id="selectSysTemplateVo">
-        select template_id, template_name, template_type, dept_id, post_ids, status, remark, del_flag, create_by, create_time, update_by, update_time from sys_template
+    <sql id="selectPerfTemplateVo">
+        select template_id, template_name, template_type, dept_id, post_ids, status, remark, del_flag, create_by, create_time, update_by, update_time from perf_template
     </sql>
 
-    <select id="selectSysTemplateList" parameterType="SysTemplate" resultMap="SysTemplateResult">
-        <include refid="selectSysTemplateVo"/>
+    <select id="selectPerfTemplateList" parameterType="PerfTemplate" resultMap="PerfTemplateResult">
+        <include refid="selectPerfTemplateVo"/>
         <where>  
             <if test="templateName != null  and templateName != ''"> and template_name like concat('%', #{templateName}, '%')</if>
             <if test="templateType != null  and templateType != ''"> and template_type = #{templateType}</if>
@@ -34,13 +34,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </where>
     </select>
     
-    <select id="selectSysTemplateByTemplateId" parameterType="Long" resultMap="SysTemplateResult">
-        <include refid="selectSysTemplateVo"/>
+    <select id="selectPerfTemplateByTemplateId" parameterType="Long" resultMap="PerfTemplateResult">
+        <include refid="selectPerfTemplateVo"/>
         where template_id = #{templateId}
     </select>
 
-    <insert id="insertSysTemplate" parameterType="SysTemplate" useGeneratedKeys="true" keyProperty="templateId">
-        insert into sys_template
+    <insert id="insertPerfTemplate" parameterType="PerfTemplate" useGeneratedKeys="true" keyProperty="templateId">
+        insert into perf_template
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="templateName != null and templateName != ''">template_name,</if>
             <if test="templateType != null and templateType != ''">template_type,</if>
@@ -69,8 +69,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
          </trim>
     </insert>
 
-    <update id="updateSysTemplate" parameterType="SysTemplate">
-        update sys_template
+    <update id="updatePerfTemplate" parameterType="PerfTemplate">
+        update perf_template
         <trim prefix="SET" suffixOverrides=",">
             <if test="templateName != null and templateName != ''">template_name = #{templateName},</if>
             <if test="templateType != null and templateType != ''">template_type = #{templateType},</if>
@@ -87,12 +87,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where template_id = #{templateId}
     </update>
 
-    <delete id="deleteSysTemplateByTemplateId" parameterType="Long">
-        delete from sys_template where template_id = #{templateId}
+    <delete id="deletePerfTemplateByTemplateId" parameterType="Long">
+        delete from perf_template where template_id = #{templateId}
     </delete>
 
-    <delete id="deleteSysTemplateByTemplateIds" parameterType="String">
-        delete from sys_template where template_id in 
+    <delete id="deletePerfTemplateByTemplateIds" parameterType="String">
+        delete from perf_template where template_id in 
         <foreach item="templateId" collection="array" open="(" separator="," close=")">
             #{templateId}
         </foreach>

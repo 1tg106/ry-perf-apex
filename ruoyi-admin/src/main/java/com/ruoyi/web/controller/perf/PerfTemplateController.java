@@ -1,4 +1,4 @@
-package com.ruoyi.web.controller.performance;
+package com.ruoyi.web.controller.perf;
 
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
@@ -16,89 +16,89 @@ import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.enums.BusinessType;
-import com.ruoyi.system.domain.SysTemplate;
-import com.ruoyi.system.service.ISysTemplateService;
+import com.ruoyi.perf.domain.PerfTemplate;
+import com.ruoyi.perf.service.IPerfTemplateService;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.page.TableDataInfo;
 
 /**
  * 绩效模板Controller
  * 
- * @author 柒喜
- * @date 2025-11-21
+ * @author liudahua
+ * @date 2025-11-25
  */
 @RestController
-@RequestMapping("/system/template")
-public class SysTemplateController extends BaseController
+@RequestMapping("/perf/template")
+public class PerfTemplateController extends BaseController
 {
     @Autowired
-    private ISysTemplateService sysTemplateService;
+    private IPerfTemplateService perfTemplateService;
 
     /**
      * 查询绩效模板列表
      */
-    @PreAuthorize("@ss.hasPermi('system:template:list')")
+    @PreAuthorize("@ss.hasPermi('perf:template:list')")
     @GetMapping("/list")
-    public TableDataInfo list(SysTemplate sysTemplate)
+    public TableDataInfo list(PerfTemplate perfTemplate)
     {
         startPage();
-        List<SysTemplate> list = sysTemplateService.selectSysTemplateList(sysTemplate);
+        List<PerfTemplate> list = perfTemplateService.selectPerfTemplateList(perfTemplate);
         return getDataTable(list);
     }
 
     /**
      * 导出绩效模板列表
      */
-    @PreAuthorize("@ss.hasPermi('system:template:export')")
+    @PreAuthorize("@ss.hasPermi('perf:template:export')")
     @Log(title = "绩效模板", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
-    public void export(HttpServletResponse response, SysTemplate sysTemplate)
+    public void export(HttpServletResponse response, PerfTemplate perfTemplate)
     {
-        List<SysTemplate> list = sysTemplateService.selectSysTemplateList(sysTemplate);
-        ExcelUtil<SysTemplate> util = new ExcelUtil<SysTemplate>(SysTemplate.class);
+        List<PerfTemplate> list = perfTemplateService.selectPerfTemplateList(perfTemplate);
+        ExcelUtil<PerfTemplate> util = new ExcelUtil<PerfTemplate>(PerfTemplate.class);
         util.exportExcel(response, list, "绩效模板数据");
     }
 
     /**
      * 获取绩效模板详细信息
      */
-    @PreAuthorize("@ss.hasPermi('system:template:query')")
+    @PreAuthorize("@ss.hasPermi('perf:template:query')")
     @GetMapping(value = "/{templateId}")
     public AjaxResult getInfo(@PathVariable("templateId") Long templateId)
     {
-        return success(sysTemplateService.selectSysTemplateByTemplateId(templateId));
+        return success(perfTemplateService.selectPerfTemplateByTemplateId(templateId));
     }
 
     /**
      * 新增绩效模板
      */
-    @PreAuthorize("@ss.hasPermi('system:template:add')")
+    @PreAuthorize("@ss.hasPermi('perf:template:add')")
     @Log(title = "绩效模板", businessType = BusinessType.INSERT)
     @PostMapping
-    public AjaxResult add(@RequestBody SysTemplate sysTemplate)
+    public AjaxResult add(@RequestBody PerfTemplate perfTemplate)
     {
-        return toAjax(sysTemplateService.insertSysTemplate(sysTemplate));
+        return toAjax(perfTemplateService.insertPerfTemplate(perfTemplate));
     }
 
     /**
      * 修改绩效模板
      */
-    @PreAuthorize("@ss.hasPermi('system:template:edit')")
+    @PreAuthorize("@ss.hasPermi('perf:template:edit')")
     @Log(title = "绩效模板", businessType = BusinessType.UPDATE)
     @PutMapping
-    public AjaxResult edit(@RequestBody SysTemplate sysTemplate)
+    public AjaxResult edit(@RequestBody PerfTemplate perfTemplate)
     {
-        return toAjax(sysTemplateService.updateSysTemplate(sysTemplate));
+        return toAjax(perfTemplateService.updatePerfTemplate(perfTemplate));
     }
 
     /**
      * 删除绩效模板
      */
-    @PreAuthorize("@ss.hasPermi('system:template:remove')")
+    @PreAuthorize("@ss.hasPermi('perf:template:remove')")
     @Log(title = "绩效模板", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{templateIds}")
     public AjaxResult remove(@PathVariable Long[] templateIds)
     {
-        return toAjax(sysTemplateService.deleteSysTemplateByTemplateIds(templateIds));
+        return toAjax(perfTemplateService.deletePerfTemplateByTemplateIds(templateIds));
     }
 }
