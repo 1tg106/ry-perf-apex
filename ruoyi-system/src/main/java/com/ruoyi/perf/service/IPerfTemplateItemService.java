@@ -3,8 +3,8 @@ package com.ruoyi.perf.service;
 import java.util.List;
 import com.ruoyi.perf.domain.PerfTemplateItem;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.ruoyi.perf.dto.PerfTemplateItemSaveDTO;
-import com.ruoyi.perf.vo.CommonChooseVO;
+import com.ruoyi.perf.domain.dto.PerfTemplateItemSaveDTO;
+import com.ruoyi.perf.domain.vo.CommonChooseVO;
 
 /**
  * 模板指标Service接口

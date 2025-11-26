@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.perf.mapper.PerfPerformanceContentMapper">
+    
+    <resultMap type="PerfPerformanceContent" id="PerfPerformanceContentResult">
+        <result property="id"    column="id"    />
+        <result property="performanceId"    column="performance_id"    />
+        <result property="itemId"    column="item_id"    />
+        <result property="selfTarget"    column="self_target"    />
+        <result property="selfResult"    column="self_result"    />
+        <result property="selfScore"    column="self_score"    />
+        <result property="selfComment"    column="self_comment"    />
+        <result property="finalScore"    column="final_score"    />
+        <result property="finalComment"    column="final_comment"    />
+        <result property="sortOrder"    column="sort_order"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectPerfPerformanceContentVo">
+        select id, performance_id, item_id, self_target, self_result, self_score, self_comment, final_score, final_comment, sort_order, del_flag, create_by, create_time, update_by, update_time from perf_performance_content
+    </sql>
+
+    <select id="selectPerfPerformanceContentList" parameterType="PerfPerformanceContent" resultMap="PerfPerformanceContentResult">
+        <include refid="selectPerfPerformanceContentVo"/>
+        <where>  
+            <if test="performanceId != null "> and performance_id = #{performanceId}</if>
+            <if test="itemId != null "> and item_id = #{itemId}</if>
+            <if test="selfTarget != null  and selfTarget != ''"> and self_target = #{selfTarget}</if>
+            <if test="selfResult != null  and selfResult != ''"> and self_result = #{selfResult}</if>
+            <if test="selfScore != null "> and self_score = #{selfScore}</if>
+            <if test="selfComment != null  and selfComment != ''"> and self_comment = #{selfComment}</if>
+            <if test="finalScore != null "> and final_score = #{finalScore}</if>
+            <if test="finalComment != null  and finalComment != ''"> and final_comment = #{finalComment}</if>
+            <if test="sortOrder != null "> and sort_order = #{sortOrder}</if>
+        </where>
+    </select>
+    
+    <select id="selectPerfPerformanceContentById" parameterType="Long" resultMap="PerfPerformanceContentResult">
+        <include refid="selectPerfPerformanceContentVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertPerfPerformanceContent" parameterType="PerfPerformanceContent" useGeneratedKeys="true" keyProperty="id">
+        insert into perf_performance_content
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="performanceId != null">performance_id,</if>
+            <if test="itemId != null">item_id,</if>
+            <if test="selfTarget != null">self_target,</if>
+            <if test="selfResult != null">self_result,</if>
+            <if test="selfScore != null">self_score,</if>
+            <if test="selfComment != null">self_comment,</if>
+            <if test="finalScore != null">final_score,</if>
+            <if test="finalComment != null">final_comment,</if>
+            <if test="sortOrder != null">sort_order,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="performanceId != null">#{performanceId},</if>
+            <if test="itemId != null">#{itemId},</if>
+            <if test="selfTarget != null">#{selfTarget},</if>
+            <if test="selfResult != null">#{selfResult},</if>
+            <if test="selfScore != null">#{selfScore},</if>
+            <if test="selfComment != null">#{selfComment},</if>
+            <if test="finalScore != null">#{finalScore},</if>
+            <if test="finalComment != null">#{finalComment},</if>
+            <if test="sortOrder != null">#{sortOrder},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updatePerfPerformanceContent" parameterType="PerfPerformanceContent">
+        update perf_performance_content
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="performanceId != null">performance_id = #{performanceId},</if>
+            <if test="itemId != null">item_id = #{itemId},</if>
+            <if test="selfTarget != null">self_target = #{selfTarget},</if>
+            <if test="selfResult != null">self_result = #{selfResult},</if>
+            <if test="selfScore != null">self_score = #{selfScore},</if>
+            <if test="selfComment != null">self_comment = #{selfComment},</if>
+            <if test="finalScore != null">final_score = #{finalScore},</if>
+            <if test="finalComment != null">final_comment = #{finalComment},</if>
+            <if test="sortOrder != null">sort_order = #{sortOrder},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deletePerfPerformanceContentById" parameterType="Long">
+        delete from perf_performance_content where id = #{id}
+    </delete>
+
+    <delete id="deletePerfPerformanceContentByIds" parameterType="String">
+        delete from perf_performance_content where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

@@ -3,9 +3,9 @@ package com.ruoyi.web.controller.perf;
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 
-import com.ruoyi.perf.dto.PerfTemplateSaveDTO;
-import com.ruoyi.perf.vo.CommonChooseVO;
-import com.ruoyi.perf.vo.PerfTemplateVO;
+import com.ruoyi.perf.domain.dto.PerfTemplateSaveDTO;
+import com.ruoyi.perf.domain.vo.CommonChooseVO;
+import com.ruoyi.perf.domain.vo.PerfTemplateVO;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;

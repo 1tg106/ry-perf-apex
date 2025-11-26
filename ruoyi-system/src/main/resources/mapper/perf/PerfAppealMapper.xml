@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.perf.mapper.PerfAppealMapper">
+    
+    <resultMap type="PerfAppeal" id="PerfAppealResult">
+        <result property="id"    column="id"    />
+        <result property="performanceId"    column="performance_id"    />
+        <result property="appealReason"    column="appeal_reason"    />
+        <result property="appealStatus"    column="appeal_status"    />
+        <result property="processorId"    column="processor_id"    />
+        <result property="processComment"    column="process_comment"    />
+        <result property="processResult"    column="process_result"    />
+        <result property="adjustScore"    column="adjust_score"    />
+        <result property="appealTime"    column="appeal_time"    />
+        <result property="processTime"    column="process_time"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectPerfAppealVo">
+        select id, performance_id, appeal_reason, appeal_status, processor_id, process_comment, process_result, adjust_score, appeal_time, process_time, del_flag, create_time, update_time from perf_appeal
+    </sql>
+
+    <select id="selectPerfAppealList" parameterType="PerfAppeal" resultMap="PerfAppealResult">
+        <include refid="selectPerfAppealVo"/>
+        <where>  
+            <if test="performanceId != null "> and performance_id = #{performanceId}</if>
+            <if test="appealReason != null  and appealReason != ''"> and appeal_reason = #{appealReason}</if>
+            <if test="appealStatus != null  and appealStatus != ''"> and appeal_status = #{appealStatus}</if>
+            <if test="processorId != null "> and processor_id = #{processorId}</if>
+            <if test="processComment != null  and processComment != ''"> and process_comment = #{processComment}</if>
+            <if test="processResult != null  and processResult != ''"> and process_result = #{processResult}</if>
+            <if test="adjustScore != null "> and adjust_score = #{adjustScore}</if>
+            <if test="appealTime != null "> and appeal_time = #{appealTime}</if>
+            <if test="processTime != null "> and process_time = #{processTime}</if>
+        </where>
+    </select>
+    
+    <select id="selectPerfAppealById" parameterType="Long" resultMap="PerfAppealResult">
+        <include refid="selectPerfAppealVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertPerfAppeal" parameterType="PerfAppeal" useGeneratedKeys="true" keyProperty="id">
+        insert into perf_appeal
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="performanceId != null">performance_id,</if>
+            <if test="appealReason != null and appealReason != ''">appeal_reason,</if>
+            <if test="appealStatus != null and appealStatus != ''">appeal_status,</if>
+            <if test="processorId != null">processor_id,</if>
+            <if test="processComment != null">process_comment,</if>
+            <if test="processResult != null">process_result,</if>
+            <if test="adjustScore != null">adjust_score,</if>
+            <if test="appealTime != null">appeal_time,</if>
+            <if test="processTime != null">process_time,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="performanceId != null">#{performanceId},</if>
+            <if test="appealReason != null and appealReason != ''">#{appealReason},</if>
+            <if test="appealStatus != null and appealStatus != ''">#{appealStatus},</if>
+            <if test="processorId != null">#{processorId},</if>
+            <if test="processComment != null">#{processComment},</if>
+            <if test="processResult != null">#{processResult},</if>
+            <if test="adjustScore != null">#{adjustScore},</if>
+            <if test="appealTime != null">#{appealTime},</if>
+            <if test="processTime != null">#{processTime},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updatePerfAppeal" parameterType="PerfAppeal">
+        update perf_appeal
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="performanceId != null">performance_id = #{performanceId},</if>
+            <if test="appealReason != null and appealReason != ''">appeal_reason = #{appealReason},</if>
+            <if test="appealStatus != null and appealStatus != ''">appeal_status = #{appealStatus},</if>
+            <if test="processorId != null">processor_id = #{processorId},</if>
+            <if test="processComment != null">process_comment = #{processComment},</if>
+            <if test="processResult != null">process_result = #{processResult},</if>
+            <if test="adjustScore != null">adjust_score = #{adjustScore},</if>
+            <if test="appealTime != null">appeal_time = #{appealTime},</if>
+            <if test="processTime != null">process_time = #{processTime},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deletePerfAppealById" parameterType="Long">
+        delete from perf_appeal where id = #{id}
+    </delete>
+
+    <delete id="deletePerfAppealByIds" parameterType="String">
+        delete from perf_appeal where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>
