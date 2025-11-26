@@ -1,22 +1,6 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="模板ID" prop="templateId">
-        <el-input
-          v-model="queryParams.templateId"
-          placeholder="请输入模板ID"
-          clearable
-          @keyup.enter="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="父指标ID" prop="parentId">
-        <el-input
-          v-model="queryParams.parentId"
-          placeholder="请输入父指标ID"
-          clearable
-          @keyup.enter="handleQuery"
-        />
-      </el-form-item>
       <el-form-item label="指标名称" prop="itemName">
         <el-input
           v-model="queryParams.itemName"
@@ -25,7 +9,7 @@
           @keyup.enter="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="权重(0-100)" prop="weight">
+      <el-form-item label="权重" prop="weight">
         <el-input
           v-model="queryParams.weight"
           placeholder="请输入权重(0-100)"
@@ -45,14 +29,6 @@
         <el-input
           v-model="queryParams.maxScore"
           placeholder="请输入最高分"
-          clearable
-          @keyup.enter="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="排序" prop="sortOrder">
-        <el-input
-          v-model="queryParams.sortOrder"
-          placeholder="请输入排序"
           clearable
           @keyup.enter="handleQuery"
         />
@@ -107,19 +83,21 @@
 
     <el-table v-loading="loading" :data="templateItemList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="指标项ID" align="center" prop="itemId" />
-      <el-table-column label="模板ID" align="center" prop="templateId" />
-      <el-table-column label="父指标ID" align="center" prop="parentId" />
       <el-table-column label="指标名称" align="center" prop="itemName" />
-      <el-table-column label="指标类型(OBJECTIVE:目标, KEY_RESULT:关键成果, COMPETENCY:能力项)" align="center" prop="itemType" />
+      <el-table-column label="指标类型" align="center" prop="itemType" />
+      <el-table-column label="指标类型" align="center" prop="itemType">
+        <template #default="scope">
+          <el-tag type="primary" v-if="scope.row.itemType == ITEM_TYPE.OBJECTIVE">{{ ITEM_TYPE_LIST[0].label }}</el-tag>
+          <el-tag type="success" v-if="scope.row.itemType == ITEM_TYPE.KEY_RESULT">{{ ITEM_TYPE_LIST[1].label }}</el-tag>
+          <el-tag type="warning" v-if="scope.row.itemType == ITEM_TYPE.COMPETENCY">{{ ITEM_TYPE_LIST[2].label }}</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column label="权重(0-100)" align="center" prop="weight" />
-      <el-table-column label="评分标准描述" align="center" prop="scoreStandard" />
       <el-table-column label="最低分" align="center" prop="minScore" />
       <el-table-column label="最高分" align="center" prop="maxScore" />
-      <el-table-column label="排序" align="center" prop="sortOrder" />
-      <el-table-column label="备注" align="center" prop="remark" />
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" fixed="right" width="220">
         <template #default="scope">
+          <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['perf:templateItem:edit']">复制</el-button>
           <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['perf:templateItem:edit']">修改</el-button>
           <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)" v-hasPermi="['perf:templateItem:remove']">删除</el-button>
         </template>
@@ -137,35 +115,39 @@
     <!-- 添加或修改模板指标对话框 -->
     <el-dialog :title="title" v-model="open" width="500px" append-to-body>
       <el-form ref="templateItemRef" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="模板ID" prop="templateId">
+        <el-form-item label="模板" prop="templateId">
           <el-input v-model="form.templateId" placeholder="请输入模板ID" />
         </el-form-item>
-        <el-form-item label="父指标ID" prop="parentId">
+        <el-form-item label="父指标" prop="parentId">
           <el-input v-model="form.parentId" placeholder="请输入父指标ID" />
         </el-form-item>
         <el-form-item label="指标名称" prop="itemName">
           <el-input v-model="form.itemName" placeholder="请输入指标名称" />
         </el-form-item>
-        <el-form-item label="权重(0-100)" prop="weight">
-          <el-input v-model="form.weight" placeholder="请输入权重(0-100)" />
+        <el-form-item label="指标类型" prop="itemType">
+          <el-select v-model="form.itemType" placeholder="请选择类型" style="width: 220px">
+            <el-option
+              v-for="(item,index) in ITEM_TYPE_LIST"
+              :key="index"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
         </el-form-item>
-        <el-form-item label="评分标准描述" prop="scoreStandard">
-          <el-input v-model="form.scoreStandard" type="textarea" placeholder="请输入内容" />
+        <el-form-item label="权重" prop="weight">
+          <el-input-number v-model="form.weight" :min="1" :max="100" />
         </el-form-item>
         <el-form-item label="最低分" prop="minScore">
-          <el-input v-model="form.minScore" placeholder="请输入最低分" />
+          <el-input-number v-model="form.minScore" :min="1" :max="10" />
         </el-form-item>
         <el-form-item label="最高分" prop="maxScore">
-          <el-input v-model="form.maxScore" placeholder="请输入最高分" />
+          <el-input-number v-model="form.maxScore" :min="1" :max="10" />
         </el-form-item>
-        <el-form-item label="排序" prop="sortOrder">
-          <el-input v-model="form.sortOrder" placeholder="请输入排序" />
+        <el-form-item label="标准描述" prop="scoreStandard">
+          <el-input v-model="form.scoreStandard" type="textarea" placeholder="请输入评分标准描述" />
         </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
-        </el-form-item>
-        <el-form-item label="删除标志" prop="delFlag">
-          <el-input v-model="form.delFlag" placeholder="请输入删除标志" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -180,6 +162,7 @@
 
 <script setup name="TemplateItem">
 import { listTemplateItem, getTemplateItem, delTemplateItem, addTemplateItem, updateTemplateItem } from "@/api/perf/templateItem"
+import { ITEM_TYPE, ITEM_TYPE_LIST } from "@/utils/perf/templateItemEnum"
 
 const { proxy } = getCurrentInstance()
 
@@ -210,16 +193,16 @@ const data = reactive({
   },
   rules: {
     templateId: [
-      { required: true, message: "模板ID不能为空", trigger: "blur" }
+      { required: true, message: "模板不能为空", trigger: "blur" }
     ],
     itemName: [
       { required: true, message: "指标名称不能为空", trigger: "blur" }
     ],
     itemType: [
-      { required: true, message: "指标类型(OBJECTIVE:目标, KEY_RESULT:关键成果, COMPETENCY:能力项)不能为空", trigger: "change" }
+      { required: true, message: "指标类型不能为空", trigger: "change" }
     ],
     weight: [
-      { required: true, message: "权重(0-100)不能为空", trigger: "blur" }
+      { required: true, message: "权重不能为空", trigger: "blur" }
     ],
   }
 })
@@ -245,7 +228,7 @@ function cancel() {
 // 表单重置
 function reset() {
   form.value = {
-    itemId: null,
+    id: null,
     templateId: null,
     parentId: null,
     itemName: null,
@@ -279,7 +262,7 @@ function resetQuery() {
 
 // 多选框选中数据
 function handleSelectionChange(selection) {
-  ids.value = selection.map(item => item.itemId)
+  ids.value = selection.map(item => item.id)
   single.value = selection.length != 1
   multiple.value = !selection.length
 }
@@ -294,8 +277,8 @@ function handleAdd() {
 /** 修改按钮操作 */
 function handleUpdate(row) {
   reset()
-  const _itemId = row.itemId || ids.value
-  getTemplateItem(_itemId).then(response => {
+  const _id = row.id || ids.value
+  getTemplateItem(_id).then(response => {
     form.value = response.data
     open.value = true
     title.value = "修改模板指标"
@@ -306,7 +289,7 @@ function handleUpdate(row) {
 function submitForm() {
   proxy.$refs["templateItemRef"].validate(valid => {
     if (valid) {
-      if (form.value.itemId != null) {
+      if (form.value.id != null) {
         updateTemplateItem(form.value).then(response => {
           proxy.$modal.msgSuccess("修改成功")
           open.value = false
@@ -325,9 +308,9 @@ function submitForm() {
 
 /** 删除按钮操作 */
 function handleDelete(row) {
-  const _itemIds = row.itemId || ids.value
-  proxy.$modal.confirm('是否确认删除模板指标编号为"' + _itemIds + '"的数据项？').then(function() {
-    return delTemplateItem(_itemIds)
+  const _ids = row.id || ids.value
+  proxy.$modal.confirm('是否确认删除模板指标编号为"' + _ids + '"的数据项？').then(function() {
+    return delTemplateItem(_ids)
   }).then(() => {
     getList()
     proxy.$modal.msgSuccess("删除成功")

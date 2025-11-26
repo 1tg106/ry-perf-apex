@@ -17,7 +17,7 @@ public class PerfTemplateItem extends BaseEntity
     private static final long serialVersionUID = 1L;
 
     /** 指标项ID */
-    private Long itemId;
+    private Long id;
 
     /** 模板ID */
     @Excel(name = "模板ID")
@@ -58,17 +58,15 @@ public class PerfTemplateItem extends BaseEntity
     /** 删除标志（0:存在 1:删除） */
     private String delFlag;
 
-    public void setItemId(Long itemId) 
-    {
-        this.itemId = itemId;
+    public Long getId() {
+        return id;
     }
 
-    public Long getItemId() 
-    {
-        return itemId;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public void setTemplateId(Long templateId) 
+    public void setTemplateId(Long templateId)
     {
         this.templateId = templateId;
     }
@@ -171,7 +169,7 @@ public class PerfTemplateItem extends BaseEntity
     @Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
-            .append("itemId", getItemId())
+            .append("itemId", getId())
             .append("templateId", getTemplateId())
             .append("parentId", getParentId())
             .append("itemName", getItemName())

@@ -5,7 +5,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 <mapper namespace="com.ruoyi.perf.mapper.PerfTemplateItemMapper">
     
     <resultMap type="PerfTemplateItem" id="PerfTemplateItemResult">
-        <result property="itemId"    column="item_id"    />
+        <result property="id"    column="id"    />
         <result property="templateId"    column="template_id"    />
         <result property="parentId"    column="parent_id"    />
         <result property="itemName"    column="item_name"    />
@@ -24,7 +24,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectPerfTemplateItemVo">
-        select item_id, template_id, parent_id, item_name, item_type, weight, score_standard, min_score, max_score, sort_order, remark, del_flag, create_by, create_time, update_by, update_time from perf_template_item
+        select id, template_id, parent_id, item_name, item_type, weight, score_standard, min_score, max_score, sort_order, remark, del_flag, create_by, create_time, update_by, update_time from perf_template_item
     </sql>
 
     <select id="selectPerfTemplateItemList" parameterType="PerfTemplateItem" resultMap="PerfTemplateItemResult">
@@ -44,7 +44,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     
     <select id="selectPerfTemplateItemByItemId" parameterType="Long" resultMap="PerfTemplateItemResult">
         <include refid="selectPerfTemplateItemVo"/>
-        where item_id = #{itemId}
+        where id = #{itemId}
     </select>
 
     <insert id="insertPerfTemplateItem" parameterType="PerfTemplateItem" useGeneratedKeys="true" keyProperty="itemId">
@@ -108,11 +108,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </update>
 
     <delete id="deletePerfTemplateItemByItemId" parameterType="Long">
-        delete from perf_template_item where item_id = #{itemId}
+        delete from perf_template_item where id = #{itemId}
     </delete>
 
     <delete id="deletePerfTemplateItemByItemIds" parameterType="String">
-        delete from perf_template_item where item_id in 
+        delete from perf_template_item where id in
         <foreach item="itemId" collection="array" open="(" separator="," close=")">
             #{itemId}
         </foreach>

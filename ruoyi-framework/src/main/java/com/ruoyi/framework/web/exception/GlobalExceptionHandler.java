@@ -1,8 +1,12 @@
 package com.ruoyi.framework.web.exception;
 
 import javax.servlet.http.HttpServletRequest;
+import java.sql.SQLException;
+import java.sql.SQLSyntaxErrorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.BindException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -15,14 +19,16 @@ import com.ruoyi.common.constant.HttpStatus;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.text.Convert;
 import com.ruoyi.common.exception.DemoModeException;
+import com.ruoyi.common.exception.GlobalException;
 import com.ruoyi.common.exception.ServiceException;
+import com.ruoyi.common.exception.UtilException;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.html.EscapeUtil;
 
 /**
  * 全局异常处理器
  * 
- * @author ruoyi
+ * @author liudahua
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler
@@ -64,6 +70,26 @@ public class GlobalExceptionHandler
     }
 
     /**
+     * 全局异常
+     */
+    @ExceptionHandler(GlobalException.class)
+    public AjaxResult handleGlobalException(GlobalException e, HttpServletRequest request)
+    {
+        log.error(e.getMessage(), e);
+        return AjaxResult.error(e.getMessage());
+    }
+
+    /**
+     * 工具类异常
+     */
+    @ExceptionHandler(UtilException.class)
+    public AjaxResult handleUtilException(UtilException e, HttpServletRequest request)
+    {
+        log.error(e.getMessage(), e);
+        return AjaxResult.error(e.getMessage());
+    }
+
+    /**
      * 请求路径中缺少必需的路径变量
      */
     @ExceptionHandler(MissingPathVariableException.class)
@@ -88,6 +114,39 @@ public class GlobalExceptionHandler
         }
         log.error("请求参数类型不匹配'{}',发生系统异常.", requestURI, e);
         return AjaxResult.error(String.format("请求参数类型不匹配，参数[%s]要求类型为：'%s'，但输入值为：'%s'", e.getName(), e.getRequiredType().getName(), value));
+    }
+
+    /**
+     * 空指针异常
+     */
+    @ExceptionHandler(NullPointerException.class)
+    public AjaxResult handleNullPointerException(NullPointerException e, HttpServletRequest request)
+    {
+        String requestURI = request.getRequestURI();
+        log.error("请求地址'{}',发生空指针异常.", requestURI, e);
+        return AjaxResult.error("服务器内部错误，空指针异常");
+    }
+
+    /**
+     * 非法参数异常
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public AjaxResult handleIllegalArgumentException(IllegalArgumentException e, HttpServletRequest request)
+    {
+        String requestURI = request.getRequestURI();
+        log.error("请求地址'{}',发生非法参数异常.", requestURI, e);
+        return AjaxResult.error("请求参数错误：" + e.getMessage());
+    }
+
+    /**
+     * 非法状态异常
+     */
+    @ExceptionHandler(IllegalStateException.class)
+    public AjaxResult handleIllegalStateException(IllegalStateException e, HttpServletRequest request)
+    {
+        String requestURI = request.getRequestURI();
+        log.error("请求地址'{}',发生非法状态异常.", requestURI, e);
+        return AjaxResult.error("服务器状态错误：" + e.getMessage());
     }
 
     /**
@@ -141,5 +200,49 @@ public class GlobalExceptionHandler
     public AjaxResult handleDemoModeException(DemoModeException e)
     {
         return AjaxResult.error("演示模式，不允许操作");
+    }
+
+    /**
+     * 数据库操作异常
+     */
+    @ExceptionHandler(DataAccessException.class)
+    public AjaxResult handleDataAccessException(DataAccessException e, HttpServletRequest request)
+    {
+        String requestURI = request.getRequestURI();
+        log.error("请求地址'{}',发生数据库操作异常.", requestURI, e);
+        return AjaxResult.error("数据库操作异常");
+    }
+
+    /**
+     * 数据库操作异常
+     */
+    @ExceptionHandler(SQLSyntaxErrorException.class)
+    public AjaxResult handleSQLSyntaxErrorException(SQLSyntaxErrorException e, HttpServletRequest request)
+    {
+        String requestURI = request.getRequestURI();
+        log.error("请求地址'{}',发生数据库操作异常.", requestURI, e);
+        return AjaxResult.error("数据库操作异常");
+    }
+
+    /**
+     * 数据库操作异常
+     */
+    @ExceptionHandler(SQLException.class)
+    public AjaxResult handleSQLException(SQLException e, HttpServletRequest request)
+    {
+        String requestURI = request.getRequestURI();
+        log.error("请求地址'{}',发生数据库操作异常.", requestURI, e);
+        return AjaxResult.error("数据库操作异常");
+    }
+
+    /**
+     * 数据库操作异常
+     */
+    @ExceptionHandler(DuplicateKeyException.class)
+    public AjaxResult handleDuplicateKeyException(DuplicateKeyException e, HttpServletRequest request)
+    {
+        String requestURI = request.getRequestURI();
+        log.error("请求地址'{}',发生数据库操作异常.", requestURI, e);
+        return AjaxResult.error("数据库操作异常");
     }
 }
