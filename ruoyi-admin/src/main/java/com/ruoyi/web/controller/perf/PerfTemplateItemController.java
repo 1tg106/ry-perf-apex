@@ -2,8 +2,13 @@ package com.ruoyi.web.controller.perf;
 
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+
+import com.ruoyi.perf.dto.PerfTemplateItemSaveDTO;
+import com.ruoyi.perf.vo.CommonChooseVO;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -75,9 +80,9 @@ public class PerfTemplateItemController extends BaseController
     @PreAuthorize("@ss.hasPermi('perf:templateItem:add')")
     @Log(title = "模板指标", businessType = BusinessType.INSERT)
     @PostMapping
-    public AjaxResult add(@RequestBody PerfTemplateItem perfTemplateItem)
+    public AjaxResult add(@Valid @RequestBody PerfTemplateItemSaveDTO itemSaveDTO)
     {
-        return toAjax(perfTemplateItemService.insertPerfTemplateItem(perfTemplateItem));
+        return toAjax(perfTemplateItemService.insertPerfTemplateItem(itemSaveDTO));
     }
 
     /**
@@ -86,9 +91,9 @@ public class PerfTemplateItemController extends BaseController
     @PreAuthorize("@ss.hasPermi('perf:templateItem:edit')")
     @Log(title = "模板指标", businessType = BusinessType.UPDATE)
     @PutMapping
-    public AjaxResult edit(@RequestBody PerfTemplateItem perfTemplateItem)
+    public AjaxResult edit(@Valid @RequestBody PerfTemplateItemSaveDTO itemSaveDTO)
     {
-        return toAjax(perfTemplateItemService.updatePerfTemplateItem(perfTemplateItem));
+        return toAjax(perfTemplateItemService.updatePerfTemplateItem(itemSaveDTO));
     }
 
     /**
@@ -100,5 +105,28 @@ public class PerfTemplateItemController extends BaseController
     public AjaxResult remove(@PathVariable Long[] itemIds)
     {
         return toAjax(perfTemplateItemService.deletePerfTemplateItemByItemIds(itemIds));
+    }
+
+    /**
+     * 获取模板指标列表
+     * @return
+     */
+    @PreAuthorize("@ss.hasPermi('perf:templateItem:list')")
+    @GetMapping("/getItemChooseList")
+    public AjaxResult getCommonChooseList()
+    {
+        List<CommonChooseVO> list = perfTemplateItemService.getCommonChooseList();
+        return success(list);
+    }
+
+    /**
+     * 复制指标
+     */
+    @PreAuthorize("@ss.hasPermi('perf:templateItem:add')")
+    @Log(title = "模板指标", businessType = BusinessType.INSERT)
+    @PostMapping("/copyTemplateItem/{id}")
+    public AjaxResult copyTemplateItem(@PathVariable("id") Long id)
+    {
+        return success(perfTemplateItemService.copyTemplateItem(id));
     }
 }

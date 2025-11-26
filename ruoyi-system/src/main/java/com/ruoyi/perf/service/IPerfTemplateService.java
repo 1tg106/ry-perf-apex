@@ -4,6 +4,7 @@ import java.util.List;
 import com.ruoyi.perf.domain.PerfTemplate;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ruoyi.perf.dto.PerfTemplateSaveDTO;
+import com.ruoyi.perf.vo.CommonChooseVO;
 import com.ruoyi.perf.vo.PerfTemplateVO;
 
 /**
@@ -62,4 +63,10 @@ public interface IPerfTemplateService extends IService<PerfTemplate>
      * @return 结果
      */
     public int deletePerfTemplateByTemplateId(Long templateId);
+
+    /**
+     * 选择列表
+     * @return
+     */
+    public List<CommonChooseVO> getCommonChooseList();
 }

@@ -1,3 +1,4 @@
+// 指标类型枚举
 export const ITEM_TYPE = {
   OBJECTIVE: 'OBJECTIVE', // 目标
   KEY_RESULT: 'KEY_RESULT', // 关键成果

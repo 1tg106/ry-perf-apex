@@ -84,7 +84,6 @@
     <el-table v-loading="loading" :data="templateItemList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="指标名称" align="center" prop="itemName" />
-      <el-table-column label="指标类型" align="center" prop="itemType" />
       <el-table-column label="指标类型" align="center" prop="itemType">
         <template #default="scope">
           <el-tag type="primary" v-if="scope.row.itemType == ITEM_TYPE.OBJECTIVE">{{ ITEM_TYPE_LIST[0].label }}</el-tag>
@@ -97,7 +96,7 @@
       <el-table-column label="最高分" align="center" prop="maxScore" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width" fixed="right" width="220">
         <template #default="scope">
-          <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['perf:templateItem:edit']">复制</el-button>
+          <el-button link type="primary" icon="CopyDocument" @click="handleCopy(scope.row)" v-hasPermi="['perf:templateItem:edit']">复制</el-button>
           <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['perf:templateItem:edit']">修改</el-button>
           <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)" v-hasPermi="['perf:templateItem:remove']">删除</el-button>
         </template>
@@ -115,14 +114,28 @@
     <!-- 添加或修改模板指标对话框 -->
     <el-dialog :title="title" v-model="open" width="500px" append-to-body>
       <el-form ref="templateItemRef" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="模板" prop="templateId">
-          <el-input v-model="form.templateId" placeholder="请输入模板ID" />
-        </el-form-item>
-        <el-form-item label="父指标" prop="parentId">
-          <el-input v-model="form.parentId" placeholder="请输入父指标ID" />
-        </el-form-item>
         <el-form-item label="指标名称" prop="itemName">
           <el-input v-model="form.itemName" placeholder="请输入指标名称" />
+        </el-form-item>
+        <el-form-item label="模板" prop="templateId">
+          <el-select v-model="form.templateId" placeholder="请选择模板" style="width: 220px">
+            <el-option
+              v-for="(item,index) in templateOptions"
+              :key="index"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="父指标" prop="parentId">
+          <el-select v-model="form.parentId" placeholder="请选择父指标" clearable style="width: 220px">
+            <el-option
+              v-for="(item,index) in parentItemOptions"
+              :key="index"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item label="指标类型" prop="itemType">
           <el-select v-model="form.itemType" placeholder="请选择类型" style="width: 220px">
@@ -161,8 +174,9 @@
 </template>
 
 <script setup name="TemplateItem">
-import { listTemplateItem, getTemplateItem, delTemplateItem, addTemplateItem, updateTemplateItem } from "@/api/perf/templateItem"
+import { listTemplateItem, getTemplateItem, delTemplateItem, addTemplateItem, updateTemplateItem, getItemChooseList, copyTemplateItem } from "@/api/perf/templateItem"
 import { ITEM_TYPE, ITEM_TYPE_LIST } from "@/utils/perf/templateItemEnum"
+import { getTemplateChooseList } from "@/api/perf/template"
 
 const { proxy } = getCurrentInstance()
 
@@ -178,6 +192,9 @@ const title = ref("")
 
 const data = reactive({
   form: {},
+  // Add template and parent item options
+  templateOptions: [],
+  parentItemOptions: [],
   queryParams: {
     pageNum: 1,
     pageSize: 10,
@@ -193,7 +210,7 @@ const data = reactive({
   },
   rules: {
     templateId: [
-      { required: true, message: "模板不能为空", trigger: "blur" }
+      { required: true, message: "模板不能为空", trigger: "change" }
     ],
     itemName: [
       { required: true, message: "指标名称不能为空", trigger: "blur" }
@@ -207,7 +224,7 @@ const data = reactive({
   }
 })
 
-const { queryParams, form, rules } = toRefs(data)
+const { queryParams, form, rules, templateOptions, parentItemOptions } = toRefs(data)
 
 /** 查询模板指标列表 */
 function getList() {
@@ -216,6 +233,27 @@ function getList() {
     templateItemList.value = response.rows
     total.value = response.total
     loading.value = false
+  })
+}
+
+// 获取模板选项
+function getTemplateOptions() {
+  getTemplateChooseList().then(response => {
+    templateOptions.value = response.data.map(item => ({
+      value: item.value,
+      label: item.label
+    }))
+  })
+}
+
+// 获取父级指标选项
+function getParentItemOptions() {
+  // 获取所有指标作为父级选项
+  getItemChooseList().then(response => {
+    parentItemOptions.value = response.data.map(item => ({
+      value: item.value,
+      label: item.label
+    }))
   })
 }
 
@@ -239,11 +277,6 @@ function reset() {
     maxScore: null,
     sortOrder: null,
     remark: null,
-    delFlag: null,
-    createBy: null,
-    createTime: null,
-    updateBy: null,
-    updateTime: null
   }
   proxy.resetForm("templateItemRef")
 }
@@ -270,16 +303,35 @@ function handleSelectionChange(selection) {
 /** 新增按钮操作 */
 function handleAdd() {
   reset()
+  // 加载下拉选项
+  getTemplateOptions()
+  getParentItemOptions()
   open.value = true
   title.value = "添加模板指标"
+}
+
+function handleCopy(row) {
+  const _id = row.id;
+  proxy.$modal.confirm('是否确认复制该数据项？').then(function() {
+    return copyTemplateItem(_id)
+  }).then(() => {
+    getList()
+    proxy.$modal.msgSuccess("复制成功")
+  }).catch(() => {})
 }
 
 /** 修改按钮操作 */
 function handleUpdate(row) {
   reset()
+  // 加载下拉选项
+  getTemplateOptions()
+  getParentItemOptions()
   const _id = row.id || ids.value
   getTemplateItem(_id).then(response => {
     form.value = response.data
+    if(form.value.parentId === 0){
+      form.value.parentId = null
+    }
     open.value = true
     title.value = "修改模板指标"
   })
@@ -309,7 +361,7 @@ function submitForm() {
 /** 删除按钮操作 */
 function handleDelete(row) {
   const _ids = row.id || ids.value
-  proxy.$modal.confirm('是否确认删除模板指标编号为"' + _ids + '"的数据项？').then(function() {
+  proxy.$modal.confirm('是否确认删除该数据项？').then(function() {
     return delTemplateItem(_ids)
   }).then(() => {
     getList()
@@ -325,4 +377,6 @@ function handleExport() {
 }
 
 getList()
+getTemplateOptions()
+getParentItemOptions()
 </script>

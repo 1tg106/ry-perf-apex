@@ -32,6 +32,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="scoreDeadline != null "> and score_deadline = #{scoreDeadline}</if>
             <if test="status != null  and status != ''"> and status = #{status}</if>
         </where>
+        order by period_id desc
     </select>
     
     <select id="selectPerfPeriodByPeriodId" parameterType="Long" resultMap="PerfPeriodResult">
@@ -48,7 +49,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="scoreDeadline != null">score_deadline,</if>
             <if test="status != null and status != ''">status,</if>
             <if test="remark != null">remark,</if>
-            <if test="delFlag != null">del_flag,</if>
             <if test="createBy != null">create_by,</if>
             <if test="createTime != null">create_time,</if>
             <if test="updateBy != null">update_by,</if>
@@ -61,7 +61,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="scoreDeadline != null">#{scoreDeadline},</if>
             <if test="status != null and status != ''">#{status},</if>
             <if test="remark != null">#{remark},</if>
-            <if test="delFlag != null">#{delFlag},</if>
             <if test="createBy != null">#{createBy},</if>
             <if test="createTime != null">#{createTime},</if>
             <if test="updateBy != null">#{updateBy},</if>
@@ -78,7 +77,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="scoreDeadline != null">score_deadline = #{scoreDeadline},</if>
             <if test="status != null and status != ''">status = #{status},</if>
             <if test="remark != null">remark = #{remark},</if>
-            <if test="delFlag != null">del_flag = #{delFlag},</if>
             <if test="createBy != null">create_by = #{createBy},</if>
             <if test="createTime != null">create_time = #{createTime},</if>
             <if test="updateBy != null">update_by = #{updateBy},</if>

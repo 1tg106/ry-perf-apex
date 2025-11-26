@@ -42,3 +42,11 @@ export function delTemplate(templateId) {
     method: 'delete'
   })
 }
+
+// 获取模板选择列表
+export function getTemplateChooseList() {
+  return request({
+    url: '/perf/template/getTemplateChooseList',
+    method: 'get'
+  })
+}

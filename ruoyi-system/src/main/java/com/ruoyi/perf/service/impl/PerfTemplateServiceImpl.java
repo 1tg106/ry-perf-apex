@@ -11,6 +11,7 @@ import com.ruoyi.perf.domain.PerfTemplate;
 import com.ruoyi.perf.dto.PerfTemplateSaveDTO;
 import com.ruoyi.perf.mapper.PerfTemplateMapper;
 import com.ruoyi.perf.service.IPerfTemplateService;
+import com.ruoyi.perf.vo.CommonChooseVO;
 import com.ruoyi.perf.vo.PerfTemplateVO;
 import com.ruoyi.system.domain.SysPost;
 import com.ruoyi.system.service.ISysDeptService;
@@ -85,7 +86,7 @@ public class PerfTemplateServiceImpl extends ServiceImpl<PerfTemplateMapper,Perf
     @Override
     public List<PerfTemplateVO> selectPerfTemplateList(PerfTemplate perfTemplate)
     {
-        List<PerfTemplate> list = this.list(Wrappers.lambdaQuery(PerfTemplate.class));
+        List<PerfTemplate> list = perfTemplateMapper.selectPerfTemplateList(perfTemplate);
         List<Long> deptIds = list.stream().map(PerfTemplate::getDeptId).collect(Collectors.toList());
         List<SysDept> deptList = sysDeptService.selectDeptListByIds(deptIds);
 
@@ -164,6 +165,9 @@ public class PerfTemplateServiceImpl extends ServiceImpl<PerfTemplateMapper,Perf
     public int updatePerfTemplate(PerfTemplateSaveDTO perfTemplate)
     {
         verificationPerfTemplate(perfTemplate);
+        if(perfTemplate.getId() == null){
+            throw new RuntimeException("模板ID不能为空");
+        }
         PerfTemplate template = this.getById(perfTemplate.getId());
         template.setTemplateName(perfTemplate.getTemplateName());
         template.setTemplateType(perfTemplate.getTemplateType());
@@ -212,5 +216,19 @@ public class PerfTemplateServiceImpl extends ServiceImpl<PerfTemplateMapper,Perf
     public int deletePerfTemplateByTemplateId(Long templateId)
     {
         return perfTemplateMapper.deletePerfTemplateByTemplateId(templateId);
+    }
+
+    @Override
+    public List<CommonChooseVO> getCommonChooseList() {
+        List<PerfTemplate> list = this.list(Wrappers.lambdaQuery(PerfTemplate.class).eq(PerfTemplate::getStatus, 0));
+        if(!list.isEmpty()){
+            return list.stream().map(item -> {
+                CommonChooseVO vo = new CommonChooseVO();
+                vo.setLabel(item.getTemplateName());
+                vo.setValue(item.getId());
+                return vo;
+            }).collect(Collectors.toList());
+        }
+        return Collections.emptyList();
     }
 }

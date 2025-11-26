@@ -251,12 +251,7 @@ function reset() {
     submitDeadline: null,
     scoreDeadline: null,
     status: null,
-    remark: null,
-    delFlag: null,
-    createBy: null,
-    createTime: null,
-    updateBy: null,
-    updateTime: null
+    remark: null
   }
   proxy.resetForm("periodRef")
 }
@@ -322,7 +317,7 @@ function submitForm() {
 /** 删除按钮操作 */
 function handleDelete(row) {
   const _periodIds = row.periodId || ids.value
-  proxy.$modal.confirm('是否确认删除绩效周期编号为"' + _periodIds + '"的数据项？').then(function() {
+  proxy.$modal.confirm('是否确认删除该数据项？').then(function() {
     return delPeriod(_periodIds)
   }).then(() => {
     getList()

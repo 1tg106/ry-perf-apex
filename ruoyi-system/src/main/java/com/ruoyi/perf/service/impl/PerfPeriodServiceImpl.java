@@ -2,6 +2,7 @@ package com.ruoyi.perf.service.impl;
 
 import java.util.List;
 import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.common.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.perf.mapper.PerfPeriodMapper;
@@ -55,6 +56,7 @@ public class PerfPeriodServiceImpl extends ServiceImpl<PerfPeriodMapper,PerfPeri
     public int insertPerfPeriod(PerfPeriod perfPeriod)
     {
         perfPeriod.setCreateTime(DateUtils.getNowDate());
+        perfPeriod.setCreateBy(SecurityUtils.getUserId().toString());
         return perfPeriodMapper.insertPerfPeriod(perfPeriod);
     }
 
@@ -68,6 +70,7 @@ public class PerfPeriodServiceImpl extends ServiceImpl<PerfPeriodMapper,PerfPeri
     public int updatePerfPeriod(PerfPeriod perfPeriod)
     {
         perfPeriod.setUpdateTime(DateUtils.getNowDate());
+        perfPeriod.setUpdateBy(SecurityUtils.getUserId().toString());
         return perfPeriodMapper.updatePerfPeriod(perfPeriod);
     }
 

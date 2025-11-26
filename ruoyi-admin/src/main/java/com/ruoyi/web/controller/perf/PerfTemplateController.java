@@ -4,6 +4,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 
 import com.ruoyi.perf.dto.PerfTemplateSaveDTO;
+import com.ruoyi.perf.vo.CommonChooseVO;
 import com.ruoyi.perf.vo.PerfTemplateVO;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -103,5 +104,17 @@ public class PerfTemplateController extends BaseController
     public AjaxResult remove(@PathVariable Long[] templateIds)
     {
         return toAjax(perfTemplateService.deletePerfTemplateByTemplateIds(templateIds));
+    }
+
+    /**
+     * 获取模板选择列表
+     * @return
+     */
+    @PreAuthorize("@ss.hasPermi('perf:template:list')")
+    @GetMapping("/getTemplateChooseList")
+    public AjaxResult getCommonChooseList()
+    {
+        List<CommonChooseVO> list = perfTemplateService.getCommonChooseList();
+        return success(list);
     }
 }

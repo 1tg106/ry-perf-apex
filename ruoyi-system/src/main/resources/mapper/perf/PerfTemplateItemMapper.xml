@@ -29,7 +29,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="selectPerfTemplateItemList" parameterType="PerfTemplateItem" resultMap="PerfTemplateItemResult">
         <include refid="selectPerfTemplateItemVo"/>
-        <where>  
+        <where>
+            del_flag = '0'
             <if test="templateId != null "> and template_id = #{templateId}</if>
             <if test="parentId != null "> and parent_id = #{parentId}</if>
             <if test="itemName != null  and itemName != ''"> and item_name like concat('%', #{itemName}, '%')</if>
@@ -40,6 +41,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="maxScore != null "> and max_score = #{maxScore}</if>
             <if test="sortOrder != null "> and sort_order = #{sortOrder}</if>
         </where>
+        order by create_time desc
     </select>
     
     <select id="selectPerfTemplateItemByItemId" parameterType="Long" resultMap="PerfTemplateItemResult">
@@ -108,11 +110,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </update>
 
     <delete id="deletePerfTemplateItemByItemId" parameterType="Long">
-        delete from perf_template_item where id = #{itemId}
+        update perf_template_item set del_flag = '2' where id = #{itemId}
     </delete>
 
     <delete id="deletePerfTemplateItemByItemIds" parameterType="String">
-        delete from perf_template_item where id in
+        update perf_template_item set del_flag = '2' where id in
         <foreach item="itemId" collection="array" open="(" separator="," close=")">
             #{itemId}
         </foreach>

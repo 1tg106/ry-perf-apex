@@ -42,3 +42,19 @@ export function delTemplateItem(itemId) {
     method: 'delete'
   })
 }
+
+// 获取模板选择列表
+export function getItemChooseList() {
+  return request({
+    url: '/perf/templateItem/getItemChooseList',
+    method: 'get'
+  })
+}
+
+// 复制模板指标
+export function copyTemplateItem(id) {
+  return request({
+    url: '/perf/templateItem/copyTemplateItem/' + id,
+    method: 'post'
+  })
+}

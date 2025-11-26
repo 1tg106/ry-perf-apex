@@ -1,7 +1,16 @@
 package com.ruoyi.perf.service.impl;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.perf.dto.PerfTemplateItemSaveDTO;
+import com.ruoyi.perf.vo.CommonChooseVO;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.perf.mapper.PerfTemplateItemMapper;
@@ -48,27 +57,59 @@ public class PerfTemplateItemServiceImpl extends ServiceImpl<PerfTemplateItemMap
     /**
      * 新增模板指标
      * 
-     * @param perfTemplateItem 模板指标
+     * @param itemSaveDTO 模板指标
      * @return 结果
      */
     @Override
-    public int insertPerfTemplateItem(PerfTemplateItem perfTemplateItem)
+    public int insertPerfTemplateItem(PerfTemplateItemSaveDTO itemSaveDTO)
     {
-        perfTemplateItem.setCreateTime(DateUtils.getNowDate());
-        return perfTemplateItemMapper.insertPerfTemplateItem(perfTemplateItem);
+        PerfTemplateItem item = new PerfTemplateItem();
+        BeanUtils.copyProperties(itemSaveDTO, item);
+        item.setCreateTime(DateUtils.getNowDate());
+        item.setCreateBy(SecurityUtils.getUserId().toString());
+        return this.save(item)? 1 : 0;
     }
 
     /**
      * 修改模板指标
      * 
-     * @param perfTemplateItem 模板指标
+     * @param itemSaveDTO 模板指标
      * @return 结果
      */
     @Override
-    public int updatePerfTemplateItem(PerfTemplateItem perfTemplateItem)
+    public int updatePerfTemplateItem(PerfTemplateItemSaveDTO itemSaveDTO)
     {
-        perfTemplateItem.setUpdateTime(DateUtils.getNowDate());
-        return perfTemplateItemMapper.updatePerfTemplateItem(perfTemplateItem);
+        if(itemSaveDTO.getId() == null){
+            throw new RuntimeException("指标id不能为空");
+        }
+        PerfTemplateItem templateItem = this.getById(itemSaveDTO.getId());
+        PerfTemplateItem item = new PerfTemplateItem();
+        BeanUtils.copyProperties(itemSaveDTO, item);
+        item.setUpdateTime(DateUtils.getNowDate());
+        item.setUpdateBy(SecurityUtils.getUserId().toString());
+        item.setId(templateItem.getId());
+        if(item.getParentId() == null){
+            item.setParentId(0l);
+        }
+        return this.updateById(item)? 1 : 0;
+    }
+
+    private void verificationPerfTemplate(PerfTemplateItemSaveDTO itemSaveDTO){
+        if(StringUtils.isEmpty(itemSaveDTO.getItemName())){
+            throw new RuntimeException("请填写指标名称");
+        }
+        if(StringUtils.isEmpty(itemSaveDTO.getItemType())){
+            throw new RuntimeException("请选择指标类型");
+        }
+        if(itemSaveDTO.getWeight() == null){
+            throw new RuntimeException("请填写权重");
+        }
+        if(itemSaveDTO.getMaxScore() == null){
+            throw new RuntimeException("请填写权重");
+        }
+        if(itemSaveDTO.getMinScore() == null){
+            throw new RuntimeException("请填写权重");
+        }
     }
 
     /**
@@ -93,5 +134,35 @@ public class PerfTemplateItemServiceImpl extends ServiceImpl<PerfTemplateItemMap
     public int deletePerfTemplateItemByItemId(Long itemId)
     {
         return perfTemplateItemMapper.deletePerfTemplateItemByItemId(itemId);
+    }
+
+    @Override
+    public List<CommonChooseVO> getCommonChooseList() {
+        List<PerfTemplateItem> list = this.list(Wrappers.lambdaQuery(PerfTemplateItem.class).eq(PerfTemplateItem::getParentId, 0));
+        if (!list.isEmpty()) {
+            return list.stream().map(item -> {
+                CommonChooseVO vo = new CommonChooseVO();
+                vo.setLabel(item.getItemName());
+                vo.setValue(item.getId());
+                return vo;
+            }).collect(Collectors.toList());
+        }
+        return Collections.emptyList();
+    }
+
+    @Override
+    public int copyTemplateItem(Long id) {
+        PerfTemplateItem templateItem = this.getById(id);
+        if (templateItem ==  null){
+            throw new RuntimeException("未找到该指标");
+        }
+        PerfTemplateItem item = new PerfTemplateItem();
+        BeanUtils.copyProperties(templateItem, item);
+        item.setId(null);
+        item.setUpdateBy(null);
+        item.setUpdateTime(null);
+        item.setCreateTime(DateUtils.getNowDate());
+        item.setCreateBy(SecurityUtils.getUserId().toString());
+        return this.save(item)? 1 : 0;
     }
 }
