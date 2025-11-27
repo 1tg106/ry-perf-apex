@@ -110,7 +110,6 @@ public class PerfTemplateController extends BaseController
      * 获取模板选择列表
      * @return
      */
-    @PreAuthorize("@ss.hasPermi('perf:template:list')")
     @GetMapping("/getTemplateChooseList")
     public AjaxResult getCommonChooseList()
     {

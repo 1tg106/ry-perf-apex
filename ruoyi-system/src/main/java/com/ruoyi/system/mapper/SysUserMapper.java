@@ -2,6 +2,8 @@ package com.ruoyi.system.mapper;
 
 import java.util.Date;
 import java.util.List;
+
+import com.ruoyi.perf.domain.vo.CommonChooseVO;
 import org.apache.ibatis.annotations.Param;
 import com.ruoyi.common.core.domain.entity.SysUser;
 
@@ -144,4 +146,11 @@ public interface SysUserMapper
      * @return 结果
      */
     public SysUser checkEmailUnique(String email);
+
+    /**
+     * 获取用户选择列表
+     * @param deptId 部门ID
+     * @return 用户列表
+     */
+    public List<CommonChooseVO> getUserChooseList(@Param("deptId") Long deptId);
 }

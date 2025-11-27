@@ -3,6 +3,7 @@ package com.ruoyi.system.service;
 import java.util.Date;
 import java.util.List;
 import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.perf.domain.vo.CommonChooseVO;
 
 /**
  * 用户 业务层
@@ -214,4 +215,10 @@ public interface ISysUserService
      * @return 结果
      */
     public String importUser(List<SysUser> userList, Boolean isUpdateSupport, String operName);
+
+    /**
+     * 获取用户选择列表
+     * @return
+     */
+    public List<CommonChooseVO> getUserChooseList(Long deptId);
 }

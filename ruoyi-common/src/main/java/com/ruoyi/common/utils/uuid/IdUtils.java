@@ -1,5 +1,9 @@
 package com.ruoyi.common.utils.uuid;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Random;
+
 /**
  * ID生成器工具类
  * 
@@ -45,5 +49,17 @@ public class IdUtils
     public static String fastSimpleUUID()
     {
         return UUID.fastUUID().toString(true);
+    }
+
+    /**
+     * 生成唯一绩效编号
+     * @return
+     */
+    public static String generateUniquePerformanceNo() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+        String timestamp = sdf.format(new Date());
+        Random random = new Random();
+        int randomNumber = 1000 + random.nextInt(9000); // 4-digit random number
+        return "PERF" + timestamp + randomNumber;
     }
 }

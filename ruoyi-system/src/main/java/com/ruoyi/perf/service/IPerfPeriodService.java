@@ -3,6 +3,7 @@ package com.ruoyi.perf.service;
 import java.util.List;
 import com.ruoyi.perf.domain.PerfPeriod;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.ruoyi.perf.domain.vo.CommonChooseVO;
 
 /**
  * 绩效周期Service接口
@@ -60,4 +61,10 @@ public interface IPerfPeriodService extends IService<PerfPeriod>
      * @return 结果
      */
     public int deletePerfPeriodByPeriodId(Long periodId);
+
+    /**
+     * 获取周期选择列表
+     * @return
+     */
+    public List<CommonChooseVO> getPerfChooseList();
 }

@@ -3,6 +3,7 @@ package com.ruoyi.perf.mapper;
 import java.util.List;
 import com.ruoyi.perf.domain.PerfPeriod;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.ruoyi.perf.domain.vo.CommonChooseVO;
 
 /**
  * 绩效周期Mapper接口
@@ -59,4 +60,10 @@ public interface PerfPeriodMapper extends BaseMapper<PerfPeriod>
      * @return 结果
      */
     public int deletePerfPeriodByPeriodIds(Long[] periodIds);
+
+    /**
+     * 获取绩效周期列表
+     * @return
+     */
+    public List<CommonChooseVO> getPerfChooseList();
 }

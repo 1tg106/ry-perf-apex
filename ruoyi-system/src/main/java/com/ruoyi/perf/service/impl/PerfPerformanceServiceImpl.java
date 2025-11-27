@@ -1,7 +1,15 @@
 package com.ruoyi.perf.service.impl;
 
 import java.util.List;
+
+import com.ruoyi.common.enums.PerformanceStatus;
+import com.ruoyi.common.enums.PerformanceStep;
 import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.common.utils.bean.BeanUtils;
+import com.ruoyi.common.utils.uuid.IdUtils;
+import com.ruoyi.perf.domain.dto.PerfPerformanceSaveDTO;
+import com.ruoyi.perf.domain.vo.PerfPerformanceVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.perf.mapper.PerfPerformanceMapper;
@@ -40,7 +48,7 @@ public class PerfPerformanceServiceImpl extends ServiceImpl<PerfPerformanceMappe
      * @return 绩效实例
      */
     @Override
-    public List<PerfPerformance> selectPerfPerformanceList(PerfPerformance perfPerformance)
+    public List<PerfPerformanceVO> selectPerfPerformanceList(PerfPerformance perfPerformance)
     {
         return perfPerformanceMapper.selectPerfPerformanceList(perfPerformance);
     }
@@ -48,27 +56,38 @@ public class PerfPerformanceServiceImpl extends ServiceImpl<PerfPerformanceMappe
     /**
      * 新增绩效实例
      * 
-     * @param perfPerformance 绩效实例
+     * @param saveDTO 绩效实例
      * @return 结果
      */
     @Override
-    public int insertPerfPerformance(PerfPerformance perfPerformance)
+    public int insertPerfPerformance(PerfPerformanceSaveDTO saveDTO)
     {
+        saveDTO.setPerformanceNo(IdUtils.generateUniquePerformanceNo());
+        saveDTO.setStatus(PerformanceStatus.PENDING_SUBMISSION.getCode());
+        saveDTO.setCurrentStep(PerformanceStep.DRAFT.getStepValue());
+        PerfPerformance perfPerformance = new PerfPerformance();
+        BeanUtils.copyProperties(saveDTO, perfPerformance);
         perfPerformance.setCreateTime(DateUtils.getNowDate());
-        return perfPerformanceMapper.insertPerfPerformance(perfPerformance);
+        perfPerformance.setCreateBy(SecurityUtils.getUserId().toString());
+        return this.save(perfPerformance)? 1 : 0;
     }
 
     /**
      * 修改绩效实例
      * 
-     * @param perfPerformance 绩效实例
+     * @param saveDTO 绩效实例
      * @return 结果
      */
     @Override
-    public int updatePerfPerformance(PerfPerformance perfPerformance)
+    public int updatePerfPerformance(PerfPerformanceSaveDTO saveDTO)
     {
+        PerfPerformance perf = this.getById(saveDTO.getId());
+        PerfPerformance perfPerformance = new PerfPerformance();
+        BeanUtils.copyProperties(saveDTO, perfPerformance);
         perfPerformance.setUpdateTime(DateUtils.getNowDate());
-        return perfPerformanceMapper.updatePerfPerformance(perfPerformance);
+        perfPerformance.setUpdateBy(SecurityUtils.getUserId().toString());
+        perfPerformance.setId(perf.getId());
+        return this.updateById(perfPerformance)? 1 : 0;
     }
 
     /**

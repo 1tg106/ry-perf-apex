@@ -3,6 +3,7 @@ package com.ruoyi.perf.mapper;
 import java.util.List;
 import com.ruoyi.perf.domain.PerfPerformance;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.ruoyi.perf.domain.vo.PerfPerformanceVO;
 
 /**
  * 绩效实例Mapper接口
@@ -26,7 +27,7 @@ public interface PerfPerformanceMapper extends BaseMapper<PerfPerformance>
      * @param perfPerformance 绩效实例
      * @return 绩效实例集合
      */
-    public List<PerfPerformance> selectPerfPerformanceList(PerfPerformance perfPerformance);
+    public List<PerfPerformanceVO> selectPerfPerformanceList(PerfPerformance perfPerformance);
 
     /**
      * 新增绩效实例

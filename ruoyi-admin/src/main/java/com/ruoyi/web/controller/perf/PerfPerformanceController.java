@@ -2,6 +2,9 @@ package com.ruoyi.web.controller.perf;
 
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
+
+import com.ruoyi.perf.domain.dto.PerfPerformanceSaveDTO;
+import com.ruoyi.perf.domain.vo.PerfPerformanceVO;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,7 +45,7 @@ public class PerfPerformanceController extends BaseController
     public TableDataInfo list(PerfPerformance perfPerformance)
     {
         startPage();
-        List<PerfPerformance> list = perfPerformanceService.selectPerfPerformanceList(perfPerformance);
+        List<PerfPerformanceVO> list = perfPerformanceService.selectPerfPerformanceList(perfPerformance);
         return getDataTable(list);
     }
 
@@ -54,8 +57,8 @@ public class PerfPerformanceController extends BaseController
     @PostMapping("/export")
     public void export(HttpServletResponse response, PerfPerformance perfPerformance)
     {
-        List<PerfPerformance> list = perfPerformanceService.selectPerfPerformanceList(perfPerformance);
-        ExcelUtil<PerfPerformance> util = new ExcelUtil<PerfPerformance>(PerfPerformance.class);
+        List<PerfPerformanceVO> list = perfPerformanceService.selectPerfPerformanceList(perfPerformance);
+        ExcelUtil<PerfPerformanceVO> util = new ExcelUtil<PerfPerformanceVO>(PerfPerformanceVO.class);
         util.exportExcel(response, list, "绩效实例数据");
     }
 
@@ -75,9 +78,9 @@ public class PerfPerformanceController extends BaseController
     @PreAuthorize("@ss.hasPermi('perf:performance:add')")
     @Log(title = "绩效实例", businessType = BusinessType.INSERT)
     @PostMapping
-    public AjaxResult add(@RequestBody PerfPerformance perfPerformance)
+    public AjaxResult add(@RequestBody PerfPerformanceSaveDTO saveDTO)
     {
-        return toAjax(perfPerformanceService.insertPerfPerformance(perfPerformance));
+        return toAjax(perfPerformanceService.insertPerfPerformance(saveDTO));
     }
 
     /**
@@ -86,9 +89,9 @@ public class PerfPerformanceController extends BaseController
     @PreAuthorize("@ss.hasPermi('perf:performance:edit')")
     @Log(title = "绩效实例", businessType = BusinessType.UPDATE)
     @PutMapping
-    public AjaxResult edit(@RequestBody PerfPerformance perfPerformance)
+    public AjaxResult edit(@RequestBody PerfPerformanceSaveDTO saveDTO)
     {
-        return toAjax(perfPerformanceService.updatePerfPerformance(perfPerformance));
+        return toAjax(perfPerformanceService.updatePerfPerformance(saveDTO));
     }
 
     /**

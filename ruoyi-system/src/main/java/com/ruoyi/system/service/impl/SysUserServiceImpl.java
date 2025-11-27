@@ -1,10 +1,13 @@
 package com.ruoyi.system.service.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.validation.Validator;
+
+import com.ruoyi.perf.domain.vo.CommonChooseVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -561,5 +564,10 @@ public class SysUserServiceImpl implements ISysUserService
             successMsg.insert(0, "恭喜您，数据已全部导入成功！共 " + successNum + " 条，数据如下：");
         }
         return successMsg.toString();
+    }
+
+    @Override
+    public List<CommonChooseVO> getUserChooseList(Long deptId) {
+        return userMapper.getUserChooseList(deptId);
     }
 }

@@ -7,6 +7,7 @@ import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.perf.domain.PerfPeriod;
+import com.ruoyi.perf.domain.vo.CommonChooseVO;
 import com.ruoyi.perf.service.IPerfPeriodService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -94,5 +95,16 @@ public class PerfPeriodController extends BaseController
     public AjaxResult remove(@PathVariable Long[] periodIds)
     {
         return toAjax(perfPeriodService.deletePerfPeriodByPeriodIds(periodIds));
+    }
+
+    /**
+     * 获取模板选择列表
+     * @return
+     */
+    @GetMapping("/getPerfChooseList")
+    public AjaxResult getCommonChooseList()
+    {
+        List<CommonChooseVO> list = perfPeriodService.getPerfChooseList();
+        return success(list);
     }
 }

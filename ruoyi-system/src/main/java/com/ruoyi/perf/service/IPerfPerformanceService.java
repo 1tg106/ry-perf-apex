@@ -3,6 +3,8 @@ package com.ruoyi.perf.service;
 import java.util.List;
 import com.ruoyi.perf.domain.PerfPerformance;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.ruoyi.perf.domain.dto.PerfPerformanceSaveDTO;
+import com.ruoyi.perf.domain.vo.PerfPerformanceVO;
 
 /**
  * 绩效实例Service接口
@@ -27,23 +29,23 @@ public interface IPerfPerformanceService extends IService<PerfPerformance>
      * @param perfPerformance 绩效实例
      * @return 绩效实例集合
      */
-    public List<PerfPerformance> selectPerfPerformanceList(PerfPerformance perfPerformance);
+    public List<PerfPerformanceVO> selectPerfPerformanceList(PerfPerformance perfPerformance);
 
     /**
      * 新增绩效实例
      * 
-     * @param perfPerformance 绩效实例
+     * @param saveDTO 绩效实例
      * @return 结果
      */
-    public int insertPerfPerformance(PerfPerformance perfPerformance);
+    public int insertPerfPerformance(PerfPerformanceSaveDTO saveDTO);
 
     /**
      * 修改绩效实例
      * 
-     * @param perfPerformance 绩效实例
+     * @param saveDTO 绩效实例
      * @return 结果
      */
-    public int updatePerfPerformance(PerfPerformance perfPerformance);
+    public int updatePerfPerformance(PerfPerformanceSaveDTO saveDTO);
 
     /**
      * 批量删除绩效实例

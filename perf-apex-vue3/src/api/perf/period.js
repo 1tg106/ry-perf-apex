@@ -42,3 +42,11 @@ export function delPeriod(periodId) {
     method: 'delete'
   })
 }
+
+// 根据部门id获取用户选择列表
+export function getPerfChooseList() {
+  return request({
+    url: '/perf/period/getPerfChooseList',
+    method: 'get'
+  })
+}

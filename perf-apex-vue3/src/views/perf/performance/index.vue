@@ -1,67 +1,36 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="绩效编号" prop="performanceNo">
-        <el-input
-          v-model="queryParams.performanceNo"
-          placeholder="请输入绩效编号"
-          clearable
-          @keyup.enter="handleQuery"
-        />
+      <el-form-item label="绩效周期" prop="periodId">
+        <el-select v-model="queryParams.periodId" placeholder="请选择绩效周期" clearable filterable style="width: 220px" @keyup.enter="handleQuery">
+          <el-option
+            v-for="(item, index) in periodOptions"
+            :key="index"
+            :label="item.label"
+            :value="item.value"
+          />
+        </el-select>
       </el-form-item>
-      <el-form-item label="绩效周期ID" prop="periodId">
-        <el-input
-          v-model="queryParams.periodId"
-          placeholder="请输入绩效周期ID"
-          clearable
-          @keyup.enter="handleQuery"
-        />
+      <el-form-item label="模板" prop="templateId">
+        <el-select v-model="queryParams.templateId" placeholder="请选择模板" clearable filterable style="width: 220px" @keyup.enter="handleQuery">
+          <el-option
+            v-for="(item,index) in templateOptions"
+            :key="index"
+            :label="item.label"
+            :value="item.value"
+          />
+        </el-select>
       </el-form-item>
-      <el-form-item label="模板ID" prop="templateId">
-        <el-input
-          v-model="queryParams.templateId"
-          placeholder="请输入模板ID"
-          clearable
-          @keyup.enter="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="员工ID" prop="userId">
-        <el-input
-          v-model="queryParams.userId"
-          placeholder="请输入员工ID"
-          clearable
-          @keyup.enter="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="部门ID" prop="deptId">
-        <el-input
+      <el-form-item label="部门" prop="deptId">
+        <el-tree-select
           v-model="queryParams.deptId"
-          placeholder="请输入部门ID"
+          :data="deptOptions"
+          :props="{ value: 'id', label: 'label', children: 'children' }"
+          value-key="id"
+          placeholder="请选择部门"
           clearable
-          @keyup.enter="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="自评总分" prop="selfScore">
-        <el-input
-          v-model="queryParams.selfScore"
-          placeholder="请输入自评总分"
-          clearable
-          @keyup.enter="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="最终得分" prop="finalScore">
-        <el-input
-          v-model="queryParams.finalScore"
-          placeholder="请输入最终得分"
-          clearable
-          @keyup.enter="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="当前步骤" prop="currentStep">
-        <el-input
-          v-model="queryParams.currentStep"
-          placeholder="请输入当前步骤"
-          clearable
+          check-strictly
+          style="width: 220px"
           @keyup.enter="handleQuery"
         />
       </el-form-item>
@@ -131,17 +100,34 @@
 
     <el-table v-loading="loading" :data="performanceList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="绩效ID" align="center" prop="id" />
-      <el-table-column label="绩效编号" align="center" prop="performanceNo" />
-      <el-table-column label="绩效周期ID" align="center" prop="periodId" />
-      <el-table-column label="模板ID" align="center" prop="templateId" />
-      <el-table-column label="员工ID" align="center" prop="userId" />
-      <el-table-column label="部门ID" align="center" prop="deptId" />
-      <el-table-column label="自评总分" align="center" prop="selfScore" />
-      <el-table-column label="最终得分" align="center" prop="finalScore" />
-      <el-table-column label="当前步骤" align="center" prop="currentStep" />
-      <el-table-column label="状态(DRAFT:草稿, PENDING_SCORE:待评分, PENDING_HR:待HR确认, CONFIRMED:已确认, REJECTED:已驳回, APPEAL:申诉中)" align="center" prop="status" />
-      <el-table-column label="驳回原因" align="center" prop="rejectReason" />
+      <el-table-column label="绩效编号" align="center" prop="performanceNo" width="180" />
+      <el-table-column label="绩效周期" align="center" prop="periodName" width="100" />
+      <el-table-column label="模板" align="center" prop="templateName" width="100" />
+      <el-table-column label="人员" align="center" prop="nickName" width="100" />
+      <el-table-column label="部门" align="center" prop="deptName" width="100" />
+      <el-table-column label="状态" align="center" prop="status" width="100">
+        <template #default="{row}">
+          <el-tag type="primary" v-if="row.status === PERFORMANCE_STATUS.DRAFT">{{ PERFORMANCE_STATUS_LIST[0].label }}</el-tag>
+          <el-tag type="primary" v-if="row.status === PERFORMANCE_STATUS.PENDING_SUBMISSION">{{ PERFORMANCE_STATUS_LIST[1].label }}</el-tag>
+          <el-tag type="primary" v-if="row.status === PERFORMANCE_STATUS.PENDING_SCORE">{{ PERFORMANCE_STATUS_LIST[2].label }}</el-tag>
+          <el-tag type="warning" v-if="row.status === PERFORMANCE_STATUS.PENDING_HR">{{ PERFORMANCE_STATUS_LIST[3].label }}</el-tag>
+          <el-tag type="success" v-if="row.status === PERFORMANCE_STATUS.CONFIRMED">{{ PERFORMANCE_STATUS_LIST[4].label }}</el-tag>
+          <el-tag type="danger" v-if="row.status === PERFORMANCE_STATUS.REJECTED">{{ PERFORMANCE_STATUS_LIST[5].label }}</el-tag>
+          <el-tag type="danger" v-if="row.status === PERFORMANCE_STATUS.APPEAL">{{ PERFORMANCE_STATUS_LIST[6].label }}</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column label="当前步骤" align="center" prop="currentStep" width="130">
+        <template #default="{row}">
+          <el-tag type="primary" v-if="row.currentStep === PERFORMANCE_STEP_STATUS.DRAFT">{{ PERFORMANCE_STEP_STATUS_LIST[0].label }}</el-tag>
+          <el-tag type="primary" v-if="row.currentStep === PERFORMANCE_STEP_STATUS.PENDING_SUPERVISOR_SCORE">{{ PERFORMANCE_STEP_STATUS_LIST[1].label }}</el-tag>
+          <el-tag type="warning" v-if="row.currentStep === PERFORMANCE_STEP_STATUS.PENDING_DEPT_HEAD_SCORE">{{ PERFORMANCE_STEP_STATUS_LIST[2].label }}</el-tag>
+          <el-tag type="warning" v-if="row.currentStep === PERFORMANCE_STEP_STATUS.PENDING_HR_CONFIRMATION">{{ PERFORMANCE_STEP_STATUS_LIST[3].label }}</el-tag>
+          <el-tag type="success" v-if="row.currentStep === PERFORMANCE_STEP_STATUS.COMPLETED">{{ PERFORMANCE_STEP_STATUS_LIST[4].label }}</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column label="自评总分" align="center" prop="selfScore" width="100" />
+      <el-table-column label="最终得分" align="center" prop="finalScore" width="100" />
+      <el-table-column label="驳回原因" align="center" prop="rejectReason" width="100" />
       <el-table-column label="提交时间" align="center" prop="submitTime" width="180">
         <template #default="scope">
           <span>{{ parseTime(scope.row.submitTime, '{y}-{m}-{d}') }}</span>
@@ -152,7 +138,7 @@
           <span>{{ parseTime(scope.row.confirmTime, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" fixed="right" width="180">
         <template #default="scope">
           <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['perf:performance:edit']">修改</el-button>
           <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)" v-hasPermi="['perf:performance:remove']">删除</el-button>
@@ -171,51 +157,32 @@
     <!-- 添加或修改绩效实例对话框 -->
     <el-dialog :title="title" v-model="open" width="500px" append-to-body>
       <el-form ref="performanceRef" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="绩效编号" prop="performanceNo">
-          <el-input v-model="form.performanceNo" placeholder="请输入绩效编号" />
+        <el-form-item label="绩效周期" prop="periodId">
+          <el-select v-model="form.periodId" placeholder="请选择绩效周期" clearable style="width: 220px">
+            <el-option v-for="(item,index) in periodOptions" :key="index" :label="item.label" :value="item.value" />
+          </el-select>
         </el-form-item>
-        <el-form-item label="绩效周期ID" prop="periodId">
-          <el-input v-model="form.periodId" placeholder="请输入绩效周期ID" />
+        <el-form-item label="模板" prop="templateId">
+          <el-select v-model="form.templateId" placeholder="请选择模板" clearable style="width: 220px">
+            <el-option v-for="(item,index) in templateOptions" :key="index" :label="item.label" :value="item.value" />
+          </el-select>
         </el-form-item>
-        <el-form-item label="模板ID" prop="templateId">
-          <el-input v-model="form.templateId" placeholder="请输入模板ID" />
+        <el-form-item label="部门" prop="deptId">
+          <el-tree-select
+            v-model="form.deptId"
+            :data="deptOptions"
+            :props="{ value: 'id', label: 'label', children: 'children' }"
+            value-key="id"
+            placeholder="请选择部门"
+            clearable
+            check-strictly
+            style="width: 220px"
+          />
         </el-form-item>
-        <el-form-item label="员工ID" prop="userId">
-          <el-input v-model="form.userId" placeholder="请输入员工ID" />
-        </el-form-item>
-        <el-form-item label="部门ID" prop="deptId">
-          <el-input v-model="form.deptId" placeholder="请输入部门ID" />
-        </el-form-item>
-        <el-form-item label="自评总分" prop="selfScore">
-          <el-input v-model="form.selfScore" placeholder="请输入自评总分" />
-        </el-form-item>
-        <el-form-item label="最终得分" prop="finalScore">
-          <el-input v-model="form.finalScore" placeholder="请输入最终得分" />
-        </el-form-item>
-        <el-form-item label="当前步骤" prop="currentStep">
-          <el-input v-model="form.currentStep" placeholder="请输入当前步骤" />
-        </el-form-item>
-        <el-form-item label="驳回原因" prop="rejectReason">
-          <el-input v-model="form.rejectReason" type="textarea" placeholder="请输入内容" />
-        </el-form-item>
-        <el-form-item label="提交时间" prop="submitTime">
-          <el-date-picker clearable
-            v-model="form.submitTime"
-            type="date"
-            value-format="YYYY-MM-DD"
-            placeholder="请选择提交时间">
-          </el-date-picker>
-        </el-form-item>
-        <el-form-item label="确认时间" prop="confirmTime">
-          <el-date-picker clearable
-            v-model="form.confirmTime"
-            type="date"
-            value-format="YYYY-MM-DD"
-            placeholder="请选择确认时间">
-          </el-date-picker>
-        </el-form-item>
-        <el-form-item label="删除标志" prop="delFlag">
-          <el-input v-model="form.delFlag" placeholder="请输入删除标志" />
+        <el-form-item label="员工" prop="userId">
+            <el-select v-model="form.userId" placeholder="请选择员工" clearable filterable style="width: 220px">
+              <el-option v-for="(item,index) in userOptions" :key="index" :label="item.label" :value="item.value" />
+            </el-select>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -230,6 +197,10 @@
 
 <script setup name="Performance">
 import { listPerformance, getPerformance, delPerformance, addPerformance, updatePerformance } from "@/api/perf/performance"
+import { getPerfChooseList } from '@/api/perf/period'
+import { getTemplateChooseList } from '@/api/perf/template'
+import { getUserChooseList,deptTreeSelect } from '@/api/system/user'
+import { PERFORMANCE_STATUS, PERFORMANCE_STATUS_LIST, PERFORMANCE_STEP_STATUS, PERFORMANCE_STEP_STATUS_LIST } from '@/utils/perf/performanceEnum'
 
 const { proxy } = getCurrentInstance()
 
@@ -245,6 +216,13 @@ const title = ref("")
 
 const data = reactive({
   form: {},
+  // dropdown / tree options loaded from API
+  periodOptions: [],
+  templateOptions: [],
+  userOptions: [],
+  // tree-shaped options used by el-tree-select
+  userTreeOptions: [],
+  deptOptions: [],
   queryParams: {
     pageNum: 1,
     pageSize: 10,
@@ -262,9 +240,6 @@ const data = reactive({
     confirmTime: null,
   },
   rules: {
-    performanceNo: [
-      { required: true, message: "绩效编号不能为空", trigger: "blur" }
-    ],
     periodId: [
       { required: true, message: "绩效周期ID不能为空", trigger: "blur" }
     ],
@@ -283,7 +258,7 @@ const data = reactive({
   }
 })
 
-const { queryParams, form, rules } = toRefs(data)
+const { queryParams, form, rules, periodOptions, templateOptions, userOptions, userTreeOptions, deptOptions } = toRefs(data)
 
 /** 查询绩效实例列表 */
 function getList() {
@@ -294,6 +269,45 @@ function getList() {
     loading.value = false
   })
 }
+
+// 获取下拉选项：绩效周期
+function getPeriodOptions() {
+  getPerfChooseList().then(response => {
+    data.periodOptions = response.data || []
+  })
+}
+
+// 获取模板下拉选项
+function getTemplateOptions() {
+  getTemplateChooseList().then(response => {
+    data.templateOptions = response.data || []
+  })
+}
+
+// 获取用户下拉选项
+/**
+ * 获取用户下拉选项（可按 deptId 过滤）
+ */
+function getUserOptions(deptId) {
+  if(!deptId) deptId = ''
+  getUserChooseList(deptId).then(response => {
+    const list = response.data || []
+    data.userOptions = list.map(item => ({ value: item.value ?? item.templateId ?? item.id, label: item.label ?? item.templateName ?? item.name }))
+  })
+}
+
+// 获取部门树形选项（id,label,children）用于 el-tree-select
+function getDeptOptions() {
+  deptTreeSelect().then(response => {
+    data.deptOptions = response.data
+  })
+}
+
+// 当对话框中选择部门后，更新员工下拉
+watch(() => form.value.deptId, (val) => {
+  // only update for dialog form dept changes
+  getUserOptions(val)
+})
 
 // 取消按钮
 function cancel() {
@@ -316,12 +330,7 @@ function reset() {
     status: null,
     rejectReason: null,
     submitTime: null,
-    confirmTime: null,
-    delFlag: null,
-    createBy: null,
-    createTime: null,
-    updateBy: null,
-    updateTime: null
+    confirmTime: null
   }
   proxy.resetForm("performanceRef")
 }
@@ -348,6 +357,12 @@ function handleSelectionChange(selection) {
 /** 新增按钮操作 */
 function handleAdd() {
   reset()
+  // load dropdown / tree options before showing dialog
+  getPeriodOptions()
+  getTemplateOptions()
+  // start with empty user list; users are loaded after selecting department
+  data.userOptions = []
+  getDeptOptions()
   open.value = true
   title.value = "添加绩效实例"
 }
@@ -355,9 +370,16 @@ function handleAdd() {
 /** 修改按钮操作 */
 function handleUpdate(row) {
   reset()
+  // refresh dropdown / tree options
+  getPeriodOptions()
+  getTemplateOptions()
+  // refresh dept list, and reload users for current department
+  getDeptOptions()
   const _id = row.id || ids.value
   getPerformance(_id).then(response => {
     form.value = response.data
+    // load users for the record's department so current user selection shows up
+    getUserOptions(form.value.deptId)
     open.value = true
     title.value = "修改绩效实例"
   })
@@ -403,4 +425,7 @@ function handleExport() {
 }
 
 getList()
+getPeriodOptions()
+getTemplateOptions()
+getDeptOptions()
 </script>

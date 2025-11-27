@@ -1,8 +1,10 @@
 package com.ruoyi.perf.service.impl;
 
+import java.util.Collections;
 import java.util.List;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.perf.domain.vo.CommonChooseVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.perf.mapper.PerfPeriodMapper;
@@ -96,5 +98,10 @@ public class PerfPeriodServiceImpl extends ServiceImpl<PerfPeriodMapper,PerfPeri
     public int deletePerfPeriodByPeriodId(Long periodId)
     {
         return perfPeriodMapper.deletePerfPeriodByPeriodId(periodId);
+    }
+
+    @Override
+    public List<CommonChooseVO> getPerfChooseList() {
+        return perfPeriodMapper.getPerfChooseList();
     }
 }
