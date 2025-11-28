@@ -58,6 +58,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="submitTime != null "> and a.submit_time = #{submitTime}</if>
             <if test="confirmTime != null "> and a.confirm_time = #{confirmTime}</if>
         </where>
+        order by a.create_time desc
     </select>
     
     <select id="selectPerfPerformanceById" parameterType="Long" resultMap="PerfPerformanceResult">

@@ -51,20 +51,6 @@ public class PerfPerformanceController extends BaseController
     }
 
     /**
-     * 查询当前用户绩效列表
-     */
-    @PreAuthorize("@ss.hasPermi('perf:performance:list')")
-    @GetMapping("/myList")
-    public TableDataInfo myList(PerfPerformance perfPerformance)
-    {
-        startPage();
-        // 设置当前用户ID作为查询条件
-        perfPerformance.setUserId(SecurityUtils.getUserId());
-        List<PerfPerformanceVO> list = perfPerformanceService.selectPerfPerformanceList(perfPerformance);
-        return getDataTable(list);
-    }
-
-    /**
      * 导出绩效实例列表
      */
     @PreAuthorize("@ss.hasPermi('perf:performance:export')")
@@ -80,7 +66,6 @@ public class PerfPerformanceController extends BaseController
     /**
      * 获取绩效实例详细信息
      */
-    @PreAuthorize("@ss.hasPermi('perf:performance:query')")
     @GetMapping(value = "/{id}")
     public AjaxResult getInfo(@PathVariable("id") Long id)
     {
@@ -90,7 +75,6 @@ public class PerfPerformanceController extends BaseController
     /**
      * 新增绩效实例
      */
-    @PreAuthorize("@ss.hasPermi('perf:performance:add')")
     @Log(title = "绩效实例", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody PerfPerformanceSaveDTO saveDTO)
@@ -101,7 +85,6 @@ public class PerfPerformanceController extends BaseController
     /**
      * 修改绩效实例
      */
-    @PreAuthorize("@ss.hasPermi('perf:performance:edit')")
     @Log(title = "绩效实例", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody PerfPerformanceSaveDTO saveDTO)
@@ -112,11 +95,45 @@ public class PerfPerformanceController extends BaseController
     /**
      * 删除绩效实例
      */
-    @PreAuthorize("@ss.hasPermi('perf:performance:remove')")
     @Log(title = "绩效实例", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{ids}")
     public AjaxResult remove(@PathVariable Long[] ids)
     {
         return toAjax(perfPerformanceService.deletePerfPerformanceByIds(ids));
+    }
+
+    // =================================我的绩效==================================
+
+    /**
+     * 查询当前用户绩效列表
+     */
+    @GetMapping("/myList")
+    public TableDataInfo myList(PerfPerformance perfPerformance)
+    {
+        startPage();
+        // 设置当前用户ID作为查询条件
+        perfPerformance.setUserId(SecurityUtils.getUserId());
+        List<PerfPerformanceVO> list = perfPerformanceService.selectPerfPerformanceList(perfPerformance);
+        return getDataTable(list);
+    }
+
+    /**
+     * 新增我的绩效实例
+     */
+    @Log(title = "绩效实例", businessType = BusinessType.INSERT)
+    @PostMapping("addMyPerformance")
+    public AjaxResult addMyPerformance(@RequestBody PerfPerformanceSaveDTO saveDTO)
+    {
+        return toAjax(perfPerformanceService.insertMyPerfPerformance(saveDTO));
+    }
+
+    /**
+     * 修改我的绩效实例
+     */
+    @Log(title = "绩效实例", businessType = BusinessType.UPDATE)
+    @PutMapping("editMyPerformance")
+    public AjaxResult editMyPerformance(@RequestBody PerfPerformanceSaveDTO saveDTO)
+    {
+        return toAjax(perfPerformanceService.updateMyPerfPerformance(saveDTO));
     }
 }

@@ -3,6 +3,7 @@ package com.ruoyi.perf.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.common.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.perf.mapper.PerfPerformanceContentMapper;
@@ -106,6 +107,8 @@ public class PerfPerformanceContentServiceImpl extends ServiceImpl<PerfPerforman
             PerfPerformanceContent content = new PerfPerformanceContent();
             content.setPerformanceId(performanceId);
             content.setItemId(itemId);
+            content.setCreateTime(DateUtils.getNowDate());
+            content.setCreateBy(SecurityUtils.getUserId().toString());
             contentList.add(content);
         }
         return this.saveBatch(contentList);

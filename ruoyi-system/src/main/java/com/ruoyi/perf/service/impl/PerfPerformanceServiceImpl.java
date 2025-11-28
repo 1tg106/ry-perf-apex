@@ -10,6 +10,7 @@ import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.bean.BeanUtils;
 import com.ruoyi.common.utils.uuid.IdUtils;
+import com.ruoyi.perf.domain.PerfPerformanceContent;
 import com.ruoyi.perf.domain.PerfTemplateItem;
 import com.ruoyi.perf.domain.dto.PerfPerformanceSaveDTO;
 import com.ruoyi.perf.domain.vo.PerfPerformanceVO;
@@ -106,13 +107,50 @@ public class PerfPerformanceServiceImpl extends ServiceImpl<PerfPerformanceMappe
     @Override
     public int updatePerfPerformance(PerfPerformanceSaveDTO saveDTO)
     {
+        // 先查询原始记录
         PerfPerformance perf = this.getById(saveDTO.getId());
+        
+        // 检查记录是否存在
+        if (perf == null) {
+            throw new RuntimeException("绩效记录不存在");
+        }
+
+        // 检查是否需要重新生成绩效内容项（当模板ID发生变化时）
+        boolean needRegenerateContent = false;
+        if (!perf.getTemplateId().equals(saveDTO.getTemplateId())) {
+            needRegenerateContent = true;
+        }
+        
+        // 只更新允许用户修改的字段，保护敏感字段不被修改
         PerfPerformance perfPerformance = new PerfPerformance();
         BeanUtils.copyProperties(saveDTO, perfPerformance);
+        perfPerformance.setId(perf.getId());
+
+        // 设置更新时间和更新人
         perfPerformance.setUpdateTime(DateUtils.getNowDate());
         perfPerformance.setUpdateBy(SecurityUtils.getUserId().toString());
-        perfPerformance.setId(perf.getId());
-        return this.updateById(perfPerformance)? 1 : 0;
+        
+        // 更新绩效实例
+        boolean updateResult = this.updateById(perfPerformance);
+        
+        // 如果模板ID发生变化，需要重新生成绩效内容项
+        if (updateResult && needRegenerateContent) {
+            // 删除原有的绩效内容项
+            perfPerformanceContentService.remove(Wrappers.lambdaQuery(PerfPerformanceContent.class)
+                    .eq(PerfPerformanceContent::getPerformanceId, perf.getId()));
+            
+            // 重新生成新的绩效内容项
+            List<PerfTemplateItem> list = perfTemplateItemService.list(Wrappers.lambdaQuery(PerfTemplateItem.class)
+                    .eq(PerfTemplateItem::getTemplateId, saveDTO.getTemplateId()));
+            if(list.isEmpty()){
+                throw new RuntimeException("该模板没有指标");
+            }
+            
+            List<Long> itemIds = list.stream().map(PerfTemplateItem::getId).collect(Collectors.toList());
+            perfPerformanceContentService.saveBatchByItemIds(perf.getId(), itemIds);
+        }
+        
+        return updateResult ? 1 : 0;
     }
 
     /**
@@ -137,5 +175,19 @@ public class PerfPerformanceServiceImpl extends ServiceImpl<PerfPerformanceMappe
     public int deletePerfPerformanceById(Long id)
     {
         return perfPerformanceMapper.deletePerfPerformanceById(id);
+    }
+
+    @Override
+    public int insertMyPerfPerformance(PerfPerformanceSaveDTO saveDTO) {
+        saveDTO.setUserId(SecurityUtils.getUserId());
+        saveDTO.setDeptId(SecurityUtils.getDeptId());
+        return this.insertPerfPerformance(saveDTO);
+    }
+
+    @Override
+    public int updateMyPerfPerformance(PerfPerformanceSaveDTO saveDTO) {
+        saveDTO.setUserId(SecurityUtils.getUserId());
+        saveDTO.setDeptId(SecurityUtils.getDeptId());
+        return this.updatePerfPerformance(saveDTO);
     }
 }

@@ -167,7 +167,7 @@
 </template>
 
 <script setup name="Performance">
-import { listMyPerformance, getPerformance, delPerformance, addPerformance, updatePerformance } from "@/api/perf/performance"
+import { listMyPerformance, getPerformance, delPerformance, addPerformance, updatePerformance, addMyPerformance, editMyPerformance } from "@/api/perf/performance"
 import { getPerfChooseList } from '@/api/perf/period'
 import { getTemplateChooseList } from '@/api/perf/template'
 import { PERFORMANCE_STATUS, PERFORMANCE_STATUS_LIST, PERFORMANCE_STEP_STATUS, PERFORMANCE_STEP_STATUS_LIST } from '@/utils/perf/performanceEnum'
@@ -311,13 +311,13 @@ function submitForm() {
   proxy.$refs["performanceRef"].validate(valid => {
     if (valid) {
       if (form.value.id != null) {
-        updatePerformance(form.value).then(response => {
+        editMyPerformance(form.value).then(response => {
           proxy.$modal.msgSuccess("修改成功")
           open.value = false
           getList()
         })
       } else {
-        addPerformance(form.value).then(response => {
+        addMyPerformance(form.value).then(response => {
           proxy.$modal.msgSuccess("新增成功")
           open.value = false
           getList()

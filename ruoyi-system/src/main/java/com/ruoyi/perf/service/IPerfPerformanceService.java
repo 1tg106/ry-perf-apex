@@ -62,4 +62,20 @@ public interface IPerfPerformanceService extends IService<PerfPerformance>
      * @return 结果
      */
     public int deletePerfPerformanceById(Long id);
+
+    /**
+     * 新增我的绩效实例
+     *
+     * @param saveDTO 绩效实例
+     * @return 结果
+     */
+    public int insertMyPerfPerformance(PerfPerformanceSaveDTO saveDTO);
+
+    /**
+     * 修改我的绩效实例
+     *
+     * @param saveDTO 绩效实例
+     * @return 结果
+     */
+    public int updateMyPerfPerformance(PerfPerformanceSaveDTO saveDTO);
 }
