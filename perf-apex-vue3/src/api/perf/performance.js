@@ -9,6 +9,15 @@ export function listPerformance(query) {
   })
 }
 
+// 查询当前用户绩效列表
+export function listMyPerformance(query) {
+  return request({
+    url: '/perf/performance/myList',
+    method: 'get',
+    params: query
+  })
+}
+
 // 查询绩效实例详细
 export function getPerformance(id) {
   return request({

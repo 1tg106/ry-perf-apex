@@ -21,19 +21,6 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item label="部门" prop="deptId">
-        <el-tree-select
-          v-model="queryParams.deptId"
-          :data="deptOptions"
-          :props="{ value: 'id', label: 'label', children: 'children' }"
-          value-key="id"
-          placeholder="请选择部门"
-          clearable
-          check-strictly
-          style="width: 220px"
-          @keyup.enter="handleQuery"
-        />
-      </el-form-item>
       <el-form-item label="提交时间" prop="submitTime">
         <el-date-picker clearable
           v-model="queryParams.submitTime"
@@ -167,24 +154,7 @@
             <el-option v-for="(item,index) in templateOptions" :key="index" :label="item.label" :value="item.value" />
           </el-select>
         </el-form-item>
-        <el-form-item label="部门" prop="deptId">
-          <el-tree-select
-            v-model="form.deptId"
-            :data="deptOptions"
-            :props="{ value: 'id', label: 'label', children: 'children' }"
-            value-key="id"
-            placeholder="请选择部门"
-            clearable
-            check-strictly
-            @change="getUserOptions(form.deptId)"
-            style="width: 220px"
-          />
-        </el-form-item>
-        <el-form-item label="员工" prop="userId">
-            <el-select v-model="form.userId" placeholder="请选择员工" clearable filterable style="width: 220px">
-              <el-option v-for="(item,index) in userOptions" :key="index" :label="item.label" :value="item.value" />
-            </el-select>
-        </el-form-item>
+        <!-- 部门 & 员工选择已移除（由上层业务自动处理或不允许在此处编辑） -->
       </el-form>
       <template #footer>
         <div class="dialog-footer">
@@ -197,10 +167,9 @@
 </template>
 
 <script setup name="Performance">
-import { listPerformance, getPerformance, delPerformance, addPerformance, updatePerformance } from "@/api/perf/performance"
+import { listMyPerformance, getPerformance, delPerformance, addPerformance, updatePerformance } from "@/api/perf/performance"
 import { getPerfChooseList } from '@/api/perf/period'
 import { getTemplateChooseList } from '@/api/perf/template'
-import { getUserChooseList,deptTreeSelect } from '@/api/system/user'
 import { PERFORMANCE_STATUS, PERFORMANCE_STATUS_LIST, PERFORMANCE_STEP_STATUS, PERFORMANCE_STEP_STATUS_LIST } from '@/utils/perf/performanceEnum'
 
 const { proxy } = getCurrentInstance()
@@ -217,21 +186,14 @@ const title = ref("")
 
 const data = reactive({
   form: {},
-  // dropdown / tree options loaded from API
   periodOptions: [],
   templateOptions: [],
-  userOptions: [],
-  // tree-shaped options used by el-tree-select
-  userTreeOptions: [],
-  deptOptions: [],
   queryParams: {
     pageNum: 1,
     pageSize: 10,
     performanceNo: null,
     periodId: null,
     templateId: null,
-    userId: null,
-    deptId: null,
     selfScore: null,
     finalScore: null,
     currentStep: null,
@@ -247,24 +209,18 @@ const data = reactive({
     templateId: [
       { required: true, message: "模板ID不能为空", trigger: "blur" }
     ],
-    userId: [
-      { required: true, message: "员工ID不能为空", trigger: "blur" }
-    ],
-    deptId: [
-      { required: true, message: "部门ID不能为空", trigger: "blur" }
-    ],
     status: [
       { required: true, message: "状态(DRAFT:草稿, PENDING_SCORE:待评分, PENDING_HR:待HR确认, CONFIRMED:已确认, REJECTED:已驳回, APPEAL:申诉中)不能为空", trigger: "change" }
     ],
   }
 })
 
-const { queryParams, form, rules, periodOptions, templateOptions, userOptions, userTreeOptions, deptOptions } = toRefs(data)
+const { queryParams, form, rules, periodOptions, templateOptions } = toRefs(data)
 
 /** 查询绩效实例列表 */
 function getList() {
   loading.value = true
-  listPerformance(queryParams.value).then(response => {
+  listMyPerformance(queryParams.value).then(response => {
     performanceList.value = response.rows
     total.value = response.total
     loading.value = false
@@ -285,30 +241,6 @@ function getTemplateOptions() {
   })
 }
 
-// 获取用户下拉选项
-/**
- * 获取用户下拉选项（可按 deptId 过滤）
- */
-function getUserOptions(deptId) {
-  if(!deptId) deptId = ''
-  getUserChooseList(deptId).then(response => {
-    const list = response.data || []
-    data.userOptions = list.map(item => ({ value: item.value ?? item.templateId ?? item.id, label: item.label ?? item.templateName ?? item.name }))
-  })
-}
-
-// 获取部门树形选项（id,label,children）用于 el-tree-select
-function getDeptOptions() {
-  deptTreeSelect().then(response => {
-    data.deptOptions = response.data
-  })
-}
-
-// 当对话框中选择部门后，更新员工下拉
-watch(() => form.value.deptId, (val) => {
-  // getUserOptions(val)
-})
-
 // 取消按钮
 function cancel() {
   open.value = false
@@ -318,12 +250,10 @@ function cancel() {
 // 表单重置
 function reset() {
   form.value = {
-    id: null,
-    performanceNo: null,
-    periodId: null,
-    templateId: null,
-    userId: null,
-    deptId: null,
+  id: null,
+  performanceNo: null,
+  periodId: null,
+  templateId: null,
     selfScore: null,
     finalScore: null,
     currentStep: null,
@@ -357,12 +287,8 @@ function handleSelectionChange(selection) {
 /** 新增按钮操作 */
 function handleAdd() {
   reset()
-  // load dropdown / tree options before showing dialog
   getPeriodOptions()
   getTemplateOptions()
-  // start with empty user list; users are loaded after selecting department
-  data.userOptions = []
-  getDeptOptions()
   open.value = true
   title.value = "添加绩效实例"
 }
@@ -372,12 +298,9 @@ function handleUpdate(row) {
   reset()
   getPeriodOptions()
   getTemplateOptions()
-  getDeptOptions()
   const _id = row.id || ids.value
   getPerformance(_id).then(response => {
     form.value = response.data
-    // load users for the record's department so current user selection shows up
-    getUserOptions(form.value.deptId)
     open.value = true
     title.value = "修改绩效实例"
   })
@@ -425,5 +348,4 @@ function handleExport() {
 getList()
 getPeriodOptions()
 getTemplateOptions()
-getDeptOptions()
 </script>

@@ -3,6 +3,7 @@ package com.ruoyi.web.controller.perf;
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 
+import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.perf.domain.dto.PerfPerformanceSaveDTO;
 import com.ruoyi.perf.domain.vo.PerfPerformanceVO;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -45,6 +46,20 @@ public class PerfPerformanceController extends BaseController
     public TableDataInfo list(PerfPerformance perfPerformance)
     {
         startPage();
+        List<PerfPerformanceVO> list = perfPerformanceService.selectPerfPerformanceList(perfPerformance);
+        return getDataTable(list);
+    }
+
+    /**
+     * 查询当前用户绩效列表
+     */
+    @PreAuthorize("@ss.hasPermi('perf:performance:list')")
+    @GetMapping("/myList")
+    public TableDataInfo myList(PerfPerformance perfPerformance)
+    {
+        startPage();
+        // 设置当前用户ID作为查询条件
+        perfPerformance.setUserId(SecurityUtils.getUserId());
         List<PerfPerformanceVO> list = perfPerformanceService.selectPerfPerformanceList(perfPerformance);
         return getDataTable(list);
     }
