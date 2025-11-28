@@ -1,21 +1,27 @@
 package com.ruoyi.perf.service.impl;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.ruoyi.common.enums.PerformanceStatus;
 import com.ruoyi.common.enums.PerformanceStep;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.bean.BeanUtils;
 import com.ruoyi.common.utils.uuid.IdUtils;
+import com.ruoyi.perf.domain.PerfTemplateItem;
 import com.ruoyi.perf.domain.dto.PerfPerformanceSaveDTO;
 import com.ruoyi.perf.domain.vo.PerfPerformanceVO;
+import com.ruoyi.perf.service.IPerfPerformanceContentService;
+import com.ruoyi.perf.service.IPerfTemplateItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.perf.mapper.PerfPerformanceMapper;
 import com.ruoyi.perf.domain.PerfPerformance;
 import com.ruoyi.perf.service.IPerfPerformanceService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 绩效实例Service业务层处理
@@ -29,6 +35,12 @@ public class PerfPerformanceServiceImpl extends ServiceImpl<PerfPerformanceMappe
     @Autowired
     private PerfPerformanceMapper perfPerformanceMapper;
 
+    @Autowired
+    private IPerfTemplateItemService perfTemplateItemService;
+
+    @Autowired
+    private IPerfPerformanceContentService perfPerformanceContentService;
+
     /**
      * 查询绩效实例
      * 
@@ -36,7 +48,7 @@ public class PerfPerformanceServiceImpl extends ServiceImpl<PerfPerformanceMappe
      * @return 绩效实例
      */
     @Override
-    public PerfPerformance selectPerfPerformanceById(Long id)
+    public PerfPerformanceVO selectPerfPerformanceById(Long id)
     {
         return perfPerformanceMapper.selectPerfPerformanceById(id);
     }
@@ -59,6 +71,7 @@ public class PerfPerformanceServiceImpl extends ServiceImpl<PerfPerformanceMappe
      * @param saveDTO 绩效实例
      * @return 结果
      */
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public int insertPerfPerformance(PerfPerformanceSaveDTO saveDTO)
     {
@@ -69,7 +82,19 @@ public class PerfPerformanceServiceImpl extends ServiceImpl<PerfPerformanceMappe
         BeanUtils.copyProperties(saveDTO, perfPerformance);
         perfPerformance.setCreateTime(DateUtils.getNowDate());
         perfPerformance.setCreateBy(SecurityUtils.getUserId().toString());
-        return this.save(perfPerformance)? 1 : 0;
+        boolean save = this.save(perfPerformance);
+        if(!save){
+            throw new RuntimeException("保存失败");
+        }
+        List<PerfTemplateItem> list = perfTemplateItemService.list(Wrappers.lambdaQuery(PerfTemplateItem.class)
+                .eq(PerfTemplateItem::getTemplateId, saveDTO.getTemplateId()));
+        if(list.isEmpty()){
+            throw new RuntimeException("该模版没有指标");
+        }
+
+        List<Long> itemIds = list.stream().map(PerfTemplateItem::getId).collect(Collectors.toList());
+
+        return perfPerformanceContentService.saveBatchByItemIds(perfPerformance.getId(), itemIds) ? 1 : 0;
     }
 
     /**

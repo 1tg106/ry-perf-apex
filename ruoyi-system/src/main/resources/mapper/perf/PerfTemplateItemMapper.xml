@@ -7,6 +7,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <resultMap type="PerfTemplateItem" id="PerfTemplateItemResult">
         <result property="id"    column="id"    />
         <result property="templateId"    column="template_id"    />
+        <result property="templateName"    column="template_name"    />
         <result property="parentId"    column="parent_id"    />
         <result property="itemName"    column="item_name"    />
         <result property="itemType"    column="item_type"    />
@@ -28,20 +29,20 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </sql>
 
     <select id="selectPerfTemplateItemList" parameterType="PerfTemplateItem" resultMap="PerfTemplateItemResult">
-        <include refid="selectPerfTemplateItemVo"/>
+        select a.*,b.template_name from perf_template_item a left join perf_template b on a.template_id = b.id
         <where>
-            del_flag = '0'
-            <if test="templateId != null "> and template_id = #{templateId}</if>
-            <if test="parentId != null "> and parent_id = #{parentId}</if>
-            <if test="itemName != null  and itemName != ''"> and item_name like concat('%', #{itemName}, '%')</if>
-            <if test="itemType != null  and itemType != ''"> and item_type = #{itemType}</if>
-            <if test="weight != null "> and weight = #{weight}</if>
-            <if test="scoreStandard != null  and scoreStandard != ''"> and score_standard = #{scoreStandard}</if>
-            <if test="minScore != null "> and min_score = #{minScore}</if>
-            <if test="maxScore != null "> and max_score = #{maxScore}</if>
-            <if test="sortOrder != null "> and sort_order = #{sortOrder}</if>
+            a.del_flag = '0'
+            <if test="templateId != null "> and a.template_id = #{templateId}</if>
+            <if test="parentId != null "> and a.parent_id = #{parentId}</if>
+            <if test="itemName != null  and itemName != ''"> and a.item_name like concat('%', #{itemName}, '%')</if>
+            <if test="itemType != null  and itemType != ''"> and a.item_type = #{itemType}</if>
+            <if test="weight != null "> and a.weight = #{weight}</if>
+            <if test="scoreStandard != null  and scoreStandard != ''"> and a.score_standard = #{scoreStandard}</if>
+            <if test="minScore != null "> and a.min_score = #{minScore}</if>
+            <if test="maxScore != null "> and a.max_score = #{maxScore}</if>
+            <if test="sortOrder != null "> and a.sort_order = #{sortOrder}</if>
         </where>
-        order by create_time desc
+        order by a.create_time desc
     </select>
     
     <select id="selectPerfTemplateItemByItemId" parameterType="Long" resultMap="PerfTemplateItemResult">

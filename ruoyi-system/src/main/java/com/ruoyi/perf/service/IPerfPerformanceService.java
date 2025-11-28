@@ -21,7 +21,7 @@ public interface IPerfPerformanceService extends IService<PerfPerformance>
      * @param id 绩效实例主键
      * @return 绩效实例
      */
-    public PerfPerformance selectPerfPerformanceById(Long id);
+    public PerfPerformanceVO selectPerfPerformanceById(Long id);
 
     /**
      * 查询绩效实例列表

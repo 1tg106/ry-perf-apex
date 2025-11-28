@@ -19,7 +19,7 @@ public interface PerfPerformanceMapper extends BaseMapper<PerfPerformance>
      * @param id 绩效实例主键
      * @return 绩效实例
      */
-    public PerfPerformance selectPerfPerformanceById(Long id);
+    public PerfPerformanceVO selectPerfPerformanceById(Long id);
 
     /**
      * 查询绩效实例列表

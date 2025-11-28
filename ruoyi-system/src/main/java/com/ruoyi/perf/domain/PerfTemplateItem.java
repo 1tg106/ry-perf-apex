@@ -1,6 +1,8 @@
 package com.ruoyi.perf.domain;
 
 import java.math.BigDecimal;
+
+import com.baomidou.mybatisplus.annotation.TableField;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ruoyi.common.annotation.Excel;
@@ -57,6 +59,17 @@ public class PerfTemplateItem extends BaseEntity
 
     /** 删除标志（0:存在 1:删除） */
     private String delFlag;
+
+    @TableField(exist = false)
+    private String templateName;
+
+    public String getTemplateName() {
+		return templateName;
+	}
+
+    public void setTemplateName(String templateName) {
+		this.templateName = templateName;
+	}
 
     public Long getId() {
         return id;

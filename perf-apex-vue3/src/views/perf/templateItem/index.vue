@@ -84,6 +84,7 @@
     <el-table v-loading="loading" :data="templateItemList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="指标名称" align="center" prop="itemName" />
+      <el-table-column label="模版名称" align="center" prop="templateName" />
       <el-table-column label="指标类型" align="center" prop="itemType">
         <template #default="scope">
           <el-tag type="primary" v-if="scope.row.itemType == ITEM_TYPE.OBJECTIVE">{{ ITEM_TYPE_LIST[0].label }}</el-tag>

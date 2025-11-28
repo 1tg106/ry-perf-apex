@@ -60,4 +60,11 @@ public interface IPerfPerformanceContentService extends IService<PerfPerformance
      * @return 结果
      */
     public int deletePerfPerformanceContentById(Long id);
+
+    /**
+     * 批量保存绩效内容
+     * @param performanceId
+     * @param itemIds
+     */
+    public Boolean saveBatchByItemIds(Long performanceId, List<Long> itemIds);
 }

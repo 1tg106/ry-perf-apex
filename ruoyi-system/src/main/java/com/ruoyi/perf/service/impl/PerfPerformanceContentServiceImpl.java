@@ -1,5 +1,6 @@
 package com.ruoyi.perf.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import com.ruoyi.common.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -93,5 +94,20 @@ public class PerfPerformanceContentServiceImpl extends ServiceImpl<PerfPerforman
     public int deletePerfPerformanceContentById(Long id)
     {
         return perfPerformanceContentMapper.deletePerfPerformanceContentById(id);
+    }
+
+    @Override
+    public Boolean saveBatchByItemIds(Long performanceId, List<Long> itemIds) {
+        if(itemIds == null || itemIds.size() == 0){
+            throw new RuntimeException("该模版没有指标");
+        }
+        List<PerfPerformanceContent> contentList = new ArrayList<>();
+        for (Long itemId : itemIds){
+            PerfPerformanceContent content = new PerfPerformanceContent();
+            content.setPerformanceId(performanceId);
+            content.setItemId(itemId);
+            contentList.add(content);
+        }
+        return this.saveBatch(contentList);
     }
 }

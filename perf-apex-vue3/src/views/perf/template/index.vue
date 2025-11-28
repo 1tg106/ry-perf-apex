@@ -89,7 +89,13 @@
     <el-table v-loading="loading" :data="templateList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="模板名称" align="center" prop="templateName" />
-      <el-table-column label="模板类型" align="center" prop="templateType" />
+      <el-table-column label="模板类型" align="center" prop="templateType">
+        <template #default="scope">
+          <el-tag type="primary" v-if="scope.row.templateType == TEMPLATE_TYPE.OKR">{{ TEMPLATE_TYPE_LIST[0].label }}</el-tag>
+          <el-tag type="success" v-if="scope.row.templateType == TEMPLATE_TYPE.KPI">{{ TEMPLATE_TYPE_LIST[1].label }}</el-tag>
+          <el-tag type="warning" v-if="scope.row.templateType == TEMPLATE_TYPE.COMPETENCY">{{ TEMPLATE_TYPE_LIST[2].label }}</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column label="适用部门" align="center" prop="deptName" />
       <el-table-column label="适用岗位" align="center" prop="postNames" />
       <el-table-column label="状态" align="center" prop="status">
@@ -178,6 +184,7 @@ import { listTemplate, getTemplate, delTemplate, addTemplate, updateTemplate } f
 import { deptTreeSelect } from "@/api/system/user"
 import { listPost } from "@/api/system/post"
 import { COMMON_STATUS_LIST, COMMON_STATUS } from "@/utils/perf/commonStatus"
+import { TEMPLATE_TYPE, TEMPLATE_TYPE_LIST } from "@/utils/perf/templateIEnum"
 
 const { proxy } = getCurrentInstance()
 
@@ -318,11 +325,11 @@ function submitForm() {
           getList()
         })
       } else {
-        // addTemplate(form.value).then(response => {
-        //   proxy.$modal.msgSuccess("新增成功")
-        //   open.value = false
-        //   getList()
-        // })
+        addTemplate(form.value).then(response => {
+          proxy.$modal.msgSuccess("新增成功")
+          open.value = false
+          getList()
+        })
       }
     }
   })

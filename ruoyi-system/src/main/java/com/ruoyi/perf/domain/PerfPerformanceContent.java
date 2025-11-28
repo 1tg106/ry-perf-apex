@@ -1,6 +1,9 @@
 package com.ruoyi.perf.domain;
 
 import java.math.BigDecimal;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ruoyi.common.annotation.Excel;
@@ -12,6 +15,8 @@ import com.ruoyi.common.core.domain.BaseEntity;
  * @author liudahua
  * @date 2025-11-26
  */
+@EqualsAndHashCode(callSuper = true)
+@Data
 public class PerfPerformanceContent extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
@@ -57,135 +62,4 @@ public class PerfPerformanceContent extends BaseEntity
 
     /** 删除标志（0:存在 1:删除） */
     private String delFlag;
-
-    public void setId(Long id) 
-    {
-        this.id = id;
-    }
-
-    public Long getId() 
-    {
-        return id;
-    }
-
-    public void setPerformanceId(Long performanceId) 
-    {
-        this.performanceId = performanceId;
-    }
-
-    public Long getPerformanceId() 
-    {
-        return performanceId;
-    }
-
-    public void setItemId(Long itemId) 
-    {
-        this.itemId = itemId;
-    }
-
-    public Long getItemId() 
-    {
-        return itemId;
-    }
-
-    public void setSelfTarget(String selfTarget) 
-    {
-        this.selfTarget = selfTarget;
-    }
-
-    public String getSelfTarget() 
-    {
-        return selfTarget;
-    }
-
-    public void setSelfResult(String selfResult) 
-    {
-        this.selfResult = selfResult;
-    }
-
-    public String getSelfResult() 
-    {
-        return selfResult;
-    }
-
-    public void setSelfScore(BigDecimal selfScore) 
-    {
-        this.selfScore = selfScore;
-    }
-
-    public BigDecimal getSelfScore() 
-    {
-        return selfScore;
-    }
-
-    public void setSelfComment(String selfComment) 
-    {
-        this.selfComment = selfComment;
-    }
-
-    public String getSelfComment() 
-    {
-        return selfComment;
-    }
-
-    public void setFinalScore(BigDecimal finalScore) 
-    {
-        this.finalScore = finalScore;
-    }
-
-    public BigDecimal getFinalScore() 
-    {
-        return finalScore;
-    }
-
-    public void setFinalComment(String finalComment) 
-    {
-        this.finalComment = finalComment;
-    }
-
-    public String getFinalComment() 
-    {
-        return finalComment;
-    }
-
-    public void setSortOrder(Long sortOrder) 
-    {
-        this.sortOrder = sortOrder;
-    }
-
-    public Long getSortOrder() 
-    {
-        return sortOrder;
-    }
-
-    public void setDelFlag(String delFlag) 
-    {
-        this.delFlag = delFlag;
-    }
-
-    public String getDelFlag() 
-    {
-        return delFlag;
-    }
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
-            .append("id", getId())
-            .append("performanceId", getPerformanceId())
-            .append("itemId", getItemId())
-            .append("selfTarget", getSelfTarget())
-            .append("selfResult", getSelfResult())
-            .append("selfScore", getSelfScore())
-            .append("selfComment", getSelfComment())
-            .append("finalScore", getFinalScore())
-            .append("finalComment", getFinalComment())
-            .append("sortOrder", getSortOrder())
-            .append("delFlag", getDelFlag())
-            .append("createBy", getCreateBy())
-            .append("createTime", getCreateTime())
-            .append("updateBy", getUpdateBy())
-            .append("updateTime", getUpdateTime())
-            .toString();
-    }
 }
