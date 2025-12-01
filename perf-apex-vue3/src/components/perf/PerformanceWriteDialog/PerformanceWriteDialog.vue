@@ -1,8 +1,5 @@
 <template>
   <div>
-    <!-- 触发弹窗的按钮 -->
-    <el-button type="primary" @click="openDialog">填写绩效</el-button>
-
     <!-- 绩效填写弹窗 -->
     <el-dialog
       v-model="dialogVisible"
@@ -14,13 +11,6 @@
       :close-on-press-escape="false"
     >
       <div class="dialog-content">
-        <div class="header">
-          <h2>绩效自评填写</h2>
-          <div class="header-actions">
-            <el-button @click="saveDraft" :icon="Document">保存草稿</el-button>
-          </div>
-        </div>
-        
         <div class="main-content">
           <!-- 指标树 -->
           <div class="indicator-tree">
@@ -37,7 +27,7 @@
               :data="indicators"
               :props="treeProps"
               :filter-node-method="filterNode"
-              node-key="id"
+              node-key="itemId"
               highlight-current
               :expand-on-click-node="false"
               @node-click="handleNodeClick"
@@ -47,7 +37,6 @@
                   <span class="tree-node-title">{{ node.label }}</span>
                   <span>
                     <el-tag 
-                      v-if="data.itemType !== 'OBJECTIVE'" 
                       :type="getItemTypeTagType(data.itemType)"
                       size="small"
                       class="item-type-tag"
@@ -174,6 +163,7 @@
 import { ref, watch, nextTick } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Document, Search, DocumentAdd } from '@element-plus/icons-vue'
+import { getContentListByPerformanceId } from '@/api/perf/content'
 
 export default {
   name: 'PerformanceDialog',
@@ -197,128 +187,7 @@ export default {
     }
     
     // 模拟指标数据
-    const indicators = ref([
-      {
-        id: 1,
-        itemName: '工作业绩',
-        itemType: 'OBJECTIVE',
-        parentId:0,
-        weight: 60,
-        minScore: 0,
-        maxScore: 100,
-        scoreStandard: '根据工作完成情况、质量、效率等综合评定',
-        children: [
-          {
-            id: 2,
-            itemName: '任务完成率',
-            itemType: 'KEY_RESULT',
-            parentId:1,
-            weight: 30,
-            minScore: 0,
-            maxScore: 100,
-            scoreStandard: '完成率100%得满分，每降低5%扣10分',
-            selfTarget: '',
-            selfResult: '',
-            selfScore: 0,
-            selfComment: '',
-            finalScore: 0,
-            finalComment: ''
-          },
-          {
-            id: 3,
-            itemName: '工作质量',
-            itemType: 'KEY_RESULT',
-            parentId:1,
-            weight: 20,
-            minScore: 0,
-            maxScore: 100,
-            scoreStandard: '根据工作质量、错误率等评定',
-            selfTarget: '',
-            selfResult: '',
-            selfScore: 0,
-            selfComment: '',
-            finalScore: 0,
-            finalComment: ''
-          },
-          {
-            id: 4,
-            itemName: '工作效率',
-            itemType: 'KEY_RESULT',
-            parentId:1,
-            weight: 10,
-            minScore: 0,
-            maxScore: 100,
-            scoreStandard: '根据任务完成时效评定',
-            selfTarget: '',
-            selfResult: '',
-            selfScore: 0,
-            selfComment: '',
-            finalScore: 0,
-            finalComment: ''
-          }
-        ]
-      },
-      {
-        id: 5,
-        itemName: '能力素质',
-        itemType: 'OBJECTIVE',
-        parentId:0,
-        weight: 40,
-        minScore: 0,
-        maxScore: 100,
-        scoreStandard: '根据专业能力、团队协作、学习能力等评定',
-        children: [
-          {
-            id: 6,
-            itemName: '专业技能',
-            itemType: 'COMPETENCY',
-            parentId:5,
-            weight: 15,
-            minScore: 0,
-            maxScore: 100,
-            scoreStandard: '根据专业知识的掌握和应用能力评定',
-            selfTarget: '',
-            selfResult: '',
-            selfScore: 0,
-            selfComment: '',
-            finalScore: 0,
-            finalComment: ''
-          },
-          {
-            id: 7,
-            itemName: '团队协作',
-            itemType: 'COMPETENCY',
-            parentId:5,
-            weight: 15,
-            minScore: 0,
-            maxScore: 100,
-            scoreStandard: '根据团队合作、沟通能力等评定',
-            selfTarget: '',
-            selfResult: '',
-            selfScore: 0,
-            selfComment: '',
-            finalScore: 0,
-            finalComment: ''
-          },
-          {
-            id: 8,
-            itemName: '学习成长',
-            itemType: 'COMPETENCY',
-            parentId:5,
-            weight: 10,
-            minScore: 0,
-            maxScore: 100,
-            scoreStandard: '根据学习能力、知识更新等评定',
-            selfTarget: '',
-            selfResult: '',
-            selfScore: 0,
-            selfComment: '',
-            finalScore: 0,
-            finalComment: ''
-          }
-        ]
-      }
-    ])
+    const indicators = ref([])
     
     // 获取指标类型标签样式
     const getItemTypeTagType = (type) => {
@@ -355,10 +224,21 @@ export default {
     }
     
     // 打开弹窗
-    const openDialog = () => {
+    const openDialog = async (performanceId) => {
       dialogVisible.value = true
+      
+      // 如果传入了绩效ID，则从API获取数据
+      if (performanceId) {
+        try {
+          const response = await getContentListByPerformanceId(performanceId)
+          indicators.value = response.data || []
+        } catch (error) {
+          ElMessage.error('获取绩效内容失败: ' + error.message)
+          indicators.value = []
+        }
+      } 
       // 如果有外部传入的数据，使用外部数据
-      if (props.performanceData && props.performanceData.length > 0) {
+      else if (props.performanceData && props.performanceData.length > 0) {
         indicators.value = props.performanceData
       }
       
@@ -380,7 +260,7 @@ export default {
         if (firstLeaf) {
           currentItem.value = firstLeaf
           // 设置树节点选中状态
-          treeRef.value.setCurrentKey(firstLeaf.id)
+          treeRef.value.setCurrentKey(firstLeaf.itemId)
         }
       })
     }

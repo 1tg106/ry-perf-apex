@@ -9,6 +9,15 @@ export function listContent(query) {
   })
 }
 
+// 查询绩效内容列表（根据绩效ID）
+export function getContentListByPerformanceId(performanceId) {
+  return request({
+    url: '/perf/content/getContentListByPerformanceId',
+    method: 'get',
+    params: { performanceId }
+  })
+}
+
 // 查询绩效内容详细
 export function getContent(id) {
   return request({

@@ -50,11 +50,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         SELECT
             a.*,
             b.template_id,
+            b.item_type,
             b.item_name,
             b.weight,
             b.score_standard,
             b.parent_id,
-            b.max_score
+            b.max_score,
+            b.min_score
         FROM
             perf_performance_content a
                 LEFT JOIN perf_template_item b ON a.item_id = b.id

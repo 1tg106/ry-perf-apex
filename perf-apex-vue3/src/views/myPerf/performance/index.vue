@@ -165,7 +165,8 @@
       </template>
     </el-dialog>
 
-    <PerformanceDialog ref="performanceDialog" :performance-data="performanceData" />
+    <PerformanceDialog ref="performanceDialog" />
+
   </div>
 </template>
 
@@ -224,7 +225,7 @@ const performanceDialog = ref()
 const performanceData = ref([]) // 可以从API获取数据
 
 const openPerformanceDialog = (row) => {
-  performanceDialog.value.openDialog()
+  performanceDialog.value.openDialog(row.id)
 }
 
 /** 查询绩效实例列表 */
