@@ -101,7 +101,7 @@
           <el-tag type="info" v-if="scope.row.status === PERF_PERIOD_STATUS.FINISHED">{{ PERF_PERIOD_STATUS_LIST[2].label }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="备注" align="center" prop="remark" />
+      <el-table-column label="创建时间" align="center" prop="createTime" width="180" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width" fixed="right" width="180">
         <template #default="scope">
           <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['system:period:edit']">修改</el-button>

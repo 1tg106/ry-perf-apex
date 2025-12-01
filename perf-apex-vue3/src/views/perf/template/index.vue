@@ -98,6 +98,7 @@
       </el-table-column> -->
       <el-table-column label="适用部门" align="center" prop="deptName" />
       <el-table-column label="适用岗位" align="center" prop="postNames" />
+      <el-table-column label="创建时间" align="center" prop="createTime" width="180" />
       <el-table-column label="状态" align="center" prop="status">
         <template #default="scope">
           <el-tag type="primary" v-if="scope.row.status === COMMON_STATUS.NORMAL">{{ COMMON_STATUS_LIST[0].label }}</el-tag>
@@ -260,7 +261,6 @@ function reset() {
     postIds: [],
     status: null,
     remark: null,
-    delFlag: null,
     createBy: null,
     createTime: null,
     updateBy: null,

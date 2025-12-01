@@ -88,13 +88,15 @@
       <el-table-column label="指标类型" align="center" prop="itemType">
         <template #default="scope">
           <el-tag type="primary" v-if="scope.row.itemType == ITEM_TYPE.OBJECTIVE">{{ ITEM_TYPE_LIST[0].label }}</el-tag>
-          <el-tag type="success" v-if="scope.row.itemType == ITEM_TYPE.KEY_RESULT">{{ ITEM_TYPE_LIST[1].label }}</el-tag>
-          <el-tag type="warning" v-if="scope.row.itemType == ITEM_TYPE.COMPETENCY">{{ ITEM_TYPE_LIST[2].label }}</el-tag>
+          <el-tag type="success" v-else-if="scope.row.itemType == ITEM_TYPE.KEY_RESULT">{{ ITEM_TYPE_LIST[1].label }}</el-tag>
+          <el-tag type="warning" v-else-if="scope.row.itemType == ITEM_TYPE.COMPETENCY">{{ ITEM_TYPE_LIST[2].label }}</el-tag>
+          <el-tag type="info" v-else>{{ "指标大类" }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column label="权重(0-100)" align="center" prop="weight" />
       <el-table-column label="最低分" align="center" prop="minScore" />
       <el-table-column label="最高分" align="center" prop="maxScore" />
+      <el-table-column label="创建时间" align="center" prop="createTime" width="180" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width" fixed="right" width="220">
         <template #default="scope">
           <el-button link type="primary" icon="CopyDocument" @click="handleCopy(scope.row)" v-hasPermi="['perf:templateItem:edit']">复制</el-button>
@@ -114,7 +116,7 @@
 
     <!-- 添加或修改模板指标对话框 -->
     <el-dialog :title="title" v-model="open" width="500px" append-to-body>
-      <el-form ref="templateItemRef" :model="form" :rules="rules" label-width="80px">
+      <el-form ref="templateItemRef" :model="form" :rules="getDynamicRules()" label-width="80px">
         <el-form-item label="指标名称" prop="itemName">
           <el-input v-model="form.itemName" placeholder="请输入指标名称" />
         </el-form-item>
@@ -129,7 +131,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="父指标" prop="parentId">
-          <el-select v-model="form.parentId" placeholder="请选择父指标" clearable style="width: 220px">
+          <el-select v-model="form.parentId" placeholder="请选择父指标" clearable style="width: 220px" @change="handleParentIdChange">
             <el-option
               v-for="(item,index) in parentItemOptions"
               :key="index"
@@ -138,8 +140,8 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="指标类型" prop="itemType">
-          <el-select v-model="form.itemType" placeholder="请选择类型" style="width: 220px">
+        <el-form-item v-show="!form.parentId" label="指标类型" prop="itemType">
+          <el-select v-model="form.itemType" clearable placeholder="请选择类型" style="width: 220px">
             <el-option
               v-for="(item,index) in ITEM_TYPE_LIST"
               :key="index"
@@ -151,16 +153,16 @@
         <el-form-item label="权重" prop="weight">
           <el-input-number v-model="form.weight" :min="1" :max="100" />
         </el-form-item>
-        <el-form-item label="最低分" prop="minScore">
+        <el-form-item v-show="!form.parentId" label="最低分" prop="minScore">
           <el-input-number v-model="form.minScore" :min="1" :max="10" />
         </el-form-item>
-        <el-form-item label="最高分" prop="maxScore">
+        <el-form-item v-show="!form.parentId" label="最高分" prop="maxScore">
           <el-input-number v-model="form.maxScore" :min="1" :max="10" />
         </el-form-item>
-        <el-form-item label="标准描述" prop="scoreStandard">
+        <el-form-item v-show="!form.parentId" label="标准描述" prop="scoreStandard">
           <el-input v-model="form.scoreStandard" type="textarea" placeholder="请输入评分标准描述" />
         </el-form-item>
-        <el-form-item label="备注" prop="remark">
+        <el-form-item v-show="!form.parentId" label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
         </el-form-item>
       </el-form>
@@ -178,6 +180,7 @@
 import { listTemplateItem, getTemplateItem, delTemplateItem, addTemplateItem, updateTemplateItem, getItemChooseList, copyTemplateItem } from "@/api/perf/templateItem"
 import { ITEM_TYPE, ITEM_TYPE_LIST } from "@/utils/perf/templateItemEnum"
 import { getTemplateChooseList } from "@/api/perf/template"
+import { nextTick } from 'vue'
 
 const { proxy } = getCurrentInstance()
 
@@ -221,6 +224,12 @@ const data = reactive({
     ],
     weight: [
       { required: true, message: "权重不能为空", trigger: "blur" }
+    ],
+    minScore: [
+      { required: true, message: "最低分不能为空", trigger: "blur" }
+    ],
+    maxScore: [
+      { required: true, message: "最高分不能为空", trigger: "blur" }
     ],
   }
 })
@@ -271,11 +280,11 @@ function reset() {
     templateId: null,
     parentId: null,
     itemName: null,
-    itemType: null,
-    weight: null,
+    itemType: ITEM_TYPE_LIST[0].value,
+    weight: 0,
     scoreStandard: null,
-    minScore: null,
-    maxScore: null,
+    minScore: 0,
+    maxScore: 0,
     sortOrder: null,
     remark: null,
   }
@@ -335,6 +344,13 @@ function handleUpdate(row) {
     }
     open.value = true
     title.value = "修改模板指标"
+    
+    // 确保表单验证规则正确更新
+    nextTick(() => {
+      if (proxy.$refs["templateItemRef"]) {
+        proxy.$refs["templateItemRef"].clearValidate()
+      }
+    })
   })
 }
 
@@ -375,6 +391,47 @@ function handleExport() {
   proxy.download('perf/templateItem/export', {
     ...queryParams.value
   }, `templateItem_${new Date().getTime()}.xlsx`)
+}
+
+/** 父指标改变时触发 */
+function handleParentIdChange(value) {
+  // 当选择了父指标时，清空指标类型
+  if (value) {
+    form.value.itemType = ITEM_TYPE_LIST[0].value
+    form.value.minScore = 0
+    form.value.maxScore = 0
+    form.value.scoreStandard = ''
+    form.value.remark = ''
+  }
+  
+  // 强制重新验证表单
+  nextTick(() => {
+    if (proxy.$refs["templateItemRef"]) {
+      proxy.$refs["templateItemRef"].clearValidate()
+    }
+  })
+}
+
+/** 动态获取表单验证规则 */
+function getDynamicRules() {
+  const dynamicRules = { ...rules.value }
+  
+  // 如果有父指标，则不需要验证以下字段
+  if (form.value.parentId) {
+    // delete dynamicRules.itemType
+    // delete dynamicRules.minScore
+    // delete dynamicRules.maxScore
+
+    dynamicRules.itemType[0].required = false
+    dynamicRules.minScore[0].required = false
+    dynamicRules.maxScore[0].required = false
+  }else{
+    dynamicRules.itemType[0].required = true
+    dynamicRules.minScore[0].required = true
+    dynamicRules.maxScore[0].required = true
+  }
+  
+  return dynamicRules
 }
 
 getList()

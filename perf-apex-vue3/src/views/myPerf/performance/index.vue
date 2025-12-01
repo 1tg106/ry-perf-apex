@@ -50,7 +50,6 @@
           plain
           icon="Plus"
           @click="handleAdd"
-          v-hasPermi="['perf:performance:add']"
         >新增</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -60,7 +59,6 @@
           icon="Edit"
           :disabled="single"
           @click="handleUpdate"
-          v-hasPermi="['perf:performance:edit']"
         >修改</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -70,7 +68,6 @@
           icon="Delete"
           :disabled="multiple"
           @click="handleDelete"
-          v-hasPermi="['perf:performance:remove']"
         >删除</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -79,7 +76,6 @@
           plain
           icon="Download"
           @click="handleExport"
-          v-hasPermi="['perf:performance:export']"
         >导出</el-button>
       </el-col>
       <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>

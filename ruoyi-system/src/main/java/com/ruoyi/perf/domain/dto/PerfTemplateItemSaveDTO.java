@@ -35,22 +35,18 @@ public class PerfTemplateItemSaveDTO extends BaseEntity
     private String itemName;
 
     /** 指标类型(OBJECTIVE:目标, KEY_RESULT:关键成果, COMPETENCY:能力项) */
-    @NotBlank(message = "指标类型不能为空")
     private String itemType;
 
     /** 权重(0-100) */
-    @NotNull(message = "权重不能为空")
     private BigDecimal weight;
 
     /** 评分标准描述 */
     private String scoreStandard;
 
     /** 最低分 */
-    @NotNull(message = "最低分不能为空")
     private BigDecimal minScore;
 
     /** 最高分 */
-    @NotNull(message = "最高分不能为空")
     private BigDecimal maxScore;
 
     /** 排序 */
