@@ -45,6 +45,25 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <include refid="selectPerfPerformanceContentVo"/>
         where id = #{id}
     </select>
+    <select id="selectPerformanceContentItemVOList"
+            resultType="com.ruoyi.perf.domain.vo.PerformanceContentItemVO">
+        SELECT
+            a.*,
+            b.template_id,
+            b.item_name,
+            b.weight,
+            b.score_standard,
+            b.parent_id,
+            b.max_score
+        FROM
+            perf_performance_content a
+                LEFT JOIN perf_template_item b ON a.item_id = b.id
+        WHERE
+            a.performance_id = #{performanceId}
+            AND a.del_flag = '0'
+            AND a.del_flag = '0'
+        ORDER BY a.sort_order, a.sort_order
+    </select>
 
     <insert id="insertPerfPerformanceContent" parameterType="PerfPerformanceContent" useGeneratedKeys="true" keyProperty="id">
         insert into perf_performance_content

@@ -127,8 +127,9 @@
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width" fixed="right" width="180">
         <template #default="scope">
-          <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['perf:performance:edit']">修改</el-button>
-          <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)" v-hasPermi="['perf:performance:remove']">删除</el-button>
+          <el-button link type="primary" icon="Edit" @click="openPerformanceDialog(scope.row)">填写</el-button>
+          <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)">修改</el-button>
+          <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -163,6 +164,8 @@
         </div>
       </template>
     </el-dialog>
+
+    <PerformanceDialog ref="performanceDialog" :performance-data="performanceData" />
   </div>
 </template>
 
@@ -171,6 +174,7 @@ import { listMyPerformance, getPerformance, delPerformance, addPerformance, upda
 import { getPerfChooseList } from '@/api/perf/period'
 import { getTemplateChooseList } from '@/api/perf/template'
 import { PERFORMANCE_STATUS, PERFORMANCE_STATUS_LIST, PERFORMANCE_STEP_STATUS, PERFORMANCE_STEP_STATUS_LIST } from '@/utils/perf/performanceEnum'
+import PerformanceDialog from '@/components/perf/PerformanceWriteDialog/PerformanceWriteDialog.vue'
 
 const { proxy } = getCurrentInstance()
 
@@ -216,6 +220,12 @@ const data = reactive({
 })
 
 const { queryParams, form, rules, periodOptions, templateOptions } = toRefs(data)
+const performanceDialog = ref()
+const performanceData = ref([]) // 可以从API获取数据
+
+const openPerformanceDialog = (row) => {
+  performanceDialog.value.openDialog()
+}
 
 /** 查询绩效实例列表 */
 function getList() {

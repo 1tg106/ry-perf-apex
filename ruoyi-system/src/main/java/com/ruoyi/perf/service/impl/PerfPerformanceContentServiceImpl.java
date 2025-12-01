@@ -1,9 +1,10 @@
 package com.ruoyi.perf.service.impl;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.perf.domain.vo.PerformanceContentItemVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.perf.mapper.PerfPerformanceContentMapper;
@@ -112,5 +113,69 @@ public class PerfPerformanceContentServiceImpl extends ServiceImpl<PerfPerforman
             contentList.add(content);
         }
         return this.saveBatch(contentList);
+    }
+
+    @Override
+    public List<PerformanceContentItemVO> selectPerformanceContentItemVOList(Long performanceId) {
+        List<PerformanceContentItemVO> itemVOS = perfPerformanceContentMapper.selectPerformanceContentItemVOList(performanceId);
+
+        // 构建树形结构
+        return buildPerformanceTree(itemVOS);
+    }
+
+    /**
+     * 构建绩效指标树形结构
+     */
+    private List<PerformanceContentItemVO> buildPerformanceTree(List<PerformanceContentItemVO> list) {
+        if (list == null || list.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        Map<Long, PerformanceContentItemVO> nodeMap = new HashMap<>();
+        List<PerformanceContentItemVO> rootNodes = new ArrayList<>();
+
+        // 第一遍遍历：初始化所有节点
+        for (PerformanceContentItemVO item : list) {
+            item.setChildren(new ArrayList<>());
+            nodeMap.put(item.getItemId(), item);
+        }
+
+        // 第二遍遍历：构建树形结构
+        for (PerformanceContentItemVO item : list) {
+            Long parentId = item.getParentId();
+
+            if (parentId == null || parentId == 0 || !nodeMap.containsKey(parentId)) {
+                rootNodes.add(item);
+            } else {
+                PerformanceContentItemVO parent = nodeMap.get(parentId);
+                if (parent.getChildren() == null) {
+                    parent.setChildren(new ArrayList<>());
+                }
+                parent.getChildren().add(item);
+            }
+        }
+
+        // 排序
+        sortPerformanceTree(rootNodes);
+
+        return rootNodes;
+    }
+
+    /**
+     * 递归排序树形结构
+     */
+    private void sortPerformanceTree(List<PerformanceContentItemVO> nodes) {
+        if (nodes == null || nodes.isEmpty()) {
+            return;
+        }
+
+        nodes.sort(Comparator.comparing(PerformanceContentItemVO::getSortOrder,
+                Comparator.nullsLast(Comparator.naturalOrder())));
+
+        for (PerformanceContentItemVO node : nodes) {
+            if (node.getChildren() != null && !node.getChildren().isEmpty()) {
+                sortPerformanceTree(node.getChildren());
+            }
+        }
     }
 }

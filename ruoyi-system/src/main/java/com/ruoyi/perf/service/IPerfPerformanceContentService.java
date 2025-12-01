@@ -3,6 +3,7 @@ package com.ruoyi.perf.service;
 import java.util.List;
 import com.ruoyi.perf.domain.PerfPerformanceContent;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.ruoyi.perf.domain.vo.PerformanceContentItemVO;
 
 /**
  * 绩效内容Service接口
@@ -67,4 +68,12 @@ public interface IPerfPerformanceContentService extends IService<PerfPerformance
      * @param itemIds
      */
     public Boolean saveBatchByItemIds(Long performanceId, List<Long> itemIds);
+
+    /**
+     * 查询绩效内容列表
+     *
+     * @param performanceId 绩效ID
+     * @return 绩效内容集合
+     */
+    public List<PerformanceContentItemVO> selectPerformanceContentItemVOList(Long performanceId);
 }
