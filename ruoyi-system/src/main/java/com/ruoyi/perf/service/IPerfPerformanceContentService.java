@@ -3,6 +3,7 @@ package com.ruoyi.perf.service;
 import java.util.List;
 import com.ruoyi.perf.domain.PerfPerformanceContent;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.ruoyi.perf.domain.dto.PerfContentBatchUpdateDTO;
 import com.ruoyi.perf.domain.vo.PerformanceContentItemVO;
 
 /**
@@ -45,6 +46,14 @@ public interface IPerfPerformanceContentService extends IService<PerfPerformance
      * @return 结果
      */
     public int updatePerfPerformanceContent(PerfPerformanceContent perfPerformanceContent);
+
+    /**
+     * 批量更新绩效内容
+     * 
+     * @param updateDTO 批量更新参数
+     * @return 结果
+     */
+    public int updatePerfPerformanceContentBatch(PerfContentBatchUpdateDTO updateDTO);
 
     /**
      * 批量删除绩效内容

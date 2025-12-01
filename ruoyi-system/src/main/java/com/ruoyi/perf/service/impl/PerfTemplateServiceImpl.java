@@ -183,9 +183,6 @@ public class PerfTemplateServiceImpl extends ServiceImpl<PerfTemplateMapper,Perf
         if(StringUtils.isEmpty(perfTemplate.getTemplateName())){
             throw new RuntimeException("模板名称不能为空");
         }
-        if(StringUtils.isEmpty(perfTemplate.getTemplateType())){
-            throw new RuntimeException("模板类型不能为空");
-        }
         if(perfTemplate.getDeptId() == null){
             throw new RuntimeException("适用部门不能为空");
         }

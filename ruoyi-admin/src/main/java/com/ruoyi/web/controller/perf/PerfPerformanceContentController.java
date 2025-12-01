@@ -2,6 +2,9 @@ package com.ruoyi.web.controller.perf;
 
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+
+import com.ruoyi.perf.domain.dto.PerfContentBatchUpdateDTO;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -82,6 +85,17 @@ public class PerfPerformanceContentController extends BaseController
     public AjaxResult edit(@RequestBody PerfPerformanceContent perfPerformanceContent)
     {
         return toAjax(perfPerformanceContentService.updatePerfPerformanceContent(perfPerformanceContent));
+    }
+
+    /**
+     * 批量更新绩效内容
+     */
+    @PreAuthorize("@ss.hasPermi('perf:content:edit')")
+    @Log(title = "绩效内容", businessType = BusinessType.UPDATE)
+    @PutMapping("/batch")
+    public AjaxResult editBatch(@Valid @RequestBody PerfContentBatchUpdateDTO updateDTO)
+    {
+        return toAjax(perfPerformanceContentService.updatePerfPerformanceContentBatch(updateDTO));
     }
 
     /**

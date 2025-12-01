@@ -165,7 +165,7 @@
       </template>
     </el-dialog>
 
-    <PerformanceDialog ref="performanceDialog" />
+    <PerformanceDialog ref="performanceDialog" @submit="getList" />
 
   </div>
 </template>

@@ -151,8 +151,8 @@
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="closeDialog">取消</el-button>
-          <el-button type="primary" @click="saveDraft">保存草稿</el-button>
-          <el-button type="success" @click="submitPerformance">提交绩效</el-button>
+          <el-button type="primary" @click="saveDraftFunc">保存草稿</el-button>
+          <el-button type="success" @click="submitPerformanceFunc">提交绩效</el-button>
         </span>
       </template>
     </el-dialog>
@@ -163,7 +163,7 @@
 import { ref, watch, nextTick } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Document, Search, DocumentAdd } from '@element-plus/icons-vue'
-import { getContentListByPerformanceId } from '@/api/perf/content'
+import { getContentListByPerformanceId, saveDraft, submitPerformance } from '@/api/perf/content'
 
 export default {
   name: 'PerformanceDialog',
@@ -174,7 +174,8 @@ export default {
       default: () => []
     }
   },
-  setup(props) {
+  emits: ['submit'], // 在这里声明 emits
+  setup(props, { emit }) { // 从上下文参数中解构 emit
     const dialogVisible = ref(false)
     const filterText = ref('')
     const treeRef = ref()
@@ -272,14 +273,47 @@ export default {
     }
     
     // 保存草稿
-    const saveDraft = () => {
-      ElMessage.success('绩效已保存为草稿')
-      // 这里可以触发保存事件，将数据传递给父组件
-      // emit('save', indicators.value)
+    const saveDraftFunc = async () => {
+      try {
+        // 准备要保存的数据
+        const contentData = []
+        const traverseTree = (nodes) => {
+          nodes.forEach(node => {
+            // 只处理叶子节点（没有子节点的节点）
+            if (!node.children || node.children.length === 0) {
+              contentData.push({
+                id: node.id,
+                performanceId: node.performanceId,
+                itemId: node.itemId,
+                selfTarget: node.selfTarget,
+                selfResult: node.selfResult,
+                selfScore: node.selfScore,
+                selfComment: node.selfComment
+              })
+            }
+            // 递归处理子节点
+            if (node.children && node.children.length > 0) {
+              traverseTree(node.children)
+            }
+          })
+        }
+        
+        traverseTree(indicators.value)
+        
+        // 保存草稿
+        if (contentData.length > 0 && indicators.value.length > 0) {
+          const performanceId = indicators.value[0].performanceId;
+          await saveDraft(performanceId, contentData)
+        }
+        
+        ElMessage.success('绩效草稿保存成功')
+      } catch (error) {
+        ElMessage.error('保存草稿失败: ' + error.message)
+      }
     }
     
     // 提交绩效
-    const submitPerformance = async () => {
+    const submitPerformanceFunc = async () => {
       try {
         await ElMessageBox.confirm(
           '提交后绩效将无法修改，确定提交吗？',
@@ -290,12 +324,47 @@ export default {
             type: 'warning',
           }
         )
+        
+        // 准备要提交的数据
+        const contentData = []
+        const traverseTree = (nodes) => {
+          nodes.forEach(node => {
+            // 只处理叶子节点（没有子节点的节点）
+            if (!node.children || node.children.length === 0) {
+              contentData.push({
+                id: node.id,
+                performanceId: node.performanceId,
+                itemId: node.itemId,
+                selfTarget: node.selfTarget,
+                selfResult: node.selfResult,
+                selfScore: node.selfScore,
+                selfComment: node.selfComment
+              })
+            }
+            // 递归处理子节点
+            if (node.children && node.children.length > 0) {
+              traverseTree(node.children)
+            }
+          })
+        }
+        
+        traverseTree(indicators.value)
+        
+        // 提交绩效
+        if (contentData.length > 0 && indicators.value.length > 0) {
+          const performanceId = indicators.value[0].performanceId;
+          await submitPerformance(performanceId, contentData, 'PENDING_SCORE', 1)
+        }
+        
         ElMessage.success('绩效提交成功')
-        // 这里可以触发表单提交事件
-        // emit('submit', indicators.value)
+        // 关闭弹窗并通知父组件
         closeDialog()
+        // 可以触发提交事件，将数据传递给父组件
+        emit('submit', indicators.value)
       } catch (error) {
-        // 用户取消提交
+        if (error !== 'cancel') {
+          ElMessage.error('提交绩效失败: ' + error.message)
+        }
       }
     }
     
@@ -320,8 +389,9 @@ export default {
       handleNodeClick,
       openDialog,
       closeDialog,
-      saveDraft,
-      submitPerformance
+      saveDraftFunc,
+      submitPerformance,
+      submitPerformanceFunc
     }
   }
 }

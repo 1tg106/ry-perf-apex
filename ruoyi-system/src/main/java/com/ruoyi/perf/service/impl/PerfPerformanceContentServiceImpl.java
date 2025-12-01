@@ -2,15 +2,23 @@ package com.ruoyi.perf.service.impl;
 
 import java.util.*;
 
+import com.ruoyi.common.enums.PerformanceStatus;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.perf.domain.PerfPerformance;
+import com.ruoyi.perf.domain.vo.PerfPerformanceVO;
 import com.ruoyi.perf.domain.vo.PerformanceContentItemVO;
+import com.ruoyi.perf.mapper.PerfPerformanceMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.perf.mapper.PerfPerformanceContentMapper;
 import com.ruoyi.perf.domain.PerfPerformanceContent;
 import com.ruoyi.perf.service.IPerfPerformanceContentService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ruoyi.perf.domain.dto.PerfContentBatchUpdateDTO;
+import com.ruoyi.perf.service.IPerfPerformanceService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 绩效内容Service业务层处理
@@ -23,6 +31,9 @@ public class PerfPerformanceContentServiceImpl extends ServiceImpl<PerfPerforman
 {
     @Autowired
     private PerfPerformanceContentMapper perfPerformanceContentMapper;
+
+    @Autowired
+    private PerfPerformanceMapper perfPerformanceMapper;
 
     /**
      * 查询绩效内容
@@ -72,6 +83,39 @@ public class PerfPerformanceContentServiceImpl extends ServiceImpl<PerfPerforman
     {
         perfPerformanceContent.setUpdateTime(DateUtils.getNowDate());
         return perfPerformanceContentMapper.updatePerfPerformanceContent(perfPerformanceContent);
+    }
+
+    /**
+     * 批量更新绩效内容
+     * 
+     * @param updateDTO 批量更新参数
+     * @return 结果
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public int updatePerfPerformanceContentBatch(PerfContentBatchUpdateDTO updateDTO) {
+        List<PerfPerformanceContent> perfPerformanceContents = updateDTO.getContentList();
+        
+        // 设置更新时间
+        for (PerfPerformanceContent perfPerformanceContent : perfPerformanceContents) {
+            perfPerformanceContent.setUpdateTime(DateUtils.getNowDate());
+            perfPerformanceContent.setUpdateBy(SecurityUtils.getUserId().toString());
+        }
+        
+        // 批量更新绩效内容
+        boolean result = this.updateBatchById(perfPerformanceContents);
+        
+        // 如果是提交操作，还需要更新绩效实例状态
+        if (PerformanceStatus.PENDING_SCORE.getCode().equals(updateDTO.getPerformanceStatus())) {
+            PerfPerformance perfPerformance = perfPerformanceMapper.selectById(updateDTO.getPerformanceId());
+            perfPerformance.setStatus(PerformanceStatus.PENDING_SCORE.getCode());
+            perfPerformance.setCurrentStep(updateDTO.getPerformanceStep());
+            perfPerformance.setUpdateTime(DateUtils.getNowDate());
+            perfPerformance.setUpdateBy(SecurityUtils.getUserId().toString());
+            perfPerformanceMapper.updateById(perfPerformance);
+        }
+        
+        return result ? perfPerformanceContents.size() : 0;
     }
 
     /**

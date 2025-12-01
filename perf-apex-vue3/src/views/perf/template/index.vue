@@ -89,13 +89,13 @@
     <el-table v-loading="loading" :data="templateList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="模板名称" align="center" prop="templateName" />
-      <el-table-column label="模板类型" align="center" prop="templateType">
+      <!-- <el-table-column label="模板类型" align="center" prop="templateType">
         <template #default="scope">
           <el-tag type="primary" v-if="scope.row.templateType == TEMPLATE_TYPE.OKR">{{ TEMPLATE_TYPE_LIST[0].label }}</el-tag>
           <el-tag type="success" v-if="scope.row.templateType == TEMPLATE_TYPE.KPI">{{ TEMPLATE_TYPE_LIST[1].label }}</el-tag>
           <el-tag type="warning" v-if="scope.row.templateType == TEMPLATE_TYPE.COMPETENCY">{{ TEMPLATE_TYPE_LIST[2].label }}</el-tag>
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column label="适用部门" align="center" prop="deptName" />
       <el-table-column label="适用岗位" align="center" prop="postNames" />
       <el-table-column label="状态" align="center" prop="status">
@@ -126,13 +126,13 @@
         <el-form-item label="模板名称" prop="templateName">
           <el-input v-model="form.templateName" placeholder="请输入模板名称" />
         </el-form-item>
-        <el-form-item label="模板类型" prop="templateType">
+        <!-- <el-form-item label="模板类型" prop="templateType">
           <el-select v-model="form.templateType" placeholder="请选择模板类型">
             <el-option label="关键指标" value="KPI" />
             <el-option label="目标与成果" value="OKR" />
             <el-option label="能力素质" value="COMPETENCY" />
           </el-select>
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="适用部门" prop="deptId">
           <el-tree-select
             v-model="form.deptId"
@@ -217,9 +217,9 @@ const data = reactive({
     templateName: [
       { required: true, message: "模板名称不能为空", trigger: "blur" }
     ],
-    templateType: [
-      { required: true, message: "模板类型不能为空", trigger: "change" }
-    ],
+    // templateType: [
+    //   { required: true, message: "模板类型不能为空", trigger: "change" }
+    // ],
     deptId: [
       { required: true, message: "适用部门不能为空", trigger: "change" }
     ],
