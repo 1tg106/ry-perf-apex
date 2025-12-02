@@ -57,11 +57,13 @@ public class PerfTemplateServiceImpl extends ServiceImpl<PerfTemplateMapper,Perf
         PerfTemplateVO perfTemplateVO = new PerfTemplateVO();
         BeanUtils.copyProperties(perfTemplate,perfTemplateVO);
 
+        // 获取部门名称
         if(perfTemplate.getDeptId() == null){
             SysDept sysDept = sysDeptService.selectDeptById(perfTemplate.getDeptId());
             perfTemplateVO.setDeptName(sysDept.getDeptName());
         }
 
+        // 岗位名称
         if (StringUtils.isNotEmpty(perfTemplate.getPostIds())) {
             List<Long> postIds = Arrays.stream(perfTemplate.getPostIds().split(","))
                     .map(String::trim)
@@ -171,6 +173,7 @@ public class PerfTemplateServiceImpl extends ServiceImpl<PerfTemplateMapper,Perf
         PerfTemplate template = this.getById(perfTemplate.getId());
         template.setTemplateName(perfTemplate.getTemplateName());
         template.setTemplateType(perfTemplate.getTemplateType());
+        template.setDefaultScoreId(perfTemplate.getDefaultScoreId());
         template.setDeptId(perfTemplate.getDeptId());
         template.setPostIds(StringUtils.join(perfTemplate.getPostIds(), ","));
         template.setStatus(perfTemplate.getStatus());
@@ -188,6 +191,9 @@ public class PerfTemplateServiceImpl extends ServiceImpl<PerfTemplateMapper,Perf
         }
         if(perfTemplate.getPostIds().isEmpty()){
             throw new RuntimeException("适用岗位不能为空");
+        }
+        if(perfTemplate.getDefaultScoreId() == null){
+            throw new RuntimeException("默认评分人不能为空");
         }
     }
 

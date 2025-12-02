@@ -1,6 +1,8 @@
 package com.ruoyi.perf.service;
 
 import java.util.List;
+
+import com.ruoyi.perf.domain.PerfPerformanceContent;
 import com.ruoyi.perf.domain.PerfPerformanceContentScore;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -60,4 +62,10 @@ public interface IPerfPerformanceContentScoreService extends IService<PerfPerfor
      * @return 结果
      */
     public int deletePerfPerformanceContentScoreById(Long id);
+
+    /**
+     *  新增绩效指标评分
+     * @return
+     */
+    public Boolean savePerfPerformanceContentScore(List<PerfPerformanceContent> perfPerformanceContents, List<Long> itemIds);
 }

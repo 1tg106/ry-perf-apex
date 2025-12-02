@@ -8,6 +8,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="id"    column="id"    />
         <result property="templateName"    column="template_name"    />
         <result property="templateType"    column="template_type"    />
+        <result property="defaultScoreId"    column="default_score_id"    />
         <result property="deptId"    column="dept_id"    />
         <result property="postIds"    column="post_ids"    />
         <result property="status"    column="status"    />
@@ -20,7 +21,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectPerfTemplateVo">
-        select id, template_name, template_type, dept_id, post_ids, status, remark, del_flag, create_by, create_time, update_by, update_time from perf_template
+        select id, template_name, template_type, default_score_id, dept_id, post_ids, status, remark, del_flag, create_by, create_time, update_by, update_time from perf_template
     </sql>
 
     <select id="selectPerfTemplateList" parameterType="PerfTemplate" resultMap="PerfTemplateResult">

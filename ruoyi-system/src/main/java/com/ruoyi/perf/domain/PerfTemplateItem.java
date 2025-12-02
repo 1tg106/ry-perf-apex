@@ -29,6 +29,9 @@ public class PerfTemplateItem extends BaseEntity
     @Excel(name = "父指标ID")
     private Long parentId;
 
+    /** 默认评分人ID */
+    private Long defaultScoreId;
+
     /** 评分人IDs */
     private String scoreUserIds;
 
@@ -65,6 +68,14 @@ public class PerfTemplateItem extends BaseEntity
 
     @TableField(exist = false)
     private String templateName;
+
+    public Long getDefaultScoreId() {
+        return defaultScoreId;
+    }
+
+    public void setDefaultScoreId(Long defaultScoreId) {
+        this.defaultScoreId = defaultScoreId;
+    }
 
     public String getTemplateName() {
 		return templateName;

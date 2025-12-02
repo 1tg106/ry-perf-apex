@@ -123,7 +123,7 @@
 
     <!-- 添加或修改绩效模板对话框 -->
     <el-dialog :title="title" v-model="open" width="500px" append-to-body>
-      <el-form ref="templateRef" :model="form" :rules="rules" label-width="80px">
+      <el-form ref="templateRef" :model="form" :rules="rules" label-width="100px">
         <el-form-item label="模板名称" prop="templateName">
           <el-input v-model="form.templateName" placeholder="请输入模板名称" />
         </el-form-item>
@@ -155,6 +155,11 @@
             />
           </el-select>
         </el-form-item>
+        <el-form-item label="默认评分人" prop="defaultScoreId">
+          <el-select v-model="form.defaultScoreId" placeholder="请选择默认评分人" clearable style="width: 220px">
+            <el-option v-for="(item,idx) in userOptions" :key="idx" :label="item.label" :value="item.value" />
+          </el-select>
+        </el-form-item>
         <el-form-item label="状态" prop="periodType">
           <el-select v-model="form.status" placeholder="请选择类型" style="width: 220px">
             <el-option
@@ -182,7 +187,7 @@
 <script setup name="Template">
 import { onMounted, ref, reactive, toRefs, getCurrentInstance } from "vue"
 import { listTemplate, getTemplate, delTemplate, addTemplate, updateTemplate } from "@/api/perf/template"
-import { deptTreeSelect } from "@/api/system/user"
+import { deptTreeSelect, getUserChooseList } from "@/api/system/user"
 import { listPost } from "@/api/system/post"
 import { COMMON_STATUS_LIST, COMMON_STATUS } from "@/utils/perf/commonStatus"
 import { TEMPLATE_TYPE, TEMPLATE_TYPE_LIST } from "@/utils/perf/templateIEnum"
@@ -202,6 +207,7 @@ const title = ref("")
 const deptOptions = ref(undefined)
 const enabledDeptOptions = ref(undefined)
 const postOptions = ref([])
+const userOptions = ref([])
 
 const data = reactive({
   form: {},
@@ -226,6 +232,9 @@ const data = reactive({
     ],
     postIds: [
       { required: true, message: "适用岗位不能为空", trigger: "change" }
+    ],
+    defaultScoreId: [
+      { required: true, message: "默认评分人不能为空", trigger: "change" }
     ],
     status: [
       { required: true, message: "状态(0:正常 1:停用)不能为空", trigger: "change" }
@@ -257,6 +266,7 @@ function reset() {
     id: null,
     templateName: null,
     templateType: null,
+    defaultScoreId:null,
     deptId: null,
     postIds: [],
     status: null,
@@ -295,6 +305,8 @@ function handleAdd() {
   reset()
   getDeptTree()
   getPostList()
+  // load default scorer user options
+  getUserOptions()
   open.value = true
   title.value = "添加绩效模板"
 }
@@ -307,6 +319,9 @@ function handleUpdate(row) {
   const _id = row.id || ids.value
   getTemplate(_id).then(response => {
     form.value = response.data
+    // ensure defaultScoreId exists and load user options
+    if (!form.value.defaultScoreId) form.value.defaultScoreId = null
+    getUserOptions()
     open.value = true
     title.value = "修改绩效模板"
   })
@@ -371,6 +386,14 @@ function filterDisabledDept(deptList) {
 function getPostList() {
   listPost().then(response => {
     postOptions.value = response.rows
+  })
+}
+
+/** 获取评分人下拉（可按部门筛选） */
+function getUserOptions(deptId) {
+  const id = deptId || ''
+  getUserChooseList(id).then(response => {
+    userOptions.value = (response.data || []).map(item => ({ value: item.value ?? item.id, label: item.label ?? item.name }))
   })
 }
 

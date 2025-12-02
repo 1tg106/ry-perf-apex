@@ -1,24 +1,25 @@
 package com.ruoyi.perf.service.impl;
 
-import java.util.*;
-
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.common.enums.PerformanceStatus;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.perf.domain.PerfPerformance;
-import com.ruoyi.perf.domain.vo.PerfPerformanceVO;
+import com.ruoyi.perf.domain.PerfPerformanceContent;
+import com.ruoyi.perf.domain.PerfTemplateItem;
+import com.ruoyi.perf.domain.dto.PerfContentBatchUpdateDTO;
 import com.ruoyi.perf.domain.vo.PerformanceContentItemVO;
+import com.ruoyi.perf.mapper.PerfPerformanceContentMapper;
 import com.ruoyi.perf.mapper.PerfPerformanceMapper;
+import com.ruoyi.perf.service.IPerfPerformanceContentScoreService;
+import com.ruoyi.perf.service.IPerfPerformanceContentService;
+import com.ruoyi.perf.service.IPerfTemplateItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.ruoyi.perf.mapper.PerfPerformanceContentMapper;
-import com.ruoyi.perf.domain.PerfPerformanceContent;
-import com.ruoyi.perf.service.IPerfPerformanceContentService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.ruoyi.perf.domain.dto.PerfContentBatchUpdateDTO;
-import com.ruoyi.perf.service.IPerfPerformanceService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.*;
 
 /**
  * 绩效内容Service业务层处理
@@ -34,6 +35,12 @@ public class PerfPerformanceContentServiceImpl extends ServiceImpl<PerfPerforman
 
     @Autowired
     private PerfPerformanceMapper perfPerformanceMapper;
+
+    @Autowired
+    private IPerfTemplateItemService perfTemplateItemService;
+
+    @Autowired
+    private IPerfPerformanceContentScoreService perfPerformanceContentScoreService;
 
     /**
      * 查询绩效内容
@@ -95,11 +102,13 @@ public class PerfPerformanceContentServiceImpl extends ServiceImpl<PerfPerforman
     @Transactional(rollbackFor = Exception.class)
     public int updatePerfPerformanceContentBatch(PerfContentBatchUpdateDTO updateDTO) {
         List<PerfPerformanceContent> perfPerformanceContents = updateDTO.getContentList();
-        
+
+        List<Long> itemIds = new ArrayList<>();
         // 设置更新时间
         for (PerfPerformanceContent perfPerformanceContent : perfPerformanceContents) {
             perfPerformanceContent.setUpdateTime(DateUtils.getNowDate());
             perfPerformanceContent.setUpdateBy(SecurityUtils.getUserId().toString());
+            itemIds.add(perfPerformanceContent.getItemId());
         }
         
         // 批量更新绩效内容
@@ -113,6 +122,9 @@ public class PerfPerformanceContentServiceImpl extends ServiceImpl<PerfPerforman
             perfPerformance.setUpdateTime(DateUtils.getNowDate());
             perfPerformance.setUpdateBy(SecurityUtils.getUserId().toString());
             perfPerformanceMapper.updateById(perfPerformance);
+
+            // 保存绩效评分项
+            perfPerformanceContentScoreService.savePerfPerformanceContentScore(perfPerformanceContents, itemIds);
         }
         
         return result ? perfPerformanceContents.size() : 0;

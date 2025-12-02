@@ -15,9 +15,8 @@ import java.util.List;
  * @author liudahua
  * @date 2025-11-25
  */
-@EqualsAndHashCode(callSuper = true)
 @Data
-public class PerfTemplateItemSaveDTO extends BaseEntity
+public class PerfTemplateItemSaveDTO
 {
     private static final long serialVersionUID = 1L;
 

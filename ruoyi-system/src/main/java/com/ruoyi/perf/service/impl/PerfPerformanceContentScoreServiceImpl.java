@@ -1,7 +1,17 @@
 package com.ruoyi.perf.service.impl;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.perf.domain.PerfPerformanceContent;
+import com.ruoyi.perf.domain.PerfTemplateItem;
+import com.ruoyi.perf.service.IPerfTemplateItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.perf.mapper.PerfPerformanceContentScoreMapper;
@@ -20,6 +30,9 @@ public class PerfPerformanceContentScoreServiceImpl extends ServiceImpl<PerfPerf
 {
     @Autowired
     private PerfPerformanceContentScoreMapper perfPerformanceContentScoreMapper;
+
+    @Autowired
+    private IPerfTemplateItemService perfTemplateItemService;
 
     /**
      * 查询绩效指标评分
@@ -93,5 +106,54 @@ public class PerfPerformanceContentScoreServiceImpl extends ServiceImpl<PerfPerf
     public int deletePerfPerformanceContentScoreById(Long id)
     {
         return perfPerformanceContentScoreMapper.deletePerfPerformanceContentScoreById(id);
+    }
+
+    @Override
+    public Boolean savePerfPerformanceContentScore(List<PerfPerformanceContent> perfPerformanceContents, List<Long> itemIds) {
+        // 获取对应的指标项
+        List<PerfTemplateItem> list = perfTemplateItemService.list(Wrappers.lambdaQuery(PerfTemplateItem.class)
+                .in(PerfTemplateItem::getId, itemIds));
+        if(list.isEmpty()){
+            throw new RuntimeException("没有找到对应的指标项");
+        }
+        List<PerfPerformanceContentScore> scores = new ArrayList<>();
+        for (PerfPerformanceContent perfPerformanceContent : perfPerformanceContents){
+            for (PerfTemplateItem item : list){
+                // 判断当前指标项是否需要创建评分人评分
+                if(item.getId().equals(perfPerformanceContent.getItemId())){
+                    // 默认评分人
+                    if(StringUtils.isEmpty(item.getScoreUserIds())){
+                        PerfPerformanceContentScore score = new PerfPerformanceContentScore();
+                        score.setPerformanceId(perfPerformanceContent.getPerformanceId());
+                        score.setContentId(perfPerformanceContent.getId());
+                        score.setScoreUserId(item.getDefaultScoreId());
+                        score.setItemId(item.getId());
+                        score.setIfScore(0);
+                        score.setCreateTime(DateUtils.getNowDate());
+                        score.setCreateBy(SecurityUtils.getUserId().toString());
+                        scores.add(score);
+                        continue;
+                    }
+
+                    // 多个评分人
+                    List<Long> scoreUserIds = Arrays.stream(item.getScoreUserIds().split(","))
+                            .map(String::trim) // 去除前后空格
+                            .map(Long::parseLong)
+                            .collect(Collectors.toList());
+                    for (Long scoreUserId : scoreUserIds){
+                        PerfPerformanceContentScore score = new PerfPerformanceContentScore();
+                        score.setPerformanceId(perfPerformanceContent.getPerformanceId());
+                        score.setContentId(perfPerformanceContent.getId());
+                        score.setScoreUserId(scoreUserId);
+                        score.setItemId(item.getId());
+                        score.setIfScore(0);
+                        score.setCreateTime(DateUtils.getNowDate());
+                        score.setCreateBy(SecurityUtils.getUserId().toString());
+                        scores.add(score);
+                    }
+                }
+            }
+        }
+        return this.saveBatch(scores);
     }
 }

@@ -17,6 +17,9 @@ public class PerfTemplateSaveDTO implements Serializable {
     /** 模板类型(KPI:关键指标, OKR:目标与成果, COMPETENCY:能力素质) */
     private String templateType;
 
+    /** 默认评分人ID */
+    private Long defaultScoreId;
+
     /** 适用部门ID */
     private Long deptId;
 

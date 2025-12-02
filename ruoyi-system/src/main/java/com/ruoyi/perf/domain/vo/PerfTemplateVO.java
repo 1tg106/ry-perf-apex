@@ -21,6 +21,9 @@ public class PerfTemplateVO implements Serializable {
     @Excel(name = "模板类型")
     private String templateType;
 
+    /** 默认评分人ID */
+    private Long defaultScoreId;
+
     /** 适用部门ID */
     private Long deptId;
 

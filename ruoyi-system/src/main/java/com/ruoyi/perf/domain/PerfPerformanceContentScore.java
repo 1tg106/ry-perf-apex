@@ -19,9 +19,17 @@ public class PerfPerformanceContentScore extends BaseEntity
     /** 绩效ID */
     private Long id;
 
+    /** 绩效id */
+    @Excel(name = "绩效id")
+    private Long performanceId;
+
     /** 绩效内容id */
     @Excel(name = "绩效内容id")
     private Long contentId;
+
+    /** 模版指标id */
+    @Excel(name = "模版指标id")
+    private Long itemId;
 
     /** 评分人ID */
     @Excel(name = "评分人ID")
@@ -31,10 +39,22 @@ public class PerfPerformanceContentScore extends BaseEntity
     @Excel(name = "得分")
     private BigDecimal score;
 
+    /** 是否评分: 0-否 1-是 */
+    @Excel(name = "是否评分")
+    private Integer ifScore;
+
     /** 删除标志（0:存在 1:删除） */
     private String delFlag;
 
-    public void setId(Long id) 
+    public Long getPerformanceId() {
+        return performanceId;
+    }
+
+    public void setPerformanceId(Long performanceId) {
+        this.performanceId = performanceId;
+    }
+
+    public void setId(Long id)
     {
         this.id = id;
     }
@@ -82,6 +102,22 @@ public class PerfPerformanceContentScore extends BaseEntity
     public String getDelFlag() 
     {
         return delFlag;
+    }
+
+    public Long getItemId() {
+        return itemId;
+    }
+
+    public void setItemId(Long itemId) {
+        this.itemId = itemId;
+    }
+
+    public Integer getIfScore() {
+        return ifScore;
+    }
+
+    public void setIfScore(Integer ifScore) {
+        this.ifScore = ifScore;
     }
 
     @Override
