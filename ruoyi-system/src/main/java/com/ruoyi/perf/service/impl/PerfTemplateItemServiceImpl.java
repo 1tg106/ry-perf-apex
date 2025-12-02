@@ -67,6 +67,9 @@ public class PerfTemplateItemServiceImpl extends ServiceImpl<PerfTemplateItemMap
         BeanUtils.copyProperties(itemSaveDTO, item);
         item.setCreateTime(DateUtils.getNowDate());
         item.setCreateBy(SecurityUtils.getUserId().toString());
+        if(!itemSaveDTO.getScoreUserIds().isEmpty()){
+            item.setScoreUserIds(StringUtils.join(itemSaveDTO.getScoreUserIds(), ","));
+        }
         return this.save(item)? 1 : 0;
     }
 
@@ -90,6 +93,9 @@ public class PerfTemplateItemServiceImpl extends ServiceImpl<PerfTemplateItemMap
         item.setId(templateItem.getId());
         if(item.getParentId() == null){
             item.setParentId(0l);
+        }
+        if(!itemSaveDTO.getScoreUserIds().isEmpty()){
+            item.setScoreUserIds(StringUtils.join(itemSaveDTO.getScoreUserIds(), ","));
         }
         return this.updateById(item)? 1 : 0;
     }

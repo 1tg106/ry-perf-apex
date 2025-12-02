@@ -57,9 +57,9 @@ export const PERFORMANCE_STEP_STATUS = {
 }
 
 export const PERFORMANCE_STEP_STATUS_LIST = [
-  { label: "员工自评中", value: 0 },
-  { label: "待直属上级评分", value: 1 },
-  { label: "待部门负责人评分", value: 2 },
+  { label: "自评中", value: 0 },
+  { label: "待上级评分", value: 1 },
+  { label: "待负责人评分", value: 2 },
   { label: "待HR确认", value: 3 },
-  { label: "已完成所有步骤", value: 4 }
+  { label: "已完成", value: 4 }
 ]

@@ -29,6 +29,9 @@ public class PerfTemplateItem extends BaseEntity
     @Excel(name = "父指标ID")
     private Long parentId;
 
+    /** 评分人IDs */
+    private String scoreUserIds;
+
     /** 指标名称 */
     @Excel(name = "指标名称")
     private String itemName;
@@ -97,6 +100,16 @@ public class PerfTemplateItem extends BaseEntity
     public Long getParentId() 
     {
         return parentId;
+    }
+
+    public void setScoreUserIds(String scoreUserIds)
+    {
+        this.scoreUserIds = scoreUserIds;
+    }
+
+    public String getScoreUserIds()
+    {
+        return scoreUserIds;
     }
 
     public void setItemName(String itemName) 

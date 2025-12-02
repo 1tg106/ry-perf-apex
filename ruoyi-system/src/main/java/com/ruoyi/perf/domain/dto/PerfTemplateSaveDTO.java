@@ -21,7 +21,7 @@ public class PerfTemplateSaveDTO implements Serializable {
     private Long deptId;
 
     /** 适用岗位IDS */
-    private List<Integer> postIds;
+    private List<Long> postIds;
 
     /** 状态(0:正常 1:停用) */
     private String status;

@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * 模板指标对象 perf_template_item
@@ -51,5 +52,8 @@ public class PerfTemplateItemSaveDTO extends BaseEntity
 
     /** 排序 */
     private Long sortOrder;
+
+    /** 评分人IDs */
+    private List<Long> scoreUserIds;
 
 }

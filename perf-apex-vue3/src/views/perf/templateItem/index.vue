@@ -94,8 +94,16 @@
         </template>
       </el-table-column>
       <el-table-column label="权重(0-100)" align="center" prop="weight" />
-      <el-table-column label="最低分" align="center" prop="minScore" />
-      <el-table-column label="最高分" align="center" prop="maxScore" />
+      <el-table-column label="最低分" align="center" prop="minScore">
+        <template #default="{row}">
+          <div>{{  row.parentId == 0? '-':row.minScore}}</div>
+        </template>
+      </el-table-column>
+      <el-table-column label="最高分" align="center" prop="maxScore">
+        <template #default="{row}">
+          <div>{{  row.parentId == 0? '-':row.maxScore}}</div>
+        </template>
+      </el-table-column>
       <el-table-column label="创建时间" align="center" prop="createTime" width="180" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width" fixed="right" width="220">
         <template #default="scope">
@@ -157,7 +165,7 @@
           <el-input-number v-model="form.minScore" :min="1" :max="10" />
         </el-form-item>
         <el-form-item v-show="form.parentId" label="最高分" prop="maxScore">
-          <el-input-number v-model="form.maxScore" :min="1" :max="10" />
+          <el-input-number v-model="form.maxScore" :min="1" :max="form.weight" />
         </el-form-item>
         <el-form-item v-show="form.parentId" label="标准描述" prop="scoreStandard">
           <el-input v-model="form.scoreStandard" type="textarea" placeholder="请输入评分标准描述" />
