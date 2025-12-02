@@ -81,9 +81,9 @@
       <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="templateItemList" @selection-change="handleSelectionChange">
+    <el-table v-loading="loading" :data="templateItemList" @selection-change="handleSelectionChange" row-key="id" :tree-props="{children: 'children', hasChildren: 'hasChildren'}" lazy :load="loadChildren" :key="tableKey">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="指标名称" align="center" prop="itemName" />
+      <el-table-column label="指标名称" align="left" prop="itemName" width="200" />
       <el-table-column label="模版名称" align="center" prop="templateName" />
       <el-table-column label="指标类型" align="center" prop="itemType">
         <template #default="scope">
@@ -193,6 +193,7 @@ const single = ref(true)
 const multiple = ref(true)
 const total = ref(0)
 const title = ref("")
+const tableKey = ref(0) // 用于强制刷新表格
 
 const data = reactive({
   form: {},
@@ -203,7 +204,7 @@ const data = reactive({
     pageNum: 1,
     pageSize: 10,
     templateId: null,
-    parentId: 0,
+    parentId: 0, // 默认只查询顶级节点
     itemName: null,
     itemType: null,
     weight: null,
@@ -239,10 +240,34 @@ const { queryParams, form, rules, templateOptions, parentItemOptions } = toRefs(
 /** 查询模板指标列表 */
 function getList() {
   loading.value = true
-  listTemplateItem(queryParams.value).then(response => {
-    templateItemList.value = response.rows
+  // 只查询顶级节点（parentId = 0）
+  const params = {...queryParams.value, parentId: 0}
+  listTemplateItem(params).then(response => {
+    // 为每个顶级节点添加hasChildren属性，用于标识是否有子节点
+    const rows = response.rows.map(item => {
+      // 顶级节点可能有子节点
+      item.hasChildren = true
+      return item
+    })
+    templateItemList.value = rows
     total.value = response.total
     loading.value = false
+  })
+}
+
+// 加载子节点数据
+function loadChildren(row, treeNode, resolve) {
+  const params = {
+    parentId: row.id
+  }
+  listTemplateItem(params).then(response => {
+    // 为子节点也添加hasChildren属性，但第二层节点不再有子节点
+    const children = response.rows.map(item => {
+      // 第二层节点（parentId不为0）不再有子节点
+      item.hasChildren = false
+      return item
+    })
+    resolve(children)
   })
 }
 
@@ -294,12 +319,16 @@ function reset() {
 /** 搜索按钮操作 */
 function handleQuery() {
   queryParams.value.pageNum = 1
+  // 确保只查询顶级节点
+  queryParams.value.parentId = 0
   getList()
 }
 
 /** 重置按钮操作 */
 function resetQuery() {
   proxy.resetForm("queryRef")
+  // 重置时确保parentId为0，只查询顶级节点
+  queryParams.value.parentId = 0
   handleQuery()
 }
 
@@ -325,9 +354,38 @@ function handleCopy(row) {
   proxy.$modal.confirm('是否确认复制该数据项？').then(function() {
     return copyTemplateItem(_id)
   }).then(() => {
-    getList()
+    // 只刷新受影响的部分，保持其他节点的展开状态
+    if (row.parentId === 0) {
+      // 如果是顶级节点，重新加载整个表格
+      getList()
+    } else {
+      getListByParentId(row);
+    }
     proxy.$modal.msgSuccess("复制成功")
   }).catch(() => {})
+}
+
+// 根据父节点ID获取子节点列表
+function getListByParentId(row) {
+  const parentRow = templateItemList.value.find(item => item.id === row.parentId);
+  if (parentRow) {
+    // 直接调用 loadChildren 但用不同的方式处理结果
+    listTemplateItem({ parentId: row.parentId }).then(response => {
+      const children = response.rows.map(item => {
+        item.hasChildren = false;
+        return item;
+      });
+      
+      // 关键：更新父节点的 children 属性
+      parentRow.children = children;
+      
+      // 强制刷新表格视图
+      tableKey.value = Date.now();
+    });
+  }else{
+    templateItemList.value = [];
+    getList()
+  }
 }
 
 /** 修改按钮操作 */
@@ -361,13 +419,15 @@ function submitForm() {
       if (form.value.id != null) {
         updateTemplateItem(form.value).then(response => {
           proxy.$modal.msgSuccess("修改成功")
-          open.value = false
+          open.value = false;
+          templateItemList.value = [];
           getList()
         })
       } else {
         addTemplateItem(form.value).then(response => {
           proxy.$modal.msgSuccess("新增成功")
-          open.value = false
+          open.value = false;
+          templateItemList.value = [];
           getList()
         })
       }
@@ -381,7 +441,12 @@ function handleDelete(row) {
   proxy.$modal.confirm('是否确认删除该数据项？').then(function() {
     return delTemplateItem(_ids)
   }).then(() => {
-    getList()
+    if (row.parentId === 0) {
+      // 如果是顶级节点，重新加载整个表格
+      getList()
+    } else {
+      getListByParentId(row);
+    }
     proxy.$modal.msgSuccess("删除成功")
   }).catch(() => {})
 }
@@ -431,6 +496,6 @@ function getDynamicRules() {
 }
 
 getList()
-getTemplateOptions()
-getParentItemOptions()
+// getTemplateOptions()
+// getParentItemOptions()
 </script>
