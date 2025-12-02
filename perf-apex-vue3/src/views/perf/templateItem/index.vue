@@ -140,7 +140,7 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item v-show="!form.parentId" label="指标类型" prop="itemType">
+        <el-form-item v-show="form.parentId" label="指标类型" prop="itemType">
           <el-select v-model="form.itemType" clearable placeholder="请选择类型" style="width: 220px">
             <el-option
               v-for="(item,index) in ITEM_TYPE_LIST"
@@ -153,16 +153,16 @@
         <el-form-item label="权重" prop="weight">
           <el-input-number v-model="form.weight" :min="1" :max="100" />
         </el-form-item>
-        <el-form-item v-show="!form.parentId" label="最低分" prop="minScore">
+        <el-form-item v-show="form.parentId" label="最低分" prop="minScore">
           <el-input-number v-model="form.minScore" :min="1" :max="10" />
         </el-form-item>
-        <el-form-item v-show="!form.parentId" label="最高分" prop="maxScore">
+        <el-form-item v-show="form.parentId" label="最高分" prop="maxScore">
           <el-input-number v-model="form.maxScore" :min="1" :max="10" />
         </el-form-item>
-        <el-form-item v-show="!form.parentId" label="标准描述" prop="scoreStandard">
+        <el-form-item v-show="form.parentId" label="标准描述" prop="scoreStandard">
           <el-input v-model="form.scoreStandard" type="textarea" placeholder="请输入评分标准描述" />
         </el-form-item>
-        <el-form-item v-show="!form.parentId" label="备注" prop="remark">
+        <el-form-item v-show="form.parentId" label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
         </el-form-item>
       </el-form>
@@ -203,7 +203,7 @@ const data = reactive({
     pageNum: 1,
     pageSize: 10,
     templateId: null,
-    parentId: null,
+    parentId: 0,
     itemName: null,
     itemType: null,
     weight: null,
@@ -395,8 +395,8 @@ function handleExport() {
 
 /** 父指标改变时触发 */
 function handleParentIdChange(value) {
-  // 当选择了父指标时，清空指标类型
-  if (value) {
+  // 当取消父指标选择时，清空指标相关字段
+  if (!value) {
     form.value.itemType = ITEM_TYPE_LIST[0].value
     form.value.minScore = 0
     form.value.maxScore = 0
@@ -416,19 +416,15 @@ function handleParentIdChange(value) {
 function getDynamicRules() {
   const dynamicRules = { ...rules.value }
   
-  // 如果有父指标，则不需要验证以下字段
+  // 如果选择了父指标，则这些字段需要验证；否则不需要验证
   if (form.value.parentId) {
-    // delete dynamicRules.itemType
-    // delete dynamicRules.minScore
-    // delete dynamicRules.maxScore
-
-    dynamicRules.itemType[0].required = false
-    dynamicRules.minScore[0].required = false
-    dynamicRules.maxScore[0].required = false
-  }else{
     dynamicRules.itemType[0].required = true
     dynamicRules.minScore[0].required = true
     dynamicRules.maxScore[0].required = true
+  } else {
+    dynamicRules.itemType[0].required = false
+    dynamicRules.minScore[0].required = false
+    dynamicRules.maxScore[0].required = false
   }
   
   return dynamicRules
