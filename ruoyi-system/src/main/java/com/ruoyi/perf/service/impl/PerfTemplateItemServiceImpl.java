@@ -1,5 +1,6 @@
 package com.ruoyi.perf.service.impl;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -10,6 +11,7 @@ import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.perf.domain.dto.PerfTemplateItemSaveDTO;
 import com.ruoyi.perf.domain.vo.CommonChooseVO;
+import com.ruoyi.perf.domain.vo.PerfTemplateItemVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,9 +39,22 @@ public class PerfTemplateItemServiceImpl extends ServiceImpl<PerfTemplateItemMap
      * @return 模板指标
      */
     @Override
-    public PerfTemplateItem selectPerfTemplateItemByItemId(Long itemId)
+    public PerfTemplateItemVO selectPerfTemplateItemByItemId(Long itemId)
     {
-        return perfTemplateItemMapper.selectPerfTemplateItemByItemId(itemId);
+        PerfTemplateItem templateItem = perfTemplateItemMapper.selectPerfTemplateItemByItemId(itemId);
+        if(templateItem == null){
+            return null;
+        }
+        PerfTemplateItemVO itemVO = new PerfTemplateItemVO();
+        BeanUtils.copyProperties(templateItem, itemVO);
+        if(!StringUtils.isEmpty(templateItem.getScoreUserIds())){
+            List<Long> scoreUserIds = Arrays.stream(templateItem.getScoreUserIds().split(","))
+                    .map(String::trim) // 去除前后空格
+                    .map(Long::parseLong)
+                    .collect(Collectors.toList());
+            itemVO.setScoreUserIds(scoreUserIds);
+        }
+        return itemVO;
     }
 
     /**

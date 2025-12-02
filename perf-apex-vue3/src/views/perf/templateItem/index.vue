@@ -170,6 +170,11 @@
         <el-form-item v-show="form.parentId" label="标准描述" prop="scoreStandard">
           <el-input v-model="form.scoreStandard" type="textarea" placeholder="请输入评分标准描述" />
         </el-form-item>
+        <el-form-item v-show="form.parentId" label="评分人" prop="scoreUserIds">
+          <el-select v-model="form.scoreUserIds" multiple filterable clearable placeholder="请选择评分人" style="width: 220px">
+            <el-option v-for="(item,index) in userOptions" :key="index" :label="item.label" :value="item.value" />
+          </el-select>
+        </el-form-item>
         <el-form-item v-show="form.parentId" label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
         </el-form-item>
@@ -186,6 +191,7 @@
 
 <script setup name="TemplateItem">
 import { listTemplateItem, getTemplateItem, delTemplateItem, addTemplateItem, updateTemplateItem, getItemChooseList, copyTemplateItem } from "@/api/perf/templateItem"
+import { getUserChooseList } from '@/api/system/user'
 import { ITEM_TYPE, ITEM_TYPE_LIST } from "@/utils/perf/templateItemEnum"
 import { getTemplateChooseList } from "@/api/perf/template"
 import { nextTick } from 'vue'
@@ -206,6 +212,7 @@ const tableKey = ref(0) // 用于强制刷新表格
 const data = reactive({
   form: {},
   // Add template and parent item options
+  userOptions: [],
   templateOptions: [],
   parentItemOptions: [],
   queryParams: {
@@ -243,7 +250,7 @@ const data = reactive({
   }
 })
 
-const { queryParams, form, rules, templateOptions, parentItemOptions } = toRefs(data)
+const { queryParams, form, rules, templateOptions, parentItemOptions, userOptions } = toRefs(data)
 
 /** 查询模板指标列表 */
 function getList() {
@@ -300,6 +307,16 @@ function getParentItemOptions() {
   })
 }
 
+// 获取评分人下拉选项
+function getUserOptions(deptId) {
+  // support optional deptId filtering
+  const id = deptId || ''
+  getUserChooseList(id).then(response => {
+    const list = response.data || []
+    data.userOptions = list.map(item => ({ value: item.value ?? item.id, label: item.label ?? item.name }))
+  })
+}
+
 // 取消按钮
 function cancel() {
   open.value = false
@@ -308,7 +325,7 @@ function cancel() {
 
 // 表单重置
 function reset() {
-  form.value = {
+    form.value = {
     id: null,
     templateId: null,
     parentId: null,
@@ -316,6 +333,7 @@ function reset() {
     itemType: ITEM_TYPE_LIST[0].value,
     weight: 0,
     scoreStandard: null,
+    scoreUserIds: [],
     minScore: 0,
     maxScore: 0,
     sortOrder: null,
@@ -353,6 +371,8 @@ function handleAdd() {
   // 加载下拉选项
   getTemplateOptions()
   getParentItemOptions()
+  // 加载评分人列表
+  getUserOptions()
   open.value = true
   title.value = "添加模板指标"
 }
@@ -405,11 +425,21 @@ function handleUpdate(row) {
   const _id = row.id || ids.value
   getTemplateItem(_id).then(response => {
     form.value = response.data
+    // normalize scoreUserIds to array (API may return CSV string)
+    if (form.value.scoreUserIds && !Array.isArray(form.value.scoreUserIds)) {
+      if (typeof form.value.scoreUserIds === 'string') {
+        form.value.scoreUserIds = form.value.scoreUserIds.split(',').map(v => v === '' ? '' : (isNaN(Number(v)) ? v.trim() : Number(v.trim())))
+      } else {
+        form.value.scoreUserIds = []
+      }
+    }
     if(form.value.parentId === 0){
       form.value.parentId = null
     }
     open.value = true
     title.value = "修改模板指标"
+    // load user options so existing selection shows in multi-select
+    getUserOptions()
     
     // 确保表单验证规则正确更新
     nextTick(() => {

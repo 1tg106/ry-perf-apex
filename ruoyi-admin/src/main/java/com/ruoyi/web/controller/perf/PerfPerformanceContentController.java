@@ -88,7 +88,7 @@ public class PerfPerformanceContentController extends BaseController
     }
 
     /**
-     * 批量更新绩效内容
+     * 提交/报错绩效
      */
     @PreAuthorize("@ss.hasPermi('perf:content:edit')")
     @Log(title = "绩效内容", businessType = BusinessType.UPDATE)

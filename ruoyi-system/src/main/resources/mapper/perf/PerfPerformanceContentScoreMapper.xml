@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.perf.mapper.PerfPerformanceContentScoreMapper">
+    
+    <resultMap type="PerfPerformanceContentScore" id="PerfPerformanceContentScoreResult">
+        <result property="id"    column="id"    />
+        <result property="contentId"    column="content_id"    />
+        <result property="scoreUserId"    column="score_user_id"    />
+        <result property="score"    column="score"    />
+        <result property="remark"    column="remark"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectPerfPerformanceContentScoreVo">
+        select id, content_id, score_user_id, score, remark, del_flag, create_by, create_time, update_by, update_time from perf_performance_content_score
+    </sql>
+
+    <select id="selectPerfPerformanceContentScoreList" parameterType="PerfPerformanceContentScore" resultMap="PerfPerformanceContentScoreResult">
+        <include refid="selectPerfPerformanceContentScoreVo"/>
+        <where>  
+            <if test="contentId != null "> and content_id = #{contentId}</if>
+            <if test="scoreUserId != null "> and score_user_id = #{scoreUserId}</if>
+            <if test="score != null "> and score = #{score}</if>
+        </where>
+    </select>
+    
+    <select id="selectPerfPerformanceContentScoreById" parameterType="Long" resultMap="PerfPerformanceContentScoreResult">
+        <include refid="selectPerfPerformanceContentScoreVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertPerfPerformanceContentScore" parameterType="PerfPerformanceContentScore" useGeneratedKeys="true" keyProperty="id">
+        insert into perf_performance_content_score
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="contentId != null">content_id,</if>
+            <if test="scoreUserId != null">score_user_id,</if>
+            <if test="score != null">score,</if>
+            <if test="remark != null">remark,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="contentId != null">#{contentId},</if>
+            <if test="scoreUserId != null">#{scoreUserId},</if>
+            <if test="score != null">#{score},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updatePerfPerformanceContentScore" parameterType="PerfPerformanceContentScore">
+        update perf_performance_content_score
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="contentId != null">content_id = #{contentId},</if>
+            <if test="scoreUserId != null">score_user_id = #{scoreUserId},</if>
+            <if test="score != null">score = #{score},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deletePerfPerformanceContentScoreById" parameterType="Long">
+        delete from perf_performance_content_score where id = #{id}
+    </delete>
+
+    <delete id="deletePerfPerformanceContentScoreByIds" parameterType="String">
+        delete from perf_performance_content_score where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

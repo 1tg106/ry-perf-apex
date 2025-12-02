@@ -5,6 +5,7 @@ import com.ruoyi.perf.domain.PerfTemplateItem;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ruoyi.perf.domain.dto.PerfTemplateItemSaveDTO;
 import com.ruoyi.perf.domain.vo.CommonChooseVO;
+import com.ruoyi.perf.domain.vo.PerfTemplateItemVO;
 
 /**
  * 模板指标Service接口
@@ -21,7 +22,7 @@ public interface IPerfTemplateItemService extends IService<PerfTemplateItem>
      * @param itemId 模板指标主键
      * @return 模板指标
      */
-    public PerfTemplateItem selectPerfTemplateItemByItemId(Long itemId);
+    public PerfTemplateItemVO selectPerfTemplateItemByItemId(Long itemId);
 
     /**
      * 查询模板指标列表
