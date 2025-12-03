@@ -2,6 +2,7 @@ package com.ruoyi.perf.service.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -9,8 +10,14 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.utils.bean.BeanUtils;
 import com.ruoyi.perf.domain.PerfPerformanceContent;
 import com.ruoyi.perf.domain.PerfTemplateItem;
+import com.ruoyi.perf.domain.dto.PerfScoreDTO;
+import com.ruoyi.perf.domain.vo.PerfPerformanceVO;
+import com.ruoyi.perf.domain.vo.PerfScoreItemVO;
+import com.ruoyi.perf.domain.vo.PerfScoreVO;
+import com.ruoyi.perf.mapper.PerfPerformanceMapper;
 import com.ruoyi.perf.service.IPerfTemplateItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,6 +40,9 @@ public class PerfPerformanceContentScoreServiceImpl extends ServiceImpl<PerfPerf
 
     @Autowired
     private IPerfTemplateItemService perfTemplateItemService;
+
+    @Autowired
+    private PerfPerformanceMapper perfPerformanceMapper;
 
     /**
      * 查询绩效指标评分
@@ -117,6 +127,8 @@ public class PerfPerformanceContentScoreServiceImpl extends ServiceImpl<PerfPerf
             throw new RuntimeException("没有找到对应的指标项");
         }
         List<PerfPerformanceContentScore> scores = new ArrayList<>();
+
+        List<Long> performanceIds = new ArrayList<>();
         for (PerfPerformanceContent perfPerformanceContent : perfPerformanceContents){
             for (PerfTemplateItem item : list){
                 // 判断当前指标项是否需要创建评分人评分
@@ -153,7 +165,37 @@ public class PerfPerformanceContentScoreServiceImpl extends ServiceImpl<PerfPerf
                     }
                 }
             }
+            performanceIds.add(perfPerformanceContent.getPerformanceId());
         }
+        // 删除
+        perfPerformanceContentScoreMapper.delete(Wrappers.lambdaQuery(PerfPerformanceContentScore.class)
+                .in(PerfPerformanceContentScore::getPerformanceId, performanceIds));
         return this.saveBatch(scores);
+    }
+
+    @Override
+    public List<PerfPerformanceVO> getWaitScorePerformanceList(PerfScoreDTO perfScoreDTO) {
+        // 获取待评分列表
+        List<PerfPerformanceContentScore> scoreUserList = perfPerformanceContentScoreMapper.getWaitScoreUserList(SecurityUtils.getUserId(), perfScoreDTO);
+        if(scoreUserList ==  null || scoreUserList.isEmpty()){
+            return Collections.emptyList();
+        }
+
+        // 根据待评分列表获取待评分的绩效实例
+        List<Long> performanceIds = scoreUserList.stream().map(PerfPerformanceContentScore::getPerformanceId).collect(Collectors.toList());
+        return perfPerformanceMapper.selectPerfPerformanceByIdsList(performanceIds);
+    }
+
+    @Override
+    public PerfScoreVO getPerformanceScoreDetailByPerformanceId(Long performanceId) {
+        PerfPerformanceVO perfPerformanceVO = perfPerformanceMapper.selectPerfPerformanceVOById(performanceId);
+        if(perfPerformanceVO == null){
+            throw new RuntimeException("绩效实例不存在");
+        }
+        PerfScoreVO perfScoreVO = new PerfScoreVO();
+        BeanUtils.copyProperties(perfPerformanceVO, perfScoreVO);
+        List<PerfScoreItemVO> scoreItemVOList = perfPerformanceContentScoreMapper.getPerformanceScoreDetailByPerformanceId(performanceId, SecurityUtils.getUserId());
+        perfScoreVO.setPerfScoreItemVOList(scoreItemVOList);
+        return perfScoreVO;
     }
 }

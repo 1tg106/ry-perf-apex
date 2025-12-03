@@ -37,9 +37,6 @@ public class PerfPerformanceContentServiceImpl extends ServiceImpl<PerfPerforman
     private PerfPerformanceMapper perfPerformanceMapper;
 
     @Autowired
-    private IPerfTemplateItemService perfTemplateItemService;
-
-    @Autowired
     private IPerfPerformanceContentScoreService perfPerformanceContentScoreService;
 
     /**
@@ -103,6 +100,15 @@ public class PerfPerformanceContentServiceImpl extends ServiceImpl<PerfPerforman
     public int updatePerfPerformanceContentBatch(PerfContentBatchUpdateDTO updateDTO) {
         List<PerfPerformanceContent> perfPerformanceContents = updateDTO.getContentList();
 
+        PerfPerformance perfPerformance = perfPerformanceMapper.selectById(updateDTO.getPerformanceId());
+        if(perfPerformance == null){
+            throw new RuntimeException("绩效实例不存在");
+        }
+        if(!perfPerformance.getStatus().equals(PerformanceStatus.PENDING_SUBMISSION.getCode()) &&
+                !perfPerformance.getStatus().equals(PerformanceStatus.DRAFT.getCode())){
+            throw new RuntimeException("该状态不允许操作");
+        }
+
         List<Long> itemIds = new ArrayList<>();
         // 设置更新时间
         for (PerfPerformanceContent perfPerformanceContent : perfPerformanceContents) {
@@ -116,7 +122,6 @@ public class PerfPerformanceContentServiceImpl extends ServiceImpl<PerfPerforman
         
         // 如果是提交操作，还需要更新绩效实例状态
         if (PerformanceStatus.PENDING_SCORE.getCode().equals(updateDTO.getPerformanceStatus())) {
-            PerfPerformance perfPerformance = perfPerformanceMapper.selectById(updateDTO.getPerformanceId());
             perfPerformance.setStatus(PerformanceStatus.PENDING_SCORE.getCode());
             perfPerformance.setCurrentStep(updateDTO.getPerformanceStep());
             perfPerformance.setUpdateTime(DateUtils.getNowDate());

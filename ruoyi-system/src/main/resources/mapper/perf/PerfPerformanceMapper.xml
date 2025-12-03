@@ -65,6 +65,40 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <include refid="selectPerfPerformanceVo"/>
         where id = #{id}
     </select>
+    <select id="selectPerfPerformanceByIdsList" resultType="com.ruoyi.perf.domain.vo.PerfPerformanceVO">
+        SELECT
+        a.*,
+        b.period_name,
+        c.template_name,
+        d.nick_name,
+        e.dept_name
+        FROM
+        perf_performance a
+        LEFT JOIN perf_period b ON a.period_id = b.period_id
+        LEFT JOIN perf_template c ON a.template_id = c.id
+        LEFT JOIN sys_user d ON a.user_id = d.user_id
+        LEFT JOIN sys_dept e ON a.dept_id = e.dept_id
+        where a.del_flag = '0' and a.id in
+        <foreach item="id" collection="ids" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        order by a.create_time desc
+    </select>
+    <select id="selectPerfPerformanceVOById" resultType="com.ruoyi.perf.domain.vo.PerfPerformanceVO">
+        SELECT
+        a.*,
+        b.period_name,
+        c.template_name,
+        d.nick_name,
+        e.dept_name
+        FROM
+        perf_performance a
+        LEFT JOIN perf_period b ON a.period_id = b.period_id
+        LEFT JOIN perf_template c ON a.template_id = c.id
+        LEFT JOIN sys_user d ON a.user_id = d.user_id
+        LEFT JOIN sys_dept e ON a.dept_id = e.dept_id
+        where a.del_flag = '0' and a.id = #{id}
+    </select>
 
     <insert id="insertPerfPerformance" parameterType="PerfPerformance" useGeneratedKeys="true" keyProperty="id">
         insert into perf_performance

@@ -4,6 +4,7 @@ import java.util.List;
 import com.ruoyi.perf.domain.PerfPerformance;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ruoyi.perf.domain.vo.PerfPerformanceVO;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 绩效实例Mapper接口
@@ -60,4 +61,20 @@ public interface PerfPerformanceMapper extends BaseMapper<PerfPerformance>
      * @return 结果
      */
     public int deletePerfPerformanceByIds(Long[] ids);
+
+    /**
+     * 根据绩效ids查询绩效实例列表
+     *
+     * @param ids 绩效实例
+     * @return 绩效实例集合
+     */
+    public List<PerfPerformanceVO> selectPerfPerformanceByIdsList(@Param("ids") List<Long> ids);
+
+    /**
+     * 根据绩效id查询绩效实例
+     *
+     * @param id 绩效实例
+     * @return 绩效实例
+     */
+    public PerfPerformanceVO selectPerfPerformanceVOById(Long id);
 }

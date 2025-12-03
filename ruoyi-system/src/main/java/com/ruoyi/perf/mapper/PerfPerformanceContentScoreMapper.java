@@ -3,6 +3,9 @@ package com.ruoyi.perf.mapper;
 import java.util.List;
 import com.ruoyi.perf.domain.PerfPerformanceContentScore;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.ruoyi.perf.domain.dto.PerfScoreDTO;
+import com.ruoyi.perf.domain.vo.PerfScoreItemVO;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 绩效指标评分Mapper接口
@@ -59,4 +62,19 @@ public interface PerfPerformanceContentScoreMapper extends BaseMapper<PerfPerfor
      * @return 结果
      */
     public int deletePerfPerformanceContentScoreByIds(Long[] ids);
+
+    /**
+     * 获取待评分信息
+     * @param userId
+     * @return
+     */
+    public List<PerfPerformanceContentScore> getWaitScoreUserList(@Param("userId") Long userId,
+                                                                  @Param("pageDTO") PerfScoreDTO pageDTO);
+
+    /**
+     * 获取待评分列表
+     * @param userId
+     * @return
+     */
+    public List<PerfScoreItemVO> getPerformanceScoreDetailByPerformanceId(@Param("performanceId") Long performanceId, @Param("userId") Long userId);
 }

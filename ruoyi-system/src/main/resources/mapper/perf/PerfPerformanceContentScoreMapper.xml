@@ -34,6 +34,46 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <include refid="selectPerfPerformanceContentScoreVo"/>
         where id = #{id}
     </select>
+    <select id="getWaitScoreUserList" resultType="com.ruoyi.perf.domain.PerfPerformanceContentScore">
+        SELECT
+            *
+        FROM
+            perf_performance_content_score
+        WHERE
+            del_flag = '0'
+          AND score_user_id = #{userId}
+          <if test="pageDTO.ifScore != null"> AND if_score = #{pageDTO.ifScore}</if>
+          AND id IN (
+            SELECT MAX(id)
+            FROM perf_performance_content_score
+            WHERE score_user_id = #{userId}
+            <if test="pageDTO.ifScore != null"> AND if_score = #{pageDTO.ifScore}</if>
+            GROUP BY performance_id
+        )
+        ORDER BY id DESC
+    </select>
+    <select id="getPerformanceScoreDetailByPerformanceId"
+            resultType="com.ruoyi.perf.domain.vo.PerfScoreItemVO">
+        SELECT
+            a.*,
+            b.self_target,
+            b.self_result,
+            b.self_score,
+            b.self_comment,
+            c.item_name,
+            c.item_type,
+            c.weight,
+            c.score_standard,
+            c.min_score,
+            c.max_score
+        FROM
+            perf_performance_content_score a
+                LEFT JOIN perf_performance_content b ON b.id = a.content_id
+                LEFT JOIN perf_template_item c ON c.id = a.item_id
+        WHERE
+            a.performance_id = #{performanceId}
+          AND a.score_user_id = #{userId}
+    </select>
 
     <insert id="insertPerfPerformanceContentScore" parameterType="PerfPerformanceContentScore" useGeneratedKeys="true" keyProperty="id">
         insert into perf_performance_content_score

@@ -76,7 +76,7 @@
                 <template #header>
                   <div style="display: flex; justify-content: space-between; align-items: center;">
                     <span>{{ currentItem.itemName }}</span>
-                    <el-tag :type="getItemTypeTagType(currentItem.itemType)" effect="dark">
+                    <el-tag :type="getItemTypeTagType(currentItem.itemType)">
                       {{ getItemTypeText(currentItem.itemType) }}
                     </el-tag>
                   </div>
@@ -308,7 +308,7 @@ export default {
         
         ElMessage.success('绩效草稿保存成功')
       } catch (error) {
-        ElMessage.error('保存草稿失败: ' + error.message)
+        console.log(error);
       }
     }
     
@@ -331,6 +331,10 @@ export default {
           nodes.forEach(node => {
             // 只处理叶子节点（没有子节点的节点）
             if (!node.children || node.children.length === 0) {
+              if(!node.selfTarget || !node.selfResult || !node.selfScore){
+                ElMessage.error('请填写自评分项目标！')
+                throw new Error('请填写自评分项目标！')
+              }
               contentData.push({
                 id: node.id,
                 performanceId: node.performanceId,
@@ -362,9 +366,7 @@ export default {
         // 可以触发提交事件，将数据传递给父组件
         emit('submit', indicators.value)
       } catch (error) {
-        if (error !== 'cancel') {
-          ElMessage.error('提交绩效失败: ' + error.message)
-        }
+        console.log(error);
       }
     }
     
@@ -484,13 +486,19 @@ export default {
   flex: 1;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 8px;
   font-size: 14px;
   padding-right: 8px;
+  min-width: 0; /* 关键：允许 flex 子项收缩到内容大小以下 */
 }
 
 .tree-node-title {
   font-weight: 500;
+  flex: 1;
+  min-width: 0; /* 关键：启用椭圆文本溢出 */
+  white-space: nowrap; /* 防止文本换行 */
+  overflow: hidden; /* 隐藏溢出的内容 */
+  text-overflow: ellipsis; /* 显示省略符号来代表被修剪的文本 */
 }
 
 .tree-node-weight {
