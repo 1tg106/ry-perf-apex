@@ -54,7 +54,8 @@
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width" fixed="right" width="180">
         <template #default="scope">
-          <el-button link type="primary" icon="Edit" @click="openPerformanceDialog(scope.row)">填写</el-button>
+          <el-button link type="success" icon="Star" v-if="scope.row == PERFORMANCE_STATUS.PENDING_SCORE" @click="openScoreDialog(scope.row)">评分</el-button>
+          <el-button link type="success" icon="View" v-else @click="openScoreDialog(scope.row)">查看</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -67,14 +68,16 @@
       @pagination="getList"
     />
 
-    <PerformanceDialog ref="performanceDialog" @submit="getList" />
+    <!-- 添加评分弹窗组件 -->
+    <PerformanceScoreDialog ref="scoreDialog" @submit="getList" />
 
   </div>
 </template>
 
 <script setup name="Performance">
 import { PERFORMANCE_STATUS, PERFORMANCE_STATUS_LIST, PERFORMANCE_STEP_STATUS, PERFORMANCE_STEP_STATUS_LIST } from '@/utils/perf/performanceEnum'
-import PerformanceDialog from '@/components/perf/PerformanceWriteDialog/PerformanceWriteDialog.vue'
+// 引入评分弹窗组件
+import PerformanceScoreDialog from '@/components/perf/PerformanceScoreDialog/PerformanceScoreDialog.vue'
 import { listScore, getScore } from '@/api/perf/score'
 
 const { proxy } = getCurrentInstance()
@@ -98,9 +101,15 @@ const data = reactive({
 
 const { queryParams } = toRefs(data)
 const performanceDialog = ref()
+const scoreDialog = ref() // 评分弹窗引用
 
 const openPerformanceDialog = (row) => {
   performanceDialog.value.openDialog(row.id)
+}
+
+// 打开评分弹窗
+const openScoreDialog = (row) => {
+  scoreDialog.value.openDialog(row.id)
 }
 
 /** 查询绩效实例列表 */

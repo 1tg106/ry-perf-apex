@@ -4,6 +4,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 
 import com.ruoyi.perf.domain.dto.PerfScoreDTO;
+import com.ruoyi.perf.domain.dto.PerfScoreSubmitDTO;
 import com.ruoyi.perf.domain.vo.PerfPerformanceVO;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,5 +57,14 @@ public class PerfPerformanceContentScoreController extends BaseController
     {
         return success(perfPerformanceContentScoreService.getPerformanceScoreDetailByPerformanceId(performanceId));
     }
-
+    
+    /**
+     * 提交绩效指标评分
+     */
+    @Log(title = "绩效指标评分", businessType = BusinessType.UPDATE)
+    @PutMapping("/submitScoreBatch")
+    public AjaxResult submitScoreBatch(@RequestBody List<PerfScoreSubmitDTO> perfScoreSubmitDTOS)
+    {
+        return toAjax(perfPerformanceContentScoreService.submitScoreBatch(perfScoreSubmitDTOS));
+    }
 }

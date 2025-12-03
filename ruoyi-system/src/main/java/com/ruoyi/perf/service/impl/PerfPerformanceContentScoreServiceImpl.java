@@ -1,5 +1,6 @@
 package com.ruoyi.perf.service.impl;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -7,13 +8,17 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.ruoyi.common.enums.PerformanceStatus;
+import com.ruoyi.common.enums.PerformanceStep;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.bean.BeanUtils;
+import com.ruoyi.perf.domain.PerfPerformance;
 import com.ruoyi.perf.domain.PerfPerformanceContent;
 import com.ruoyi.perf.domain.PerfTemplateItem;
 import com.ruoyi.perf.domain.dto.PerfScoreDTO;
+import com.ruoyi.perf.domain.dto.PerfScoreSubmitDTO;
 import com.ruoyi.perf.domain.vo.PerfPerformanceVO;
 import com.ruoyi.perf.domain.vo.PerfScoreItemVO;
 import com.ruoyi.perf.domain.vo.PerfScoreVO;
@@ -197,5 +202,67 @@ public class PerfPerformanceContentScoreServiceImpl extends ServiceImpl<PerfPerf
         List<PerfScoreItemVO> scoreItemVOList = perfPerformanceContentScoreMapper.getPerformanceScoreDetailByPerformanceId(performanceId, SecurityUtils.getUserId());
         perfScoreVO.setPerfScoreItemVOList(scoreItemVOList);
         return perfScoreVO;
+    }
+
+    @Override
+    public Boolean submitScoreBatch(List<PerfScoreSubmitDTO> perfScoreSubmitDTOS) {
+        if(perfScoreSubmitDTOS.isEmpty()){
+            throw new RuntimeException("提交的数据为空");
+        }
+
+        // 获取对应的数据
+        List<Long> ids = perfScoreSubmitDTOS.stream().map(PerfScoreSubmitDTO::getId).collect(Collectors.toList());
+        List<PerfPerformanceContentScore> list = this.list(Wrappers.lambdaQuery(PerfPerformanceContentScore.class)
+                .in(PerfPerformanceContentScore::getId, ids));
+        if(list.isEmpty()){
+            throw new RuntimeException("没有找到对应的数据");
+        }
+
+        // 获取对应的绩效实例
+        Long performanceId = list.get(0).getPerformanceId();
+        PerfPerformance perfPerformance = perfPerformanceMapper.selectById(performanceId);
+        if(perfPerformance == null){
+            throw new RuntimeException("绩效实例不存在");
+        }
+        if(!perfPerformance.getStatus().equals(PerformanceStatus.PENDING_SCORE.getCode())){
+            throw new RuntimeException("该状态不允许操作");
+        }
+
+        // 操作数据
+        BigDecimal finalScore = BigDecimal.ZERO;
+        for (PerfScoreSubmitDTO perfScoreSubmitDTO : perfScoreSubmitDTOS){
+            if(perfScoreSubmitDTO.getId() == null){
+                throw new RuntimeException("提交数据id不能为空");
+            }
+            if(perfScoreSubmitDTO.getScore() == null){
+                throw new RuntimeException("提交数据分数不能为空");
+            }
+            finalScore = finalScore.add(perfScoreSubmitDTO.getScore());
+            for (PerfPerformanceContentScore score : list){
+                if(score.getId().equals(perfScoreSubmitDTO.getId())){
+                    score.setScore(perfScoreSubmitDTO.getScore());
+                    score.setIfScore(1);
+                    score.setRemark(perfScoreSubmitDTO.getRemark());
+                    score.setUpdateTime(DateUtils.getNowDate());
+                    score.setUpdateBy(SecurityUtils.getUserId().toString());
+                }
+            }
+        }
+        boolean updateBatch = this.updateBatchById(list);
+        if(updateBatch){
+            // 判断是否所有评分人已评分
+            long count = this.count(Wrappers.lambdaQuery(PerfPerformanceContentScore.class)
+                    .eq(PerfPerformanceContentScore::getPerformanceId, performanceId)
+                    .eq(PerfPerformanceContentScore::getIfScore, 0));
+            if(count == 0){
+                // 绩效实例状态改为待HR确认
+                perfPerformance.setStatus(PerformanceStatus.PENDING_HR.getCode());
+                perfPerformance.setCurrentStep(Long.valueOf(PerformanceStep.PENDING_HR_CONFIRMATION.getStepValue()));
+                perfPerformance.setUpdateTime(DateUtils.getNowDate());
+                perfPerformance.setFinalScore(finalScore);
+                perfPerformanceMapper.updateById(perfPerformance);
+            }
+        }
+        return updateBatch;
     }
 }

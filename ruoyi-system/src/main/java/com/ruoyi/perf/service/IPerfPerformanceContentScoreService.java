@@ -6,6 +6,7 @@ import com.ruoyi.perf.domain.PerfPerformanceContent;
 import com.ruoyi.perf.domain.PerfPerformanceContentScore;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ruoyi.perf.domain.dto.PerfScoreDTO;
+import com.ruoyi.perf.domain.dto.PerfScoreSubmitDTO;
 import com.ruoyi.perf.domain.vo.PerfPerformanceVO;
 import com.ruoyi.perf.domain.vo.PerfScoreVO;
 
@@ -83,4 +84,11 @@ public interface IPerfPerformanceContentScoreService extends IService<PerfPerfor
      * @return
      */
     public PerfScoreVO getPerformanceScoreDetailByPerformanceId(Long performanceId);
+
+
+    /**
+     *  提交绩效指标评分
+     * @return
+     */
+    public Boolean submitScoreBatch(List<PerfScoreSubmitDTO> perfScoreSubmitDTOS);
 }

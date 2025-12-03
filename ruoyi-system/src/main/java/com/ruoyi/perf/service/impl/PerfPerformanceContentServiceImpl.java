@@ -3,6 +3,7 @@ package com.ruoyi.perf.service.impl;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.common.enums.PerformanceStatus;
+import com.ruoyi.common.enums.PerformanceStep;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.perf.domain.PerfPerformance;
@@ -19,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -111,10 +113,12 @@ public class PerfPerformanceContentServiceImpl extends ServiceImpl<PerfPerforman
 
         List<Long> itemIds = new ArrayList<>();
         // 设置更新时间
+        BigDecimal selfScore = BigDecimal.ZERO;
         for (PerfPerformanceContent perfPerformanceContent : perfPerformanceContents) {
             perfPerformanceContent.setUpdateTime(DateUtils.getNowDate());
             perfPerformanceContent.setUpdateBy(SecurityUtils.getUserId().toString());
             itemIds.add(perfPerformanceContent.getItemId());
+            selfScore = selfScore.add(perfPerformanceContent.getSelfScore());
         }
         
         // 批量更新绩效内容
@@ -123,9 +127,11 @@ public class PerfPerformanceContentServiceImpl extends ServiceImpl<PerfPerforman
         // 如果是提交操作，还需要更新绩效实例状态
         if (PerformanceStatus.PENDING_SCORE.getCode().equals(updateDTO.getPerformanceStatus())) {
             perfPerformance.setStatus(PerformanceStatus.PENDING_SCORE.getCode());
-            perfPerformance.setCurrentStep(updateDTO.getPerformanceStep());
+            perfPerformance.setCurrentStep(Long.valueOf(PerformanceStep.PENDING_DEPT_HEAD_SCORE.getStepValue()));
             perfPerformance.setUpdateTime(DateUtils.getNowDate());
             perfPerformance.setUpdateBy(SecurityUtils.getUserId().toString());
+            perfPerformance.setSubmitTime(DateUtils.getNowDate());
+            perfPerformance.setSelfScore(selfScore);
             perfPerformanceMapper.updateById(perfPerformance);
 
             // 保存绩效评分项

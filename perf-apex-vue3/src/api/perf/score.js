@@ -16,3 +16,12 @@ export function getScore(performanceId) {
     method: 'get'
   })
 }
+
+// 提交绩效指标评分
+export function submitScoreBatch(data) {
+  return request({
+    url: '/perf/score/submitScoreBatch',
+    method: 'put',
+    data: data
+  })
+}
