@@ -114,6 +114,7 @@
           v-if="scope.row.status === PERFORMANCE_STATUS.PENDING_SUBMISSION || scope.row.status === PERFORMANCE_STATUS.DRAFT" 
           @click="handleUpdate(scope.row)"
           >修改</el-button>
+          <el-button link type="primary" icon="View" @click="handleViewDetail(scope.row)">详情</el-button>
           <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)">删除</el-button>
         </template>
       </el-table-column>
@@ -151,6 +152,8 @@
     </el-dialog>
 
     <PerformanceDialog ref="performanceDialog" @submit="getList" />
+    <!-- 绩效详情弹窗 -->
+    <PerformanceDetailDialog ref="performanceDetailDialog" />
 
   </div>
 </template>
@@ -161,6 +164,7 @@ import { getPerfChooseList } from '@/api/perf/period'
 import { getTemplateChooseList } from '@/api/perf/template'
 import { PERFORMANCE_STATUS, PERFORMANCE_STATUS_LIST, PERFORMANCE_STEP_STATUS, PERFORMANCE_STEP_STATUS_LIST } from '@/utils/perf/performanceEnum'
 import PerformanceDialog from '@/components/perf/PerformanceWriteDialog/PerformanceWriteDialog.vue'
+import PerformanceDetailDialog from '@/components/perf/PerformanceDetailDialog/PerformanceDetailDialog.vue'
 
 const { proxy } = getCurrentInstance()
 
@@ -207,7 +211,7 @@ const data = reactive({
 
 const { queryParams, form, rules, periodOptions, templateOptions } = toRefs(data)
 const performanceDialog = ref()
-const performanceData = ref([]) // 可以从API获取数据
+const performanceDetailDialog = ref() // 绩效详情弹窗引用
 
 const openPerformanceDialog = (row) => {
   performanceDialog.value.openDialog(row.id)
@@ -300,6 +304,11 @@ function handleUpdate(row) {
     open.value = true
     title.value = "修改绩效实例"
   })
+}
+
+/** 查看详情按钮操作 */
+function handleViewDetail(row) {
+  performanceDetailDialog.value.openDialog(row.id)
 }
 
 /** 提交按钮 */

@@ -2,52 +2,27 @@ package com.ruoyi.perf.domain.vo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ruoyi.common.annotation.Excel;
+import com.ruoyi.common.core.domain.BaseEntity;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
- * 绩效指标评分对象 vo
- * 
+ *
  * @author liudahua
- * @date 2025-12-02
+ * @date 2025-11-26
  */
 @Data
-public class PerfScoreItemVO implements Serializable {
+public class PerfContentVO implements Serializable
+{
     private static final long serialVersionUID = 1L;
 
-    /** 绩效ID */
+    /** 内容ID */
     private Long id;
-
-    /** 绩效id */
-    private Long performanceId;
-
-    /** 绩效内容id */
-    private Long contentId;
-
-    /** 模版指标id */
-    private Long itemId;
-
-    /** 评分人ID */
-    private Long scoreUserId;
-
-    /** 得分 */
-    private BigDecimal score;
-
-    /** 是否评分: 0-否 1-是 */
-    private Integer ifScore;
-
-    /** 创建者 */
-    private String createBy;
-
-    /** 创建时间 */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date createTime;
-
-    /** 备注 */
-    private String remark;
 
     /** 自评目标 */
     private String selfTarget;
@@ -78,4 +53,15 @@ public class PerfScoreItemVO implements Serializable {
 
     /** 最高分 */
     private BigDecimal maxScore;
+
+    /** 创建人 */
+    private String createBy;
+
+    /** 创建时间 */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date createTime;
+
+    /** 绩效内容评分列表 */
+    private List<PerfContentScoreVO> perfContentScoreVOList;
+
 }
