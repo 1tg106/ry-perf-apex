@@ -1,29 +1,29 @@
 package com.ruoyi.perf.service.impl;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.common.enums.PerformanceStatus;
 import com.ruoyi.common.enums.PerformanceStep;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.bean.BeanUtils;
 import com.ruoyi.common.utils.uuid.IdUtils;
+import com.ruoyi.perf.domain.PerfPerformance;
 import com.ruoyi.perf.domain.PerfPerformanceContent;
 import com.ruoyi.perf.domain.PerfTemplateItem;
 import com.ruoyi.perf.domain.dto.PerfPerformanceSaveDTO;
-import com.ruoyi.perf.domain.vo.PerfContentVO;
 import com.ruoyi.perf.domain.vo.PerfPerformanceVO;
+import com.ruoyi.perf.domain.vo.PerformanceContentItemVO;
+import com.ruoyi.perf.mapper.PerfPerformanceMapper;
 import com.ruoyi.perf.service.IPerfPerformanceContentService;
+import com.ruoyi.perf.service.IPerfPerformanceService;
 import com.ruoyi.perf.service.IPerfTemplateItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.ruoyi.perf.mapper.PerfPerformanceMapper;
-import com.ruoyi.perf.domain.PerfPerformance;
-import com.ruoyi.perf.service.IPerfPerformanceService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 绩效实例Service业务层处理
@@ -58,7 +58,7 @@ public class PerfPerformanceServiceImpl extends ServiceImpl<PerfPerformanceMappe
         }
         if(!perfPerformanceVO.getStatus().equals(PerformanceStatus.DRAFT.getCode()) &&
                 !perfPerformanceVO.getStatus().equals(PerformanceStatus.PENDING_SUBMISSION.getCode())){
-            List<PerfContentVO> perfContentVOS = perfPerformanceContentService.selectPerfContentVOList(perfPerformanceVO.getId());
+            List<PerformanceContentItemVO> perfContentVOS = perfPerformanceContentService.selectPerfContentVOList(perfPerformanceVO.getId());
             perfPerformanceVO.setPerfContentVOList(perfContentVOS);
         }
 

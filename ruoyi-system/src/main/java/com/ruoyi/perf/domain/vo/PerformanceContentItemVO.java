@@ -74,4 +74,7 @@ public class PerformanceContentItemVO implements Serializable
     /** 子指标项 */
     private List<PerformanceContentItemVO> children;
 
+    /** 绩效内容评分列表 */
+    private List<PerfContentScoreVO> perfContentScoreVOList;
+
 }

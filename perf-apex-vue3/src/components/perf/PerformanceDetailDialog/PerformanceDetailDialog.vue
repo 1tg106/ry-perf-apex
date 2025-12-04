@@ -172,7 +172,7 @@
 import { ref, watch, nextTick } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Document, Search } from '@element-plus/icons-vue'
-import { getScore } from '@/api/perf/score'
+import { getPerformance } from '@/api/perf/performance'
 import { PERFORMANCE_STATUS, PERFORMANCE_STATUS_LIST, PERFORMANCE_STEP_STATUS, PERFORMANCE_STEP_STATUS_LIST } from '@/utils/perf/performanceEnum'
 import { parseTime } from '@/utils/ruoyi'
 
@@ -248,9 +248,9 @@ export default {
       // 如果传入了绩效ID，则从API获取数据
       if (performanceId) {
         try {
-          const response = await getScore(performanceId)
+          const response = await getPerformance(performanceId)
           performanceData.value = response.data || {}
-          indicators.value = response.data.perfScoreItemVOList || []
+          indicators.value = response.data.perfContentVOList || []
           
           // 默认选中第一个叶子节点
           nextTick(() => {

@@ -92,6 +92,6 @@ public class PerfPerformanceVO implements Serializable
     private Date createTime;
 
     // 指标列表
-    private List<PerfContentVO> perfContentVOList;
+    private List<PerformanceContentItemVO> perfContentVOList;
 
 }

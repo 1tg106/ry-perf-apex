@@ -1,6 +1,5 @@
 package com.ruoyi.perf.service.impl;
 
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.common.enums.PerformanceStatus;
 import com.ruoyi.common.enums.PerformanceStep;
@@ -8,17 +7,13 @@ import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.perf.domain.PerfPerformance;
 import com.ruoyi.perf.domain.PerfPerformanceContent;
-import com.ruoyi.perf.domain.PerfPerformanceContentScore;
-import com.ruoyi.perf.domain.PerfTemplateItem;
 import com.ruoyi.perf.domain.dto.PerfContentBatchUpdateDTO;
 import com.ruoyi.perf.domain.vo.PerfContentScoreVO;
-import com.ruoyi.perf.domain.vo.PerfContentVO;
 import com.ruoyi.perf.domain.vo.PerformanceContentItemVO;
 import com.ruoyi.perf.mapper.PerfPerformanceContentMapper;
 import com.ruoyi.perf.mapper.PerfPerformanceMapper;
 import com.ruoyi.perf.service.IPerfPerformanceContentScoreService;
 import com.ruoyi.perf.service.IPerfPerformanceContentService;
-import com.ruoyi.perf.service.IPerfTemplateItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -194,15 +189,15 @@ public class PerfPerformanceContentServiceImpl extends ServiceImpl<PerfPerforman
     }
 
     @Override
-    public List<PerfContentVO> selectPerfContentVOList(Long performanceId) {
-        List<PerfContentVO> perfContentVOS = perfPerformanceContentMapper.selectPerfContentVOList(performanceId);
+    public List<PerformanceContentItemVO> selectPerfContentVOList(Long performanceId) {
+        List<PerformanceContentItemVO> perfContentVOS = perfPerformanceContentMapper.selectPerfContentVOList(performanceId);
         if (perfContentVOS == null || perfContentVOS.isEmpty()){
             throw new RuntimeException("没有找到对应的数据");
         }
         // 获取对应的评分数据
         List<PerfContentScoreVO> performanceScoreList = perfPerformanceContentScoreService.getPerformanceScoreByPerformanceIdList(performanceId);
 
-        for (PerfContentVO perfContentVO : perfContentVOS) {
+        for (PerformanceContentItemVO perfContentVO : perfContentVOS) {
             List<PerfContentScoreVO> scoreList = new ArrayList<>();
             for (PerfContentScoreVO performanceScore : performanceScoreList){
                 if (perfContentVO.getId().equals(performanceScore.getContentId())){
@@ -212,7 +207,7 @@ public class PerfPerformanceContentServiceImpl extends ServiceImpl<PerfPerforman
             perfContentVO.setPerfContentScoreVOList(scoreList);
         }
 
-        return perfContentVOS;
+        return buildPerformanceTree(perfContentVOS);
     }
 
     /**
