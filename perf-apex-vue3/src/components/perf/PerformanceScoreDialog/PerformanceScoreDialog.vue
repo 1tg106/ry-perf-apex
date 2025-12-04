@@ -107,7 +107,7 @@
                   <!-- 评分部分 -->
                   <el-form-item label="评分" required>
                     <el-input-number
-                      v-if="performanceData.status == PERFORMANCE_STATUS.PENDING_SCORE"
+                      v-if="!performanceData.ifScore"
                       v-model="currentItem.score"
                       :min="currentItem.minScore"
                       :max="currentItem.maxScore"
@@ -124,7 +124,7 @@
                   
                   <el-form-item label="评语">
                     <el-input
-                      v-if="performanceData.status == PERFORMANCE_STATUS.PENDING_SCORE"
+                      v-if="!performanceData.ifScore"
                       v-model="currentItem.remark"
                       type="textarea"
                       :rows="2"
@@ -154,8 +154,8 @@
       
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="closeDialog">{{performanceData.status == PERFORMANCE_STATUS.PENDING_SCORE?'取消':'关闭'}}</el-button>
-          <el-button type="primary" v-if="performanceData.status == PERFORMANCE_STATUS.PENDING_SCORE" @click="submitScore">提交评分</el-button>
+          <el-button @click="closeDialog">{{!performanceData.ifScore?'取消':'关闭'}}</el-button>
+          <el-button type="primary" v-if="!performanceData.ifScore" @click="submitScore">提交评分</el-button>
         </span>
       </template>
     </el-dialog>

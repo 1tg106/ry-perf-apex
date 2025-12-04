@@ -21,22 +21,8 @@
       <el-table-column label="部门" align="center" prop="deptName" width="100" />
       <el-table-column label="状态" align="center" prop="status" width="100">
         <template #default="{row}">
-          <el-tag type="primary" v-if="row.status === PERFORMANCE_STATUS.DRAFT">{{ PERFORMANCE_STATUS_LIST[0].label }}</el-tag>
-          <el-tag type="primary" v-if="row.status === PERFORMANCE_STATUS.PENDING_SUBMISSION">{{ PERFORMANCE_STATUS_LIST[1].label }}</el-tag>
-          <el-tag type="primary" v-if="row.status === PERFORMANCE_STATUS.PENDING_SCORE">{{ PERFORMANCE_STATUS_LIST[2].label }}</el-tag>
-          <el-tag type="warning" v-if="row.status === PERFORMANCE_STATUS.PENDING_HR">{{ PERFORMANCE_STATUS_LIST[3].label }}</el-tag>
-          <el-tag type="success" v-if="row.status === PERFORMANCE_STATUS.CONFIRMED">{{ PERFORMANCE_STATUS_LIST[4].label }}</el-tag>
-          <el-tag type="danger" v-if="row.status === PERFORMANCE_STATUS.REJECTED">{{ PERFORMANCE_STATUS_LIST[5].label }}</el-tag>
-          <el-tag type="danger" v-if="row.status === PERFORMANCE_STATUS.APPEAL">{{ PERFORMANCE_STATUS_LIST[6].label }}</el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column label="当前步骤" align="center" prop="currentStep" width="130">
-        <template #default="{row}">
-          <el-tag type="primary" v-if="row.currentStep === PERFORMANCE_STEP_STATUS.DRAFT">{{ PERFORMANCE_STEP_STATUS_LIST[0].label }}</el-tag>
-          <el-tag type="primary" v-if="row.currentStep === PERFORMANCE_STEP_STATUS.PENDING_SUPERVISOR_SCORE">{{ PERFORMANCE_STEP_STATUS_LIST[1].label }}</el-tag>
-          <el-tag type="warning" v-if="row.currentStep === PERFORMANCE_STEP_STATUS.PENDING_DEPT_HEAD_SCORE">{{ PERFORMANCE_STEP_STATUS_LIST[2].label }}</el-tag>
-          <el-tag type="warning" v-if="row.currentStep === PERFORMANCE_STEP_STATUS.PENDING_HR_CONFIRMATION">{{ PERFORMANCE_STEP_STATUS_LIST[3].label }}</el-tag>
-          <el-tag type="success" v-if="row.currentStep === PERFORMANCE_STEP_STATUS.COMPLETED">{{ PERFORMANCE_STEP_STATUS_LIST[4].label }}</el-tag>
+          <el-tag type="success" v-if="row.ifScore">已评分</el-tag>
+          <el-tag type="danger" v-if="!row.ifScore">待评分</el-tag>
         </template>
       </el-table-column>
       <el-table-column label="自评总分" align="center" prop="selfScore" width="100" />
@@ -54,7 +40,7 @@
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width" fixed="right" width="180">
         <template #default="scope">
-          <el-button link type="success" icon="Star" v-if="scope.row == PERFORMANCE_STATUS.PENDING_SCORE" @click="openScoreDialog(scope.row)">评分</el-button>
+          <el-button link type="success" icon="Star" v-if="!scope.row.ifScore" @click="openScoreDialog(scope.row)">评分</el-button>
           <el-button link type="success" icon="View" v-else @click="openScoreDialog(scope.row)">查看</el-button>
         </template>
       </el-table-column>

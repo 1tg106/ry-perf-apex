@@ -1,6 +1,7 @@
 package com.ruoyi.perf.service.impl;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -23,6 +24,7 @@ import com.ruoyi.perf.domain.vo.PerfContentScoreVO;
 import com.ruoyi.perf.domain.vo.PerfPerformanceVO;
 import com.ruoyi.perf.domain.vo.PerfScoreItemVO;
 import com.ruoyi.perf.domain.vo.PerfScoreVO;
+import com.ruoyi.perf.mapper.PerfPerformanceContentMapper;
 import com.ruoyi.perf.mapper.PerfPerformanceMapper;
 import com.ruoyi.perf.service.IPerfTemplateItemService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +33,7 @@ import com.ruoyi.perf.mapper.PerfPerformanceContentScoreMapper;
 import com.ruoyi.perf.domain.PerfPerformanceContentScore;
 import com.ruoyi.perf.service.IPerfPerformanceContentScoreService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 绩效指标评分Service业务层处理
@@ -49,6 +52,9 @@ public class PerfPerformanceContentScoreServiceImpl extends ServiceImpl<PerfPerf
 
     @Autowired
     private PerfPerformanceMapper perfPerformanceMapper;
+
+    @Autowired
+    private PerfPerformanceContentMapper perfPerformanceContentMapper;
 
     /**
      * 查询绩效指标评分
@@ -124,6 +130,7 @@ public class PerfPerformanceContentScoreServiceImpl extends ServiceImpl<PerfPerf
         return perfPerformanceContentScoreMapper.deletePerfPerformanceContentScoreById(id);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public Boolean savePerfPerformanceContentScore(List<PerfPerformanceContent> perfPerformanceContents, List<Long> itemIds) {
         // 获取对应的指标项
@@ -189,7 +196,16 @@ public class PerfPerformanceContentScoreServiceImpl extends ServiceImpl<PerfPerf
 
         // 根据待评分列表获取待评分的绩效实例
         List<Long> performanceIds = scoreUserList.stream().map(PerfPerformanceContentScore::getPerformanceId).collect(Collectors.toList());
-        return perfPerformanceMapper.selectPerfPerformanceByIdsList(performanceIds);
+        List<PerfPerformanceVO> perfPerformanceVOS = perfPerformanceMapper.selectPerfPerformanceByIdsList(performanceIds);
+        for (PerfPerformanceVO perfPerformanceVO : perfPerformanceVOS){
+            for (PerfPerformanceContentScore scoreUser : scoreUserList){
+                if(scoreUser.getPerformanceId().equals(perfPerformanceVO.getId())){
+                    perfPerformanceVO.setIfScore(scoreUser.getIfScore());
+                    break;
+                }
+            }
+        }
+        return perfPerformanceVOS;
     }
 
     @Override
@@ -202,9 +218,11 @@ public class PerfPerformanceContentScoreServiceImpl extends ServiceImpl<PerfPerf
         BeanUtils.copyProperties(perfPerformanceVO, perfScoreVO);
         List<PerfScoreItemVO> scoreItemVOList = perfPerformanceContentScoreMapper.getPerformanceScoreDetailByPerformanceId(performanceId, SecurityUtils.getUserId());
         perfScoreVO.setPerfScoreItemVOList(scoreItemVOList);
+        perfScoreVO.setIfScore(scoreItemVOList.get(0).getIfScore());
         return perfScoreVO;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public Boolean submitScoreBatch(List<PerfScoreSubmitDTO> perfScoreSubmitDTOS) {
         if(perfScoreSubmitDTOS.isEmpty()){
@@ -262,6 +280,28 @@ public class PerfPerformanceContentScoreServiceImpl extends ServiceImpl<PerfPerf
                 perfPerformance.setUpdateTime(DateUtils.getNowDate());
                 perfPerformance.setFinalScore(finalScore);
                 perfPerformanceMapper.updateById(perfPerformance);
+
+                // 获取全部指标
+                List<PerfPerformanceContent> contentList = perfPerformanceContentMapper.selectPerfPerformanceContentList(new PerfPerformanceContent(performanceId));
+                // 获取全部指标得分
+                List<PerfPerformanceContentScore> allList = this.list(Wrappers.lambdaQuery(PerfPerformanceContentScore.class)
+                        .in(PerfPerformanceContentScore::getPerformanceId, performanceId));
+                // 计算每一项指标得分
+                for (PerfPerformanceContent content : contentList){
+                    BigDecimal targetScore = BigDecimal.ZERO;
+                    BigDecimal num = new BigDecimal(1);
+                    for (PerfPerformanceContentScore score : allList){
+                        if(score.getContentId().equals(content.getId())){
+                            num = num.add(new BigDecimal(1));
+                            targetScore = targetScore.add(score.getScore());
+                        }
+                    }
+                    if(targetScore.compareTo(BigDecimal.ZERO) != 0){
+                        content.setFinalScore(targetScore.divide(num, 2, RoundingMode.HALF_UP));
+                        content.setUpdateTime(DateUtils.getNowDate());
+                    }
+                }
+                perfPerformanceContentMapper.updateScoreBatchById(contentList);
             }
         }
         return updateBatch;

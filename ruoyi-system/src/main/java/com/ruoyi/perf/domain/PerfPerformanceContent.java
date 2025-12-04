@@ -62,4 +62,9 @@ public class PerfPerformanceContent extends BaseEntity
 
     /** 删除标志（0:存在 1:删除） */
     private String delFlag;
+
+    public PerfPerformanceContent(Long performanceId){
+        this.performanceId = performanceId;
+    }
+    public PerfPerformanceContent(){}
 }

@@ -142,6 +142,26 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </trim>
         where id = #{id}
     </update>
+    <update id="updateScoreBatchById" parameterType="java.util.List">
+        UPDATE perf_performance_content
+        SET
+        final_score = CASE id
+        <foreach collection="list" item="item">
+            WHEN #{item.id} THEN #{item.finalScore}
+        </foreach>
+        END,
+        update_time = CASE id
+        <foreach collection="list" item="item">
+            WHEN #{item.id} THEN #{item.updateTime}
+        </foreach>
+        END
+        WHERE id IN
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item.id}
+        </foreach>
+    </update>
+
+
 
     <delete id="deletePerfPerformanceContentById" parameterType="Long">
         delete from perf_performance_content where id = #{id}

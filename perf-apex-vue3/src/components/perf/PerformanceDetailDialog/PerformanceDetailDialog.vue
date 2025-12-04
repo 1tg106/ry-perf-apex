@@ -40,7 +40,7 @@
           </el-tab-pane>
 
           <!-- 指标明细 Tab -->
-          <el-tab-pane label="指标明细" name="indicators">
+          <el-tab-pane label="指标明细" name="indicators"> 
             <div class="main-content">
               <!-- 指标树 -->
               <div class="indicator-tree">
@@ -93,58 +93,72 @@
                     </template>
                     
                     <el-form label-width="100px" label-position="left">
-                      <el-form-item label="权重">
+                      <el-form-item label="权重" class="mb-2">
                         <div>{{ currentItem.weight }}%</div>
                       </el-form-item>
                       
-                      <el-form-item label="自评目标">
+                      <el-form-item label="自评目标" class="mb-2">
                         <div>{{ currentItem.selfTarget || '-' }}</div>
                       </el-form-item>
                       
-                      <el-form-item label="自评结果">
+                      <el-form-item label="自评结果" class="mb-2">
                         <div>{{ currentItem.selfResult || '-' }}</div>
                       </el-form-item>
                       
-                      <el-form-item label="自评分数">
-                        <div>{{ currentItem.selfScore }}</div>
+                      <el-form-item label="自评分数" class="mb-2">
+                        <div style="color: #67c23a;font-weight: bold;">{{ currentItem.selfScore }}</div>
                         <span style="margin-left: 10px; color: #909399;">
                           评分范围: {{ currentItem.minScore }} - {{ currentItem.maxScore }}
                         </span>
                       </el-form-item>
                       
-                      <el-form-item label="自评评语">
+                      <el-form-item label="自评评语" class="mb-2">
                         <div>{{ currentItem.selfComment || '-' }}</div>
                       </el-form-item>
-                      
-                      <el-divider />
-                      
-                      <!-- 评分部分 -->
-                      <div v-for="(scoreItem, index) in currentItem.scoreList" :key="index">
-                        <h4>{{ getStepName(scoreItem.step) }}评分</h4>
-                        <el-form-item label="评分">
-                          <div>{{ scoreItem.score }}</div>
-                        </el-form-item>
-                        
-                        <el-form-item label="评语">
-                          <div>{{ scoreItem.remark || '-' }}</div>
-                        </el-form-item>
-                        
-                        <el-form-item label="评分人">
-                          <div>{{ scoreItem.scorerName }}</div>
-                        </el-form-item>
-                        
-                        <el-form-item label="评分时间">
-                          <div>{{ parseTime(scoreItem.createTime) }}</div>
-                        </el-form-item>
-                        
-                        <el-divider v-if="index < currentItem.scoreList.length - 1" />
-                      </div>
-                      
+
+                      <el-form-item label="最终得分" class="mb-2">
+                        <div style="color: #67c23a;font-weight: bold;">{{ currentItem.finalScore }}</div>
+                      </el-form-item>
+
                       <el-form-item v-if="currentItem.scoreStandard" label="评分标准">
                         <div style="padding: 10px; background-color: #f5f7fa; border-radius: 4px;">
                           {{ currentItem.scoreStandard }}
                         </div>
                       </el-form-item>
+                      
+                      <el-divider />
+                      
+                      <!-- 评分部分 -->
+                      <div v-for="(scoreItem, index) in currentItem.perfContentScoreVOList" :key="index">
+                        <el-form-item label="评分人" class="mb-1">
+                          <div>{{ scoreItem.scoreUserName }}</div>
+                          <el-tag 
+                            style="margin-left: 20px;"
+                            :type="scoreItem.ifScore?'success':'pending'"
+                            size="small"
+                          >
+                            {{ scoreItem.ifScore?'已评分':'未评分' }}
+                          </el-tag>
+                        </el-form-item>
+
+                        <el-form-item label="评分" class="mb-1" v-if="scoreItem.ifScore">
+                          <div style="color: #67c23a;font-weight: bold;">{{ scoreItem.score || '-' }}</div>
+                        </el-form-item>
+                        
+                        <el-form-item label="评语" class="mb-1" v-if="scoreItem.ifScore">
+                          <div>{{ scoreItem.remark || '-' }}</div>
+                        </el-form-item>
+                        
+                        
+                        
+                        <el-form-item label="评分时间" class="mb-1" v-if="scoreItem.ifScore">
+                          <div>{{ scoreItem.updateTime }}</div>
+                        </el-form-item>
+                        
+                        <el-divider v-if="index < currentItem.perfContentScoreVOList.length - 1" />
+                      </div>
+                      
+                      
                     </el-form>
                   </el-card>
                 </div>

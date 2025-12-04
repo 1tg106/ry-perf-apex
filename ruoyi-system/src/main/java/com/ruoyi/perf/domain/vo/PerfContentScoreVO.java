@@ -1,5 +1,6 @@
 package com.ruoyi.perf.domain.vo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -38,4 +39,8 @@ public class PerfContentScoreVO implements Serializable
 
     /** 备注 */
     private String remark;
+
+    /** 更新时间 */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private String updateTime;
 }

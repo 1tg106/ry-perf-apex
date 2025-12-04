@@ -3,6 +3,7 @@ package com.ruoyi.perf.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ruoyi.perf.domain.PerfPerformanceContent;
 import com.ruoyi.perf.domain.vo.PerformanceContentItemVO;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -75,4 +76,11 @@ public interface PerfPerformanceContentMapper extends BaseMapper<PerfPerformance
      * @param performanceId
      */
     public List<PerformanceContentItemVO> selectPerfContentVOList(Long performanceId);
+
+    /**
+     * 批量更新
+     * @param list
+     * @return
+     */
+    public int updateScoreBatchById(@Param("list") List<PerfPerformanceContent> list);
 }

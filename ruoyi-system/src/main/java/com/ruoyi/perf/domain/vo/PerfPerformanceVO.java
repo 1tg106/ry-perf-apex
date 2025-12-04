@@ -91,6 +91,8 @@ public class PerfPerformanceVO implements Serializable
     @Excel(name = "创建时间", width = 30, dateFormat = "yyyy-MM-dd")
     private Date createTime;
 
+    private Integer ifScore;
+
     // 指标列表
     private List<PerformanceContentItemVO> perfContentVOList;
 
