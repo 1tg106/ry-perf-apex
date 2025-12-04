@@ -9,6 +9,7 @@ export const PERFORMANCE_STATUS = {
   PENDING_HR: 'PENDING_HR', // 待HR确认
   CONFIRMED: 'CONFIRMED', // 已确认
   REJECTED: 'REJECTED', // 已驳回
+  CANCELLATION: 'CANCELLATION', // 已作废
   APPEAL: 'APPEAL', // 申诉中
 }
 
@@ -39,6 +40,10 @@ export const PERFORMANCE_STATUS_LIST = [
         value: 'REJECTED'
     },
     {
+        label: '已作废',
+        value: 'CANCELLATION'
+    },
+    {
         label: '申诉中',
         value: 'APPEAL'
     }
@@ -58,8 +63,12 @@ export const PERFORMANCE_STEP_STATUS = {
 
 export const PERFORMANCE_STEP_STATUS_LIST = [
   { label: "自评中", value: 0 },
-  { label: "待上级评分", value: 1 },
-  { label: "待负责人评分", value: 2 },
-  { label: "待HR确认", value: 3 },
-  { label: "已完成", value: 4 }
+  { label: "待评分", value: 1 },
+  { label: "待HR确认", value: 2 },
+  { label: "申述中", value: 3 },
+  { label: "申述完成", value: 4 },
+  { label: "已驳回", value: 5 },
+  { label: "申述完成", value: 4 },
+  { label: "已完成", value: 6 },
+  { label: "已作废", value: 7 }
 ]

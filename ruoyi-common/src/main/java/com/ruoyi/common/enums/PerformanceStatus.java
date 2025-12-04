@@ -11,6 +11,7 @@ public enum PerformanceStatus {
     PENDING_HR("PENDING_HR","待HR确认"),
     CONFIRMED("CONFIRMED","已确认"),
     REJECTED("REJECTED","已驳回"),
+    CANCELLATION("CANCELLATION","已作废"),
     APPEAL("APPEAL","申诉中");
 
     private final String code;

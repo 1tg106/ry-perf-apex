@@ -114,6 +114,10 @@ public class PerfPerformanceServiceImpl extends ServiceImpl<PerfPerformanceMappe
         if (perf == null) {
             throw new RuntimeException("绩效记录不存在");
         }
+        if(!perf.getStatus().equals(PerformanceStatus.PENDING_SUBMISSION.getCode()) &&
+                !perf.getStatus().equals(PerformanceStatus.DRAFT.getCode())){
+            throw new RuntimeException("该状态下不能修改");
+        }
 
         // 检查是否需要重新生成绩效内容项（当模板ID发生变化时）
         boolean needRegenerateContent = false;

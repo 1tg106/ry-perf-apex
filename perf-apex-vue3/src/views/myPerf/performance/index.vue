@@ -99,32 +99,21 @@
           <el-tag type="danger" v-if="row.status === PERFORMANCE_STATUS.APPEAL">{{ PERFORMANCE_STATUS_LIST[6].label }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="当前步骤" align="center" prop="currentStep" width="130">
-        <template #default="{row}">
-          <el-tag type="primary" v-if="row.currentStep === PERFORMANCE_STEP_STATUS.DRAFT">{{ PERFORMANCE_STEP_STATUS_LIST[0].label }}</el-tag>
-          <el-tag type="primary" v-if="row.currentStep === PERFORMANCE_STEP_STATUS.PENDING_SUPERVISOR_SCORE">{{ PERFORMANCE_STEP_STATUS_LIST[1].label }}</el-tag>
-          <el-tag type="warning" v-if="row.currentStep === PERFORMANCE_STEP_STATUS.PENDING_DEPT_HEAD_SCORE">{{ PERFORMANCE_STEP_STATUS_LIST[2].label }}</el-tag>
-          <el-tag type="warning" v-if="row.currentStep === PERFORMANCE_STEP_STATUS.PENDING_HR_CONFIRMATION">{{ PERFORMANCE_STEP_STATUS_LIST[3].label }}</el-tag>
-          <el-tag type="success" v-if="row.currentStep === PERFORMANCE_STEP_STATUS.COMPLETED">{{ PERFORMANCE_STEP_STATUS_LIST[4].label }}</el-tag>
-        </template>
-      </el-table-column>
       <el-table-column label="自评总分" align="center" prop="selfScore" width="100" />
       <el-table-column label="最终得分" align="center" prop="finalScore" width="100" />
-      <el-table-column label="驳回原因" align="center" prop="rejectReason" width="100" />
-      <el-table-column label="提交时间" align="center" prop="submitTime" width="180">
-        <template #default="scope">
-          <span>{{ parseTime(scope.row.submitTime, '{y}-{m}-{d}') }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="确认时间" align="center" prop="confirmTime" width="180">
-        <template #default="scope">
-          <span>{{ parseTime(scope.row.confirmTime, '{y}-{m}-{d}') }}</span>
-        </template>
-      </el-table-column>
+      <el-table-column label="提交时间" align="center" prop="submitTime" width="180" />
+      <el-table-column label="确认时间" align="center" prop="confirmTime" width="180" />
+      <el-table-column label="创建时间" align="center" prop="createTime" width="180" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width" fixed="right" width="180">
         <template #default="scope">
-          <el-button link type="primary" icon="Edit" @click="openPerformanceDialog(scope.row)">填写</el-button>
-          <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)">修改</el-button>
+          <el-button link type="primary" icon="Edit" 
+          v-if="scope.row.status === PERFORMANCE_STATUS.PENDING_SUBMISSION || scope.row.status === PERFORMANCE_STATUS.DRAFT" 
+          @click="openPerformanceDialog(scope.row)"
+          >填写</el-button>
+          <el-button link type="primary" icon="Edit" 
+          v-if="scope.row.status === PERFORMANCE_STATUS.PENDING_SUBMISSION || scope.row.status === PERFORMANCE_STATUS.DRAFT" 
+          @click="handleUpdate(scope.row)"
+          >修改</el-button>
           <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)">删除</el-button>
         </template>
       </el-table-column>

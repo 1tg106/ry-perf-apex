@@ -11,7 +11,8 @@ public enum PerformanceStep {
     PENDING_APPEAL(3, "申诉中"),
     PENDING_APPEAL_COMPLETED(4, "申诉完成"),
     PENDING_REJECTED(5, "已驳回"),
-    COMPLETED(6, "已完成");
+    COMPLETED(6, "已完成"),
+    CANCELLATION(7, "已作废");
 
     private final Integer stepValue;
     private final String description;
