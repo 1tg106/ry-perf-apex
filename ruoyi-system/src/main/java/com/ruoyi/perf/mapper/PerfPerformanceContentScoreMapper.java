@@ -4,6 +4,7 @@ import java.util.List;
 import com.ruoyi.perf.domain.PerfPerformanceContentScore;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ruoyi.perf.domain.dto.PerfScoreDTO;
+import com.ruoyi.perf.domain.vo.PerfContentScoreVO;
 import com.ruoyi.perf.domain.vo.PerfScoreItemVO;
 import org.apache.ibatis.annotations.Param;
 
@@ -77,4 +78,11 @@ public interface PerfPerformanceContentScoreMapper extends BaseMapper<PerfPerfor
      * @return
      */
     public List<PerfScoreItemVO> getPerformanceScoreDetailByPerformanceId(@Param("performanceId") Long performanceId, @Param("userId") Long userId);
+
+    /**
+     * 根据绩效id获取评分列表
+     * @param performanceId
+     * @return
+     */
+    public List<PerfContentScoreVO> getPerformanceScoreByPerformanceIdList(@Param("performanceId") Long performanceId);
 }

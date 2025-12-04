@@ -19,6 +19,7 @@ import com.ruoyi.perf.domain.PerfPerformanceContent;
 import com.ruoyi.perf.domain.PerfTemplateItem;
 import com.ruoyi.perf.domain.dto.PerfScoreDTO;
 import com.ruoyi.perf.domain.dto.PerfScoreSubmitDTO;
+import com.ruoyi.perf.domain.vo.PerfContentScoreVO;
 import com.ruoyi.perf.domain.vo.PerfPerformanceVO;
 import com.ruoyi.perf.domain.vo.PerfScoreItemVO;
 import com.ruoyi.perf.domain.vo.PerfScoreVO;
@@ -264,5 +265,10 @@ public class PerfPerformanceContentScoreServiceImpl extends ServiceImpl<PerfPerf
             }
         }
         return updateBatch;
+    }
+
+    @Override
+    public List<PerfContentScoreVO> getPerformanceScoreByPerformanceIdList(Long performanceId) {
+        return perfPerformanceContentScoreMapper.getPerformanceScoreByPerformanceIdList(performanceId);
     }
 }

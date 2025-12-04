@@ -8,8 +8,11 @@ import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.perf.domain.PerfPerformance;
 import com.ruoyi.perf.domain.PerfPerformanceContent;
+import com.ruoyi.perf.domain.PerfPerformanceContentScore;
 import com.ruoyi.perf.domain.PerfTemplateItem;
 import com.ruoyi.perf.domain.dto.PerfContentBatchUpdateDTO;
+import com.ruoyi.perf.domain.vo.PerfContentScoreVO;
+import com.ruoyi.perf.domain.vo.PerfContentVO;
 import com.ruoyi.perf.domain.vo.PerformanceContentItemVO;
 import com.ruoyi.perf.mapper.PerfPerformanceContentMapper;
 import com.ruoyi.perf.mapper.PerfPerformanceMapper;
@@ -188,6 +191,28 @@ public class PerfPerformanceContentServiceImpl extends ServiceImpl<PerfPerforman
 
         // 构建树形结构
         return buildPerformanceTree(itemVOS);
+    }
+
+    @Override
+    public List<PerfContentVO> selectPerfContentVOList(Long performanceId) {
+        List<PerfContentVO> perfContentVOS = perfPerformanceContentMapper.selectPerfContentVOList(performanceId);
+        if (perfContentVOS == null || perfContentVOS.isEmpty()){
+            throw new RuntimeException("没有找到对应的数据");
+        }
+        // 获取对应的评分数据
+        List<PerfContentScoreVO> performanceScoreList = perfPerformanceContentScoreService.getPerformanceScoreByPerformanceIdList(performanceId);
+
+        for (PerfContentVO perfContentVO : perfContentVOS) {
+            List<PerfContentScoreVO> scoreList = new ArrayList<>();
+            for (PerfContentScoreVO performanceScore : performanceScoreList){
+                if (perfContentVO.getId().equals(performanceScore.getContentId())){
+                    scoreList.add(performanceScore);
+                }
+            }
+            perfContentVO.setPerfContentScoreVOList(scoreList);
+        }
+
+        return perfContentVOS;
     }
 
     /**

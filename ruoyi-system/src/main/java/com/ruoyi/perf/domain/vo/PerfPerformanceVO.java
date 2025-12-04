@@ -10,6 +10,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  *
@@ -89,5 +90,8 @@ public class PerfPerformanceVO implements Serializable
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Excel(name = "创建时间", width = 30, dateFormat = "yyyy-MM-dd")
     private Date createTime;
+
+    // 指标列表
+    private List<PerfContentVO> perfContentVOList;
 
 }

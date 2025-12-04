@@ -74,6 +74,19 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             a.performance_id = #{performanceId}
           AND a.score_user_id = #{userId}
     </select>
+    <select id="getPerformanceScoreByPerformanceIdList"
+            resultType="com.ruoyi.perf.domain.vo.PerfContentScoreVO">
+        SELECT
+            p.*,
+            u.user_id,
+            u.nick_name AS score_user_name
+        FROM
+            perf_performance_content_score p
+                LEFT JOIN sys_user u ON u.user_id = p.score_user_id
+        WHERE
+            p.del_flag = '0'
+          AND p.performance_id = #{performanceId};
+    </select>
 
     <insert id="insertPerfPerformanceContentScore" parameterType="PerfPerformanceContentScore" useGeneratedKeys="true" keyProperty="id">
         insert into perf_performance_content_score

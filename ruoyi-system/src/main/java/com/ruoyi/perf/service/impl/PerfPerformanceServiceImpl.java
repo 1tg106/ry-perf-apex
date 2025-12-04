@@ -13,6 +13,7 @@ import com.ruoyi.common.utils.uuid.IdUtils;
 import com.ruoyi.perf.domain.PerfPerformanceContent;
 import com.ruoyi.perf.domain.PerfTemplateItem;
 import com.ruoyi.perf.domain.dto.PerfPerformanceSaveDTO;
+import com.ruoyi.perf.domain.vo.PerfContentVO;
 import com.ruoyi.perf.domain.vo.PerfPerformanceVO;
 import com.ruoyi.perf.service.IPerfPerformanceContentService;
 import com.ruoyi.perf.service.IPerfTemplateItemService;
@@ -51,7 +52,17 @@ public class PerfPerformanceServiceImpl extends ServiceImpl<PerfPerformanceMappe
     @Override
     public PerfPerformanceVO selectPerfPerformanceById(Long id)
     {
-        return perfPerformanceMapper.selectPerfPerformanceById(id);
+        PerfPerformanceVO perfPerformanceVO = perfPerformanceMapper.selectPerfPerformanceById(id);
+        if(perfPerformanceVO == null){
+            return null;
+        }
+        if(!perfPerformanceVO.getStatus().equals(PerformanceStatus.DRAFT.getCode()) &&
+                !perfPerformanceVO.getStatus().equals(PerformanceStatus.PENDING_SUBMISSION.getCode())){
+            List<PerfContentVO> perfContentVOS = perfPerformanceContentService.selectPerfContentVOList(perfPerformanceVO.getId());
+            perfPerformanceVO.setPerfContentVOList(perfContentVOS);
+        }
+
+        return perfPerformanceVO;
     }
 
     /**
