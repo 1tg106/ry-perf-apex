@@ -107,7 +107,7 @@
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width" fixed="right" width="180">
         <template #default="scope">
           <el-button link type="primary" icon="Edit" 
-          v-if="scope.row.status === PERFORMANCE_STATUS.PENDING_SUBMISSION || scope.row.status === PERFORMANCE_STATUS.DRAFT" 
+          v-if="scope.row.status === PERFORMANCE_STATUS.PENDING_SUBMISSION || scope.row.status === PERFORMANCE_STATUS.DRAFT || scope.row.status == PERFORMANCE_STATUS.REJECTED" 
           @click="openPerformanceDialog(scope.row)"
           >填写</el-button>
           <el-button link type="primary" icon="Edit" 

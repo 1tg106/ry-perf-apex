@@ -29,8 +29,8 @@ public class PerfAppeal extends BaseEntity
     @Excel(name = "申诉理由")
     private String appealReason;
 
-    /** 申诉状态(PENDING:待处理, PROCESSING:处理中, RESOLVED:已处理, REJECTED:已驳回) */
-    @Excel(name = "申诉状态(PENDING:待处理, PROCESSING:处理中, RESOLVED:已处理, REJECTED:已驳回)")
+    /** 申诉状态(PENDING:待处理, RESOLVED:已处理, REJECTED:已驳回) */
+    @Excel(name = "申诉状态(PENDING:待处理, RESOLVED:已处理, REJECTED:已驳回)")
     private String appealStatus;
 
     /** 处理人ID */

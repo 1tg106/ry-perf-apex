@@ -3,6 +3,7 @@ package com.ruoyi.perf.service;
 import java.util.List;
 import com.ruoyi.perf.domain.PerfAppeal;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.ruoyi.perf.domain.dto.PerfAppealAddDTO;
 
 /**
  * 绩效申诉Service接口
@@ -32,10 +33,10 @@ public interface IPerfAppealService extends IService<PerfAppeal>
     /**
      * 新增绩效申诉
      * 
-     * @param perfAppeal 绩效申诉
+     * @param addDTO 绩效申诉
      * @return 结果
      */
-    public int insertPerfAppeal(PerfAppeal perfAppeal);
+    public int insertPerfAppeal(PerfAppealAddDTO addDTO);
 
     /**
      * 修改绩效申诉

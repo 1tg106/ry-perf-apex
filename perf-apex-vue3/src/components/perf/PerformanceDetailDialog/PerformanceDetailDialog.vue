@@ -36,7 +36,7 @@
               <el-descriptions-item label="确认时间">{{ parseTime(performanceData.confirmTime) }}</el-descriptions-item>
               <el-descriptions-item label="创建时间">{{ parseTime(performanceData.createTime) }}</el-descriptions-item>
               <el-descriptions-item label="备注">{{ performanceData.remark || '-' }}</el-descriptions-item>
-              <el-descriptions-item label="驳回原因" :span="2" v-show="performanceData.rejectReason">{{ performanceData.rejectReason || '-' }}</el-descriptions-item>
+              <el-descriptions-item label="驳回原因" :span="2" v-show="performanceData.status === PERFORMANCE_STATUS.REJECTED">{{ performanceData.rejectReason || '-' }}</el-descriptions-item>
             </el-descriptions>
           </el-tab-pane>
 
@@ -177,6 +177,7 @@
       
       <template #footer>
         <span class="dialog-footer">
+          <el-button type="danger" @click="closeDialog">申诉</el-button>
           <el-button @click="closeDialog">关闭</el-button>
         </span>
       </template>

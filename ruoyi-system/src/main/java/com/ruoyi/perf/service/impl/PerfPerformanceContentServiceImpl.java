@@ -105,7 +105,8 @@ public class PerfPerformanceContentServiceImpl extends ServiceImpl<PerfPerforman
             throw new RuntimeException("绩效实例不存在");
         }
         if(!perfPerformance.getStatus().equals(PerformanceStatus.PENDING_SUBMISSION.getCode()) &&
-                !perfPerformance.getStatus().equals(PerformanceStatus.DRAFT.getCode())){
+                !perfPerformance.getStatus().equals(PerformanceStatus.DRAFT.getCode()) &&
+                !perfPerformance.getStatus().equals(PerformanceStatus.REJECTED.getCode())){
             throw new RuntimeException("该状态不允许操作");
         }
 
@@ -115,6 +116,7 @@ public class PerfPerformanceContentServiceImpl extends ServiceImpl<PerfPerforman
         for (PerfPerformanceContent perfPerformanceContent : perfPerformanceContents) {
             perfPerformanceContent.setUpdateTime(DateUtils.getNowDate());
             perfPerformanceContent.setUpdateBy(SecurityUtils.getUserId().toString());
+            perfPerformanceContent.setFinalScore(null);
             itemIds.add(perfPerformanceContent.getItemId());
             selfScore = selfScore.add(perfPerformanceContent.getSelfScore());
         }
@@ -130,6 +132,7 @@ public class PerfPerformanceContentServiceImpl extends ServiceImpl<PerfPerforman
             perfPerformance.setUpdateBy(SecurityUtils.getUserId().toString());
             perfPerformance.setSubmitTime(DateUtils.getNowDate());
             perfPerformance.setSelfScore(selfScore);
+            perfPerformance.setFinalScore(BigDecimal.ZERO);
             perfPerformanceMapper.updateById(perfPerformance);
 
             // 保存绩效评分项

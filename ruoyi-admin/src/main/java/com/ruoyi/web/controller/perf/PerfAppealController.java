@@ -2,6 +2,9 @@ package com.ruoyi.web.controller.perf;
 
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+
+import com.ruoyi.perf.domain.dto.PerfAppealAddDTO;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -75,9 +78,9 @@ public class PerfAppealController extends BaseController
     @PreAuthorize("@ss.hasPermi('perf:appeal:add')")
     @Log(title = "绩效申诉", businessType = BusinessType.INSERT)
     @PostMapping
-    public AjaxResult add(@RequestBody PerfAppeal perfAppeal)
+    public AjaxResult add(@Valid @RequestBody PerfAppealAddDTO addDTO)
     {
-        return toAjax(perfAppealService.insertPerfAppeal(perfAppeal));
+        return toAjax(perfAppealService.insertPerfAppeal(addDTO));
     }
 
     /**
