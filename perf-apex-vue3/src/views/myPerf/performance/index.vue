@@ -118,7 +118,9 @@
           v-if="scope.row.status !== PERFORMANCE_STATUS.PENDING_SUBMISSION && scope.row.status !== PERFORMANCE_STATUS.DRAFT" 
           @click="handleViewDetail(scope.row)"
           >详情</el-button>
-          <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)">删除</el-button>
+          <el-button link type="primary" icon="Delete"
+          v-if="scope.row.status !== PERFORMANCE_STATUS.CONFIRMED" 
+          @click="handleDelete(scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>

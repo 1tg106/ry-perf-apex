@@ -121,18 +121,23 @@
       <el-table-column label="提交时间" align="center" prop="submitTime" width="180" />
       <el-table-column label="确认时间" align="center" prop="confirmTime" width="180" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180" />
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" fixed="right" width="180">
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" fixed="right" width="220">
         <template #default="scope">
           <el-button link type="primary" icon="Edit" 
           v-if="scope.row.status === PERFORMANCE_STATUS.PENDING_SUBMISSION || scope.row.status === PERFORMANCE_STATUS.DRAFT" 
           @click="handleUpdate(scope.row)" 
           v-hasPermi="['perf:performance:edit']"
           >修改</el-button>
-          <el-button link type="primary" icon="Bell" 
+          <el-button link type="success" icon="Check" 
           v-if="scope.row.status === PERFORMANCE_STATUS.PENDING_AUDIT" 
-          @click="handleUpdate(scope.row)" 
+          @click="handleConfirm(scope.row)" 
           v-hasPermi="['perf:performance:edit']"
-          >确认绩效</el-button>
+          >确认</el-button>
+          <el-button link type="danger" icon="CircleClose" 
+          v-if="scope.row.status === PERFORMANCE_STATUS.PENDING_AUDIT || scope.row.status === PERFORMANCE_STATUS.PENDING_SCORE" 
+          @click="handleReject(scope.row)" 
+          v-hasPermi="['perf:performance:edit']"
+          >驳回</el-button>
           <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)" v-hasPermi="['perf:performance:remove']">删除</el-button>
         </template>
       </el-table-column>
@@ -185,11 +190,26 @@
         </div>
       </template>
     </el-dialog>
+
+    <!-- 绩效驳回原因对话框 -->
+    <el-dialog :title="rejectDialogTitle" v-model="rejectDialogVisible" width="500px" append-to-body>
+      <el-form ref="rejectFormRef" :model="rejectForm" :rules="rejectRules" label-width="80px">
+        <el-form-item label="驳回原因" prop="rejectReason">
+          <el-input v-model="rejectForm.rejectReason" type="textarea" placeholder="请输入驳回原因" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button type="primary" @click="submitReject">确 定</el-button>
+          <el-button @click="cancelReject">取 消</el-button>
+        </div>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup name="Performance">
-import { listPerformance, getPerformance, delPerformance, addPerformance, updatePerformance } from "@/api/perf/performance"
+import { listPerformance, getPerformance, delPerformance, addPerformance, updatePerformance, auditPerformance } from "@/api/perf/performance"
 import { getPerfChooseList } from '@/api/perf/period'
 import { getTemplateChooseList } from '@/api/perf/template'
 import { getUserChooseList,deptTreeSelect } from '@/api/system/user'
@@ -206,6 +226,10 @@ const single = ref(true)
 const multiple = ref(true)
 const total = ref(0)
 const title = ref("")
+// 添加审核相关变量
+const rejectDialogVisible = ref(false)
+const rejectDialogTitle = ref("")
+const currentAuditRow = ref({})
 
 const data = reactive({
   form: {},
@@ -248,10 +272,21 @@ const data = reactive({
     status: [
       { required: true, message: "状态(DRAFT:草稿, PENDING_SCORE:待评分, PENDING_AUDIT:待审核人确认, CONFIRMED:已确认, REJECTED:已驳回, APPEAL:申诉中)不能为空", trigger: "change" }
     ],
+  },
+  // 添加驳回表单相关数据
+  rejectForm: {
+    id: null,
+    status: 'REJECTED',
+    rejectReason: ''
+  },
+  rejectRules: {
+    rejectReason: [
+      { required: true, message: "驳回原因不能为空", trigger: "blur" }
+    ]
   }
 })
 
-const { queryParams, form, rules, periodOptions, templateOptions, userOptions, userTreeOptions, deptOptions } = toRefs(data)
+const { queryParams, form, rules, periodOptions, templateOptions, userOptions, userTreeOptions, deptOptions, rejectForm, rejectRules } = toRefs(data)
 
 /** 查询绩效实例列表 */
 function getList() {
@@ -412,6 +447,63 @@ function handleExport() {
   proxy.download('perf/performance/export', {
     ...queryParams.value
   }, `performance_${new Date().getTime()}.xlsx`)
+}
+
+/** 确认绩效操作 */
+function handleConfirm(row) {
+  proxy.$modal.confirm('是否确认通过该绩效实例？').then(function() {
+    const auditData = {
+      id: row.id,
+      status: 'CONFIRMED'
+    }
+    return auditPerformance(auditData)
+  }).then(() => {
+    getList()
+    proxy.$modal.msgSuccess("确认成功")
+  }).catch(() => {})
+}
+
+/** 驳回绩效操作 */
+function handleReject(row) {
+  currentAuditRow.value = row
+  rejectForm.value.id = row.id
+  rejectForm.value.rejectReason = ''
+  rejectDialogTitle.value = "驳回原因"
+  rejectDialogVisible.value = true
+}
+
+/** 提交驳回 */
+function submitReject() {
+  proxy.$refs["rejectFormRef"].validate(valid => {
+    if (valid) {
+      const auditData = {
+        id: rejectForm.value.id,
+        status: rejectForm.value.status,
+        rejectReason: rejectForm.value.rejectReason
+      }
+      auditPerformance(auditData).then(response => {
+        proxy.$modal.msgSuccess("驳回成功")
+        rejectDialogVisible.value = false
+        getList()
+      })
+    }
+  })
+}
+
+/** 取消驳回 */
+function cancelReject() {
+  rejectDialogVisible.value = false
+  resetRejectForm()
+}
+
+/** 重置驳回表单 */
+function resetRejectForm() {
+  rejectForm.value = {
+    id: null,
+    status: 'REJECTED',
+    rejectReason: ''
+  }
+  proxy.resetForm("rejectFormRef")
 }
 
 getList()

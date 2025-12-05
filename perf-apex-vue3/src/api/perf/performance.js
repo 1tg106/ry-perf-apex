@@ -72,3 +72,14 @@ export function editMyPerformance(data) {
     data: data
   })
 }
+
+// =======================绩效审核=======================
+
+// 绩效审核
+export function auditPerformance(data) {
+  return request({
+    url: '/perf/performance/auditPerformance',
+    method: 'put',
+    data: data
+  })
+}
