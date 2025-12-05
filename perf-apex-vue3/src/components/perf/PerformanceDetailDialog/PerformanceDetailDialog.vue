@@ -33,7 +33,6 @@
               <el-descriptions-item label="最终得分">{{ performanceData.finalScore }}</el-descriptions-item>
               <el-descriptions-item label="提交时间">{{ parseTime(performanceData.submitTime) }}</el-descriptions-item>
               <el-descriptions-item label="评分时间">{{ parseTime(performanceData.scoringTime) }}</el-descriptions-item>
-              <el-descriptions-item label="审核时间">{{ parseTime(performanceData.auditConfirmTime) }}</el-descriptions-item>
               <el-descriptions-item label="确认时间">{{ parseTime(performanceData.confirmTime) }}</el-descriptions-item>
               <el-descriptions-item label="创建时间">{{ parseTime(performanceData.createTime) }}</el-descriptions-item>
               <el-descriptions-item label="备注">{{ performanceData.remark || '-' }}</el-descriptions-item>

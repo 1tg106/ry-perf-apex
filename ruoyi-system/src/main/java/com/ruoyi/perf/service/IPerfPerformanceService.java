@@ -3,6 +3,7 @@ package com.ruoyi.perf.service;
 import java.util.List;
 import com.ruoyi.perf.domain.PerfPerformance;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.ruoyi.perf.domain.dto.PerfPerformanceAuditDTO;
 import com.ruoyi.perf.domain.dto.PerfPerformanceSaveDTO;
 import com.ruoyi.perf.domain.vo.PerfPerformanceVO;
 
@@ -78,4 +79,12 @@ public interface IPerfPerformanceService extends IService<PerfPerformance>
      * @return 结果
      */
     public int updateMyPerfPerformance(PerfPerformanceSaveDTO saveDTO);
+
+    /**
+     * 绩效审核
+     *
+     * @param auditDTO 绩效审核信息
+     * @return 状态
+     */
+    public Boolean auditPerfPerformance(PerfPerformanceAuditDTO auditDTO);
 }

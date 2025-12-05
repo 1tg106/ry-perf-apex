@@ -4,6 +4,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 
 import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.perf.domain.dto.PerfPerformanceAuditDTO;
 import com.ruoyi.perf.domain.dto.PerfPerformanceSaveDTO;
 import com.ruoyi.perf.domain.vo.PerfPerformanceVO;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -135,5 +136,17 @@ public class PerfPerformanceController extends BaseController
     public AjaxResult editMyPerformance(@RequestBody PerfPerformanceSaveDTO saveDTO)
     {
         return toAjax(perfPerformanceService.updateMyPerfPerformance(saveDTO));
+    }
+
+    // =================================审核==================================
+
+    /**
+     * 绩效审核
+     */
+    @Log(title = "绩效审核", businessType = BusinessType.UPDATE)
+    @PutMapping("auditPerformance")
+    public AjaxResult auditPerfPerformance(@RequestBody PerfPerformanceAuditDTO auditDTO)
+    {
+        return toAjax(perfPerformanceService.auditPerfPerformance(auditDTO));
     }
 }

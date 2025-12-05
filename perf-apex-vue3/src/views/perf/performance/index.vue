@@ -123,7 +123,16 @@
       <el-table-column label="创建时间" align="center" prop="createTime" width="180" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width" fixed="right" width="180">
         <template #default="scope">
-          <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['perf:performance:edit']">修改</el-button>
+          <el-button link type="primary" icon="Edit" 
+          v-if="scope.row.status === PERFORMANCE_STATUS.PENDING_SUBMISSION || scope.row.status === PERFORMANCE_STATUS.DRAFT" 
+          @click="handleUpdate(scope.row)" 
+          v-hasPermi="['perf:performance:edit']"
+          >修改</el-button>
+          <el-button link type="primary" icon="Bell" 
+          v-if="scope.row.status === PERFORMANCE_STATUS.PENDING_AUDIT" 
+          @click="handleUpdate(scope.row)" 
+          v-hasPermi="['perf:performance:edit']"
+          >确认绩效</el-button>
           <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)" v-hasPermi="['perf:performance:remove']">删除</el-button>
         </template>
       </el-table-column>
