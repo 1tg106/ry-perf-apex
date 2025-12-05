@@ -96,7 +96,7 @@
           <el-tag type="warning" v-if="row.status === PERFORMANCE_STATUS.PENDING_AUDIT">{{ PERFORMANCE_STATUS_LIST[3].label }}</el-tag>
           <el-tag type="success" v-if="row.status === PERFORMANCE_STATUS.CONFIRMED">{{ PERFORMANCE_STATUS_LIST[4].label }}</el-tag>
           <el-tag type="danger" v-if="row.status === PERFORMANCE_STATUS.REJECTED">{{ PERFORMANCE_STATUS_LIST[5].label }}</el-tag>
-          <el-tag type="danger" v-if="row.status === PERFORMANCE_STATUS.APPEAL">{{ PERFORMANCE_STATUS_LIST[6].label }}</el-tag>
+          <el-tag type="danger" v-if="row.status === PERFORMANCE_STATUS.APPEAL">{{ PERFORMANCE_STATUS_LIST[7].label }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column label="自评总分" align="center" prop="selfScore" width="100" />

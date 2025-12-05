@@ -15,6 +15,7 @@ import com.ruoyi.perf.mapper.PerfAppealMapper;
 import com.ruoyi.perf.domain.PerfAppeal;
 import com.ruoyi.perf.service.IPerfAppealService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 绩效申诉Service业务层处理
@@ -61,6 +62,7 @@ public class PerfAppealServiceImpl extends ServiceImpl<PerfAppealMapper,PerfAppe
      * @param addDTO 绩效申诉
      * @return 结果
      */
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public int insertPerfAppeal(PerfAppealAddDTO addDTO)
     {
@@ -75,6 +77,10 @@ public class PerfAppealServiceImpl extends ServiceImpl<PerfAppealMapper,PerfAppe
             // 绩效实例状态错误
             throw new RuntimeException("该状态不可申述");
         }
+
+        perfPerformance.setStatus(PerformanceStatus.APPEAL.getCode());
+        perfPerformance.setUpdateTime(DateUtils.getNowDate());
+        perfPerformanceMapper.updateById(perfPerformance);
 
         PerfAppeal perfAppeal = new PerfAppeal();
         perfAppeal.setPerformanceId(addDTO.getPerformanceId());

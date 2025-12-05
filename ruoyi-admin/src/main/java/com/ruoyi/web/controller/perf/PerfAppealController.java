@@ -75,7 +75,6 @@ public class PerfAppealController extends BaseController
     /**
      * 新增绩效申诉
      */
-    @PreAuthorize("@ss.hasPermi('perf:appeal:add')")
     @Log(title = "绩效申诉", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@Valid @RequestBody PerfAppealAddDTO addDTO)

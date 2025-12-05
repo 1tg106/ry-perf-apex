@@ -21,13 +21,14 @@
               <el-descriptions-item label="人员">{{ performanceData.nickName }}</el-descriptions-item>
               <el-descriptions-item label="部门">{{ performanceData.deptName }}</el-descriptions-item>
               <el-descriptions-item label="状态">
-                <el-tag v-if="performanceData.status === PERFORMANCE_STATUS.DRAFT">{{ PERFORMANCE_STATUS_LIST[0].label }}</el-tag>
-                <el-tag v-if="performanceData.status === PERFORMANCE_STATUS.PENDING_SUBMISSION">{{ PERFORMANCE_STATUS_LIST[1].label }}</el-tag>
-                <el-tag v-if="performanceData.status === PERFORMANCE_STATUS.PENDING_SCORE">{{ PERFORMANCE_STATUS_LIST[2].label }}</el-tag>
-                <el-tag type="warning" v-if="performanceData.status === PERFORMANCE_STATUS.PENDING_AUDIT">{{ PERFORMANCE_STATUS_LIST[3].label }}</el-tag>
-                <el-tag type="success" v-if="performanceData.status === PERFORMANCE_STATUS.CONFIRMED">{{ PERFORMANCE_STATUS_LIST[4].label }}</el-tag>
-                <el-tag type="danger" v-if="performanceData.status === PERFORMANCE_STATUS.REJECTED">{{ PERFORMANCE_STATUS_LIST[5].label }}</el-tag>
-                <el-tag type="danger" v-if="performanceData.status === PERFORMANCE_STATUS.APPEAL">{{ PERFORMANCE_STATUS_LIST[6].label }}</el-tag>
+                <el-tag v-if="performanceData.status === PERFORMANCE_STATUS.DRAFT">{{ getStatusLabel(PERFORMANCE_STATUS.DRAFT) }}</el-tag>
+                <el-tag v-if="performanceData.status === PERFORMANCE_STATUS.PENDING_SUBMISSION">{{ getStatusLabel(PERFORMANCE_STATUS.PENDING_SUBMISSION) }}</el-tag>
+                <el-tag v-if="performanceData.status === PERFORMANCE_STATUS.PENDING_SCORE">{{ getStatusLabel(PERFORMANCE_STATUS.PENDING_SCORE) }}</el-tag>
+                <el-tag type="warning" v-if="performanceData.status === PERFORMANCE_STATUS.PENDING_AUDIT">{{ getStatusLabel(PERFORMANCE_STATUS.PENDING_AUDIT) }}</el-tag>
+                <el-tag type="success" v-if="performanceData.status === PERFORMANCE_STATUS.CONFIRMED">{{ getStatusLabel(PERFORMANCE_STATUS.CONFIRMED) }}</el-tag>
+                <el-tag type="danger" v-if="performanceData.status === PERFORMANCE_STATUS.REJECTED">{{ getStatusLabel(PERFORMANCE_STATUS.REJECTED) }}</el-tag>
+                <el-tag type="danger" v-if="performanceData.status === PERFORMANCE_STATUS.CANCELLATION">{{ getStatusLabel(PERFORMANCE_STATUS.CANCELLATION) }}</el-tag>
+                <el-tag type="danger" v-if="performanceData.status === PERFORMANCE_STATUS.APPEAL">{{ getStatusLabel(PERFORMANCE_STATUS.APPEAL) }}</el-tag>
               </el-descriptions-item>
               <el-descriptions-item label="自评总分">{{ performanceData.selfScore }}</el-descriptions-item>
               <el-descriptions-item label="最终得分">{{ performanceData.finalScore }}</el-descriptions-item>
@@ -177,8 +178,34 @@
       
       <template #footer>
         <span class="dialog-footer">
-          <el-button type="danger" @click="closeDialog">申诉</el-button>
+          <el-button type="danger" @click="handleAppeal" v-if="canAppeal">申诉</el-button>
           <el-button @click="closeDialog">关闭</el-button>
+        </span>
+      </template>
+    </el-dialog>
+
+    <!-- 绩效申诉对话框 -->
+    <el-dialog
+      v-model="appealDialogVisible"
+      title="绩效申诉"
+      width="500px"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+    >
+      <el-form ref="appealFormRef" :model="appealForm" :rules="appealRules" label-width="80px">
+        <el-form-item label="申诉理由" prop="appealReason">
+          <el-input
+            v-model="appealForm.appealReason"
+            type="textarea"
+            :rows="4"
+            placeholder="请输入申诉理由"
+          />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="cancelAppeal">取消</el-button>
+          <el-button type="primary" @click="submitAppeal">提交</el-button>
         </span>
       </template>
     </el-dialog>
@@ -186,10 +213,11 @@
 </template>
 
 <script>
-import { ref, watch, nextTick } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ref, watch, nextTick, computed } from 'vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { Document, Search } from '@element-plus/icons-vue'
 import { getPerformance } from '@/api/perf/performance'
+import { addAppeal } from '@/api/perf/appeal'
 import { PERFORMANCE_STATUS, PERFORMANCE_STATUS_LIST, PERFORMANCE_STEP_STATUS, PERFORMANCE_STEP_STATUS_LIST } from '@/utils/perf/performanceEnum'
 import { parseTime } from '@/utils/ruoyi'
 
@@ -201,9 +229,24 @@ export default {
     const filterText = ref('')
     const treeRef = ref()
     const currentItem = ref(null)
+    const appealDialogVisible = ref(false)
+    const appealFormRef = ref()
     
     // 绩效数据
     const performanceData = ref({})
+    
+    // 申诉表单
+    const appealForm = ref({
+      performanceId: null,
+      appealReason: ''
+    })
+    
+    // 申诉表单验证规则
+    const appealRules = {
+      appealReason: [
+        { required: true, message: '申诉理由不能为空', trigger: 'blur' }
+      ]
+    }
     
     // 树配置
     const treeProps = {
@@ -214,6 +257,12 @@ export default {
     // 指标数据
     const indicators = ref([])
     
+    // 获取状态标签文本
+    const getStatusLabel = (status) => {
+      const statusItem = PERFORMANCE_STATUS_LIST.find(item => item.value === status);
+      return statusItem ? statusItem.label : status;
+    };
+
     // 获取指标类型标签样式
     const getItemTypeTagType = (type) => {
       const typeMap = {
@@ -243,6 +292,12 @@ export default {
       }
       return stepMap[step] || `步骤${step}`
     }
+    
+    // 判断是否可以申诉
+    const canAppeal = computed(() => {
+      return performanceData.value.status === PERFORMANCE_STATUS.CONFIRMED || 
+             performanceData.value.status === PERFORMANCE_STATUS.REJECTED
+    })
     
     // 树节点过滤方法
     const filterNode = (value, data) => {
@@ -307,6 +362,47 @@ export default {
       activeTab.value = 'basic'
     }
     
+    // 处理申诉按钮点击
+    const handleAppeal = () => {
+      // 初始化申诉表单
+      appealForm.value.performanceId = performanceData.value.id
+      appealForm.value.appealReason = ''
+      appealDialogVisible.value = true
+    }
+    
+    // 取消申诉
+    const cancelAppeal = () => {
+      appealDialogVisible.value = false
+      resetAppealForm()
+    }
+    
+    // 重置申诉表单
+    const resetAppealForm = () => {
+      appealForm.value = {
+        performanceId: null,
+        appealReason: ''
+      }
+      appealFormRef.value?.clearValidate()
+    }
+    
+    // 提交申诉
+    const submitAppeal = () => {
+      appealFormRef.value.validate(async (valid) => {
+        if (valid) {
+          try {
+            await addAppeal(appealForm.value)
+            ElMessage.success('申诉提交成功')
+            appealDialogVisible.value = false
+            resetAppealForm()
+            // 更新绩效状态为申诉中
+            performanceData.value.status = PERFORMANCE_STATUS.APPEAL
+          } catch (error) {
+            ElMessage.error('申诉提交失败: ' + error.message)
+          }
+        }
+      })
+    }
+    
     // 监听搜索文本变化
     watch(filterText, (val) => {
       treeRef.value.filter(val)
@@ -327,6 +423,7 @@ export default {
       treeProps,
       Document,
       Search,
+      getStatusLabel,
       getItemTypeTagType,
       getItemTypeText,
       getStepName,
@@ -334,7 +431,16 @@ export default {
       handleNodeClick,
       openDialog,
       closeDialog,
-      parseTime
+      parseTime,
+      // 申诉相关
+      appealDialogVisible,
+      appealForm,
+      appealFormRef,
+      appealRules,
+      canAppeal,
+      handleAppeal,
+      cancelAppeal,
+      submitAppeal
     }
   }
 }
