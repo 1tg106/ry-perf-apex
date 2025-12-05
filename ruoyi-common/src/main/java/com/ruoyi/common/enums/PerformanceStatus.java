@@ -8,7 +8,7 @@ public enum PerformanceStatus {
     DRAFT("DRAFT","草稿"),
     PENDING_SUBMISSION("PENDING_SUBMISSION","待提交"),
     PENDING_SCORE("PENDING_SCORE","待评分"),
-    PENDING_HR("PENDING_HR","待HR确认"),
+    PENDING_AUDIT("PENDING_AUDIT","待审核人确认"),
     CONFIRMED("CONFIRMED","已确认"),
     REJECTED("REJECTED","已驳回"),
     CANCELLATION("CANCELLATION","已作废"),

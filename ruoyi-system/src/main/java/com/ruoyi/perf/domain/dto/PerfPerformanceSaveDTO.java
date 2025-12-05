@@ -51,10 +51,10 @@ public class PerfPerformanceSaveDTO implements Serializable
     /** 最终得分 */
     private BigDecimal finalScore;
 
-    /** 当前步骤(当前步骤：0-草稿状态 / 员工自评中 1-待直属上级评分 2-待部门负责人评分  3-待HR确认 4-已完成所有步骤) */
+    /** 当前步骤(当前步骤：0-草稿状态 / 员工自评中 1-待直属上级评分 2-待部门负责人评分  3-待审核人确认 4-已完成所有步骤) */
     private Integer currentStep;
 
-    /** 状态(DRAFT:草稿, PENDING_SUBMISSION: 待提交, PENDING_SCORE:待评分, PENDING_HR:待HR确认, CONFIRMED:已确认, REJECTED:已驳回, APPEAL:申诉中) */
+    /** 状态(DRAFT:草稿, PENDING_SUBMISSION: 待提交, PENDING_SCORE:待评分, PENDING_AUDIT:待审核人确认, CONFIRMED:已确认, REJECTED:已驳回, APPEAL:申诉中) */
     private String status;
 
     /** 驳回原因 */

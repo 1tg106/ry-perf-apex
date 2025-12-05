@@ -24,7 +24,7 @@
                 <el-tag v-if="performanceData.status === PERFORMANCE_STATUS.DRAFT">{{ PERFORMANCE_STATUS_LIST[0].label }}</el-tag>
                 <el-tag v-if="performanceData.status === PERFORMANCE_STATUS.PENDING_SUBMISSION">{{ PERFORMANCE_STATUS_LIST[1].label }}</el-tag>
                 <el-tag v-if="performanceData.status === PERFORMANCE_STATUS.PENDING_SCORE">{{ PERFORMANCE_STATUS_LIST[2].label }}</el-tag>
-                <el-tag type="warning" v-if="performanceData.status === PERFORMANCE_STATUS.PENDING_HR">{{ PERFORMANCE_STATUS_LIST[3].label }}</el-tag>
+                <el-tag type="warning" v-if="performanceData.status === PERFORMANCE_STATUS.PENDING_AUDIT">{{ PERFORMANCE_STATUS_LIST[3].label }}</el-tag>
                 <el-tag type="success" v-if="performanceData.status === PERFORMANCE_STATUS.CONFIRMED">{{ PERFORMANCE_STATUS_LIST[4].label }}</el-tag>
                 <el-tag type="danger" v-if="performanceData.status === PERFORMANCE_STATUS.REJECTED">{{ PERFORMANCE_STATUS_LIST[5].label }}</el-tag>
                 <el-tag type="danger" v-if="performanceData.status === PERFORMANCE_STATUS.APPEAL">{{ PERFORMANCE_STATUS_LIST[6].label }}</el-tag>
@@ -32,6 +32,8 @@
               <el-descriptions-item label="自评总分">{{ performanceData.selfScore }}</el-descriptions-item>
               <el-descriptions-item label="最终得分">{{ performanceData.finalScore }}</el-descriptions-item>
               <el-descriptions-item label="提交时间">{{ parseTime(performanceData.submitTime) }}</el-descriptions-item>
+              <el-descriptions-item label="评分时间">{{ parseTime(performanceData.scoringTime) }}</el-descriptions-item>
+              <el-descriptions-item label="审核时间">{{ parseTime(performanceData.auditConfirmTime) }}</el-descriptions-item>
               <el-descriptions-item label="确认时间">{{ parseTime(performanceData.confirmTime) }}</el-descriptions-item>
               <el-descriptions-item label="创建时间">{{ parseTime(performanceData.createTime) }}</el-descriptions-item>
               <el-descriptions-item label="备注">{{ performanceData.remark || '-' }}</el-descriptions-item>
@@ -97,11 +99,11 @@
                         <div>{{ currentItem.weight }}%</div>
                       </el-form-item>
                       
-                      <el-form-item label="自评目标" class="mb-2">
+                      <el-form-item label="目标" class="mb-2">
                         <div>{{ currentItem.selfTarget || '-' }}</div>
                       </el-form-item>
                       
-                      <el-form-item label="自评结果" class="mb-2">
+                      <el-form-item label="成果" class="mb-2">
                         <div>{{ currentItem.selfResult || '-' }}</div>
                       </el-form-item>
                       
@@ -117,7 +119,8 @@
                       </el-form-item>
 
                       <el-form-item label="最终得分" class="mb-2">
-                        <div style="color: #67c23a;font-weight: bold;">{{ currentItem.finalScore }}</div>
+                        <div v-if="currentItem.finalScore" style="color: #67c23a;font-weight: bold;">{{ currentItem.finalScore }}</div>
+                        <div v-else>评分完成后计算</div>
                       </el-form-item>
 
                       <el-form-item v-if="currentItem.scoreStandard" label="评分标准">

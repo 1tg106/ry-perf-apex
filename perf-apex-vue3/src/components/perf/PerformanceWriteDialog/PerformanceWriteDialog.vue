@@ -83,24 +83,24 @@
                 </template>
                 
                 <el-form :model="currentItem" label-width="100px">
-                  <el-form-item label="自评目标">
+                  <el-form-item label="目标">
                     <el-input
                       v-model="currentItem.selfTarget"
                       type="textarea"
                       :rows="3"
-                      placeholder="请填写自评目标"
-                      maxlength="500"
+                      placeholder="请填写目标"
+                      maxlength="300"
                       show-word-limit
                     />
                   </el-form-item>
                   
-                  <el-form-item label="自评成果">
+                  <el-form-item label="成果">
                     <el-input
                       v-model="currentItem.selfResult"
                       type="textarea"
                       :rows="3"
-                      placeholder="请填写自评成果"
-                      maxlength="500"
+                      placeholder="请填写成果"
+                      maxlength="300"
                       show-word-limit
                     />
                   </el-form-item>
@@ -126,7 +126,7 @@
                       type="textarea"
                       :rows="3"
                       placeholder="请填写自评评语"
-                      maxlength="500"
+                      maxlength="200"
                       show-word-limit
                     />
                   </el-form-item>
@@ -221,6 +221,7 @@ export default {
       // 只允许选择叶子节点（没有子节点的节点）
       if (!data.children || data.children.length === 0) {
         currentItem.value = data
+        currentItem.value.selfScore = currentItem.value.selfScore?currentItem.value.selfScore:currentItem.value.maxScore;
       }
     }
     
@@ -260,6 +261,7 @@ export default {
         const firstLeaf = findFirstLeaf(indicators.value)
         if (firstLeaf) {
           currentItem.value = firstLeaf
+          currentItem.value.selfScore = currentItem.value.selfScore?currentItem.value.selfScore:currentItem.value.maxScore;
           // 设置树节点选中状态
           treeRef.value.setCurrentKey(firstLeaf.itemId)
         }

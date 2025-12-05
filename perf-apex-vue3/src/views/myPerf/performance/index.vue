@@ -88,12 +88,12 @@
       <el-table-column label="模板" align="center" prop="templateName" width="100" />
       <el-table-column label="人员" align="center" prop="nickName" width="100" />
       <el-table-column label="部门" align="center" prop="deptName" width="100" />
-      <el-table-column label="状态" align="center" prop="status" width="100">
+      <el-table-column label="状态" align="center" prop="status" width="120">
         <template #default="{row}">
           <el-tag type="primary" v-if="row.status === PERFORMANCE_STATUS.DRAFT">{{ PERFORMANCE_STATUS_LIST[0].label }}</el-tag>
           <el-tag type="primary" v-if="row.status === PERFORMANCE_STATUS.PENDING_SUBMISSION">{{ PERFORMANCE_STATUS_LIST[1].label }}</el-tag>
           <el-tag type="primary" v-if="row.status === PERFORMANCE_STATUS.PENDING_SCORE">{{ PERFORMANCE_STATUS_LIST[2].label }}</el-tag>
-          <el-tag type="warning" v-if="row.status === PERFORMANCE_STATUS.PENDING_HR">{{ PERFORMANCE_STATUS_LIST[3].label }}</el-tag>
+          <el-tag type="warning" v-if="row.status === PERFORMANCE_STATUS.PENDING_AUDIT">{{ PERFORMANCE_STATUS_LIST[3].label }}</el-tag>
           <el-tag type="success" v-if="row.status === PERFORMANCE_STATUS.CONFIRMED">{{ PERFORMANCE_STATUS_LIST[4].label }}</el-tag>
           <el-tag type="danger" v-if="row.status === PERFORMANCE_STATUS.REJECTED">{{ PERFORMANCE_STATUS_LIST[5].label }}</el-tag>
           <el-tag type="danger" v-if="row.status === PERFORMANCE_STATUS.APPEAL">{{ PERFORMANCE_STATUS_LIST[6].label }}</el-tag>
@@ -102,7 +102,7 @@
       <el-table-column label="自评总分" align="center" prop="selfScore" width="100" />
       <el-table-column label="最终得分" align="center" prop="finalScore" width="100" />
       <el-table-column label="提交时间" align="center" prop="submitTime" width="180" />
-      <el-table-column label="确认时间" align="center" prop="confirmTime" width="180" />
+      <el-table-column label="评分时间" align="center" prop="scoringTime" width="180" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width" fixed="right" width="180">
         <template #default="scope">
@@ -207,7 +207,7 @@ const data = reactive({
       { required: true, message: "模板ID不能为空", trigger: "blur" }
     ],
     status: [
-      { required: true, message: "状态(DRAFT:草稿, PENDING_SCORE:待评分, PENDING_HR:待HR确认, CONFIRMED:已确认, REJECTED:已驳回, APPEAL:申诉中)不能为空", trigger: "change" }
+      { required: true, message: "状态(DRAFT:草稿, PENDING_SCORE:待评分, PENDING_AUDIT:待审核人确认, CONFIRMED:已确认, REJECTED:已驳回, APPEAL:申诉中)不能为空", trigger: "change" }
     ],
   }
 })

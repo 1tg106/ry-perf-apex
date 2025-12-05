@@ -14,28 +14,26 @@
     </el-form>
 
     <el-table v-loading="loading" :data="performanceList" @selection-change="handleSelectionChange">
-      <el-table-column label="绩效编号" align="center" prop="performanceNo" width="180" />
-      <el-table-column label="绩效周期" align="center" prop="periodName" width="100" />
-      <el-table-column label="模板" align="center" prop="templateName" width="100" />
-      <el-table-column label="人员" align="center" prop="nickName" width="100" />
-      <el-table-column label="部门" align="center" prop="deptName" width="100" />
-      <el-table-column label="状态" align="center" prop="status" width="100">
+      <el-table-column label="绩效编号" align="center" prop="performanceNo" width="220" />
+      <el-table-column label="绩效周期" align="center" prop="periodName" />
+      <el-table-column label="模板" align="center" prop="templateName" />
+      <el-table-column label="人员" align="center" prop="nickName" />
+      <el-table-column label="部门" align="center" prop="deptName" />
+      <el-table-column label="状态" align="center" prop="status">
         <template #default="{row}">
           <el-tag type="success" v-if="row.ifScore">已评分</el-tag>
           <el-tag type="danger" v-if="!row.ifScore">待评分</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="自评总分" align="center" prop="selfScore" width="100" />
-      <el-table-column label="最终得分" align="center" prop="finalScore" width="100" />
-      <el-table-column label="驳回原因" align="center" prop="rejectReason" width="100" />
-      <el-table-column label="提交时间" align="center" prop="submitTime" width="180">
+      <el-table-column label="自评总分" align="center" prop="selfScore" />
+      <el-table-column label="提交时间" align="center" prop="submitTime">
         <template #default="scope">
-          <span>{{ parseTime(scope.row.submitTime, '{y}-{m}-{d}') }}</span>
+          <span>{{ scope.row.submitTime}}</span>
         </template>
       </el-table-column>
-      <el-table-column label="确认时间" align="center" prop="confirmTime" width="180">
+      <el-table-column label="评分时间" align="center" prop="confirmTime">
         <template #default="scope">
-          <span>{{ parseTime(scope.row.confirmTime, '{y}-{m}-{d}') }}</span>
+          <span>{{ scope.row.scoringTime }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width" fixed="right" width="180">

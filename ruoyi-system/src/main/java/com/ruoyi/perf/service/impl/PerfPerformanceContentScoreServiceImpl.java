@@ -201,6 +201,7 @@ public class PerfPerformanceContentScoreServiceImpl extends ServiceImpl<PerfPerf
             for (PerfPerformanceContentScore scoreUser : scoreUserList){
                 if(scoreUser.getPerformanceId().equals(perfPerformanceVO.getId())){
                     perfPerformanceVO.setIfScore(scoreUser.getIfScore());
+                    perfPerformanceVO.setScoringTime(scoreUser.getUpdateTime());
                     break;
                 }
             }
@@ -247,8 +248,6 @@ public class PerfPerformanceContentScoreServiceImpl extends ServiceImpl<PerfPerf
             throw new RuntimeException("该状态不允许操作");
         }
 
-        // 操作数据
-        BigDecimal finalScore = BigDecimal.ZERO;
         for (PerfScoreSubmitDTO perfScoreSubmitDTO : perfScoreSubmitDTOS){
             if(perfScoreSubmitDTO.getId() == null){
                 throw new RuntimeException("提交数据id不能为空");
@@ -256,7 +255,6 @@ public class PerfPerformanceContentScoreServiceImpl extends ServiceImpl<PerfPerf
             if(perfScoreSubmitDTO.getScore() == null){
                 throw new RuntimeException("提交数据分数不能为空");
             }
-            finalScore = finalScore.add(perfScoreSubmitDTO.getScore());
             for (PerfPerformanceContentScore score : list){
                 if(score.getId().equals(perfScoreSubmitDTO.getId())){
                     score.setScore(perfScoreSubmitDTO.getScore());
@@ -274,34 +272,51 @@ public class PerfPerformanceContentScoreServiceImpl extends ServiceImpl<PerfPerf
                     .eq(PerfPerformanceContentScore::getPerformanceId, performanceId)
                     .eq(PerfPerformanceContentScore::getIfScore, 0));
             if(count == 0){
-                // 绩效实例状态改为待HR确认
-                perfPerformance.setStatus(PerformanceStatus.PENDING_HR.getCode());
-                perfPerformance.setCurrentStep(Long.valueOf(PerformanceStep.PENDING_HR_CONFIRMATION.getStepValue()));
-                perfPerformance.setUpdateTime(DateUtils.getNowDate());
-                perfPerformance.setFinalScore(finalScore);
-                perfPerformanceMapper.updateById(perfPerformance);
 
                 // 获取全部指标
                 List<PerfPerformanceContent> contentList = perfPerformanceContentMapper.selectPerfPerformanceContentList(new PerfPerformanceContent(performanceId));
+
                 // 获取全部指标得分
                 List<PerfPerformanceContentScore> allList = this.list(Wrappers.lambdaQuery(PerfPerformanceContentScore.class)
                         .in(PerfPerformanceContentScore::getPerformanceId, performanceId));
-                // 计算每一项指标得分
+
+                // 操作数据
+                BigDecimal finalScore = BigDecimal.ZERO;
+
+                // 计算每一项指标平均得分
                 for (PerfPerformanceContent content : contentList){
                     BigDecimal targetScore = BigDecimal.ZERO;
-                    BigDecimal num = new BigDecimal(1);
+                    int scoreNum = 0;
+
                     for (PerfPerformanceContentScore score : allList){
                         if(score.getContentId().equals(content.getId())){
-                            num = num.add(new BigDecimal(1));
+                            scoreNum++;
                             targetScore = targetScore.add(score.getScore());
                         }
                     }
-                    if(targetScore.compareTo(BigDecimal.ZERO) != 0){
-                        content.setFinalScore(targetScore.divide(num, 2, RoundingMode.HALF_UP));
-                        content.setUpdateTime(DateUtils.getNowDate());
+
+                    // 统一处理
+                    if(scoreNum > 0){
+                        content.setFinalScore(targetScore.divide(
+                                BigDecimal.valueOf(scoreNum),
+                                2,
+                                RoundingMode.HALF_UP
+                        ));
+                    } else {
+                        content.setFinalScore(BigDecimal.ZERO);
                     }
+                    content.setUpdateTime(DateUtils.getNowDate());
+                    finalScore = finalScore.add(content.getFinalScore());
                 }
                 perfPerformanceContentMapper.updateScoreBatchById(contentList);
+
+                // 绩效实例状态改为待审核人确认
+                perfPerformance.setStatus(PerformanceStatus.PENDING_AUDIT.getCode());
+                perfPerformance.setCurrentStep(Long.valueOf(PerformanceStep.PENDING_AUDIT_CONFIRMATION.getStepValue()));
+                perfPerformance.setUpdateTime(DateUtils.getNowDate());
+                perfPerformance.setScoringTime(DateUtils.getNowDate());
+                perfPerformance.setFinalScore(finalScore);
+                perfPerformanceMapper.updateById(perfPerformance);
             }
         }
         return updateBatch;

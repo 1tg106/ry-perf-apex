@@ -53,8 +53,8 @@ public class PerfPerformance extends BaseEntity
     @Excel(name = "当前步骤")
     private Long currentStep;
 
-    /** 状态(DRAFT:草稿, PENDING_SCORE:待评分, PENDING_HR:待HR确认, CONFIRMED:已确认, REJECTED:已驳回, APPEAL:申诉中) */
-    @Excel(name = "状态(DRAFT:草稿, PENDING_SCORE:待评分, PENDING_HR:待HR确认, CONFIRMED:已确认, REJECTED:已驳回, APPEAL:申诉中)")
+    /** 状态(DRAFT:草稿, PENDING_SCORE:待评分, PENDING_AUDIT:待审核人确认, CONFIRMED:已确认, REJECTED:已驳回, APPEAL:申诉中) */
+    @Excel(name = "状态(DRAFT:草稿, PENDING_SCORE:待评分, PENDING_AUDIT:待审核人确认, CONFIRMED:已确认, REJECTED:已驳回, APPEAL:申诉中)")
     private String status;
 
     /** 驳回原因 */
@@ -70,6 +70,12 @@ public class PerfPerformance extends BaseEntity
     @JsonFormat(pattern = "yyyy-MM-dd")
     @Excel(name = "确认时间", width = 30, dateFormat = "yyyy-MM-dd")
     private Date confirmTime;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date scoringTime;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date auditConfirmTime;
 
     /** 删除标志（0:存在 1:删除） */
     private String delFlag;
@@ -212,6 +218,22 @@ public class PerfPerformance extends BaseEntity
     public String getDelFlag() 
     {
         return delFlag;
+    }
+
+    public Date getScoringTime() {
+        return scoringTime;
+    }
+
+    public void setScoringTime(Date scoringTime) {
+        this.scoringTime = scoringTime;
+    }
+
+    public Date getAuditConfirmTime() {
+        return auditConfirmTime;
+    }
+
+    public void setAuditConfirmTime(Date auditConfirmTime) {
+        this.auditConfirmTime = auditConfirmTime;
     }
 
     @Override

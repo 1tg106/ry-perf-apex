@@ -83,11 +83,11 @@
                 </template>
                 
                 <el-form :model="currentItem" label-width="100px">
-                  <el-form-item label="自评目标">
+                  <el-form-item label="目标">
                     <div>{{ currentItem.selfTarget }}</div>
                   </el-form-item>
                   
-                  <el-form-item label="自评成果">
+                  <el-form-item label="成果">
                     <div>{{ currentItem.selfResult }}</div>
                   </el-form-item>
                   

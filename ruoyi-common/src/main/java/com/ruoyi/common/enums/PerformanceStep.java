@@ -7,7 +7,7 @@ public enum PerformanceStep {
 
     DRAFT(0, "草稿/自评中"),
     PENDING_DEPT_HEAD_SCORE(1, "待评分"),
-    PENDING_HR_CONFIRMATION(2, "待HR确认"),
+    PENDING_AUDIT_CONFIRMATION(2, "待审核人确认"),
     PENDING_APPEAL(3, "申诉中"),
     PENDING_APPEAL_COMPLETED(4, "申诉完成"),
     PENDING_REJECTED(5, "已驳回"),

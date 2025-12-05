@@ -67,8 +67,8 @@ public class PerfPerformanceVO implements Serializable
     @Excel(name = "当前步骤")
     private Long currentStep;
 
-    /** 状态(DRAFT:草稿, PENDING_SCORE:待评分, PENDING_HR:待HR确认, CONFIRMED:已确认, REJECTED:已驳回, APPEAL:申诉中) */
-    @Excel(name = "状态(DRAFT:草稿, PENDING_SCORE:待评分, PENDING_HR:待HR确认, CONFIRMED:已确认, REJECTED:已驳回, APPEAL:申诉中)")
+    /** 状态(DRAFT:草稿, PENDING_SCORE:待评分, PENDING_AUDIT:待审核人确认, CONFIRMED:已确认, REJECTED:已驳回, APPEAL:申诉中) */
+    @Excel(name = "状态(DRAFT:草稿, PENDING_SCORE:待评分, PENDING_AUDIT:待审核人确认, CONFIRMED:已确认, REJECTED:已驳回, APPEAL:申诉中)")
     private String status;
 
     /** 驳回原因 */
@@ -92,6 +92,12 @@ public class PerfPerformanceVO implements Serializable
     private Date createTime;
 
     private Integer ifScore;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date scoringTime;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date auditConfirmTime;
 
     // 指标列表
     private List<PerformanceContentItemVO> perfContentVOList;
