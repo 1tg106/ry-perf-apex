@@ -90,13 +90,14 @@
       <el-table-column label="部门" align="center" prop="deptName" width="100" />
       <el-table-column label="状态" align="center" prop="status" width="120">
         <template #default="{row}">
-          <el-tag type="primary" v-if="row.status === PERFORMANCE_STATUS.DRAFT">{{ PERFORMANCE_STATUS_LIST[0].label }}</el-tag>
-          <el-tag type="primary" v-if="row.status === PERFORMANCE_STATUS.PENDING_SUBMISSION">{{ PERFORMANCE_STATUS_LIST[1].label }}</el-tag>
-          <el-tag type="primary" v-if="row.status === PERFORMANCE_STATUS.PENDING_SCORE">{{ PERFORMANCE_STATUS_LIST[2].label }}</el-tag>
-          <el-tag type="warning" v-if="row.status === PERFORMANCE_STATUS.PENDING_AUDIT">{{ PERFORMANCE_STATUS_LIST[3].label }}</el-tag>
-          <el-tag type="success" v-if="row.status === PERFORMANCE_STATUS.CONFIRMED">{{ PERFORMANCE_STATUS_LIST[4].label }}</el-tag>
-          <el-tag type="danger" v-if="row.status === PERFORMANCE_STATUS.REJECTED">{{ PERFORMANCE_STATUS_LIST[5].label }}</el-tag>
-          <el-tag type="danger" v-if="row.status === PERFORMANCE_STATUS.APPEAL">{{ PERFORMANCE_STATUS_LIST[7].label }}</el-tag>
+          <el-tag type="primary" v-if="row.status === PERFORMANCE_STATUS.DRAFT">{{ getStatusLabel(PERFORMANCE_STATUS.DRAFT) }}</el-tag>
+          <el-tag type="primary" v-if="row.status === PERFORMANCE_STATUS.PENDING_SUBMISSION">{{ getStatusLabel(PERFORMANCE_STATUS.PENDING_SUBMISSION) }}</el-tag>
+          <el-tag type="primary" v-if="row.status === PERFORMANCE_STATUS.PENDING_SCORE">{{ getStatusLabel(PERFORMANCE_STATUS.PENDING_SCORE) }}</el-tag>
+          <el-tag type="warning" v-if="row.status === PERFORMANCE_STATUS.PENDING_AUDIT">{{ getStatusLabel(PERFORMANCE_STATUS.PENDING_AUDIT) }}</el-tag>
+          <el-tag type="success" v-if="row.status === PERFORMANCE_STATUS.CONFIRMED">{{ getStatusLabel(PERFORMANCE_STATUS.CONFIRMED) }}</el-tag>
+          <el-tag type="danger" v-if="row.status === PERFORMANCE_STATUS.REJECTED">{{ getStatusLabel(PERFORMANCE_STATUS.REJECTED) }}</el-tag>
+          <el-tag type="danger" v-if="row.status === PERFORMANCE_STATUS.CANCELLATION">{{ getStatusLabel(PERFORMANCE_STATUS.CANCELLATION) }}</el-tag>
+          <el-tag type="danger" v-if="row.status === PERFORMANCE_STATUS.APPEAL">{{ getStatusLabel(PERFORMANCE_STATUS.APPEAL) }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column label="自评总分" align="center" prop="selfScore" width="100" />
@@ -119,7 +120,7 @@
           @click="handleViewDetail(scope.row)"
           >详情</el-button>
           <el-button link type="primary" icon="Delete"
-          v-if="scope.row.status !== PERFORMANCE_STATUS.CONFIRMED" 
+          v-if="scope.row.status !== PERFORMANCE_STATUS.CONFIRMED && scope.row.status !== PERFORMANCE_STATUS.APPEAL" 
           @click="handleDelete(scope.row)">删除</el-button>
         </template>
       </el-table-column>
@@ -158,7 +159,7 @@
 
     <PerformanceDialog ref="performanceDialog" @submit="getList" />
     <!-- 绩效详情弹窗 -->
-    <PerformanceDetailDialog ref="performanceDetailDialog" />
+    <PerformanceDetailDialog ref="performanceDetailDialog" @appealSubmitted="handleAppealSubmitted" />
 
   </div>
 </template>
@@ -316,6 +317,12 @@ function handleViewDetail(row) {
   performanceDetailDialog.value.openDialog(row.id)
 }
 
+// 处理申诉提交后的回调
+function handleAppealSubmitted(performanceId) {
+  // 刷新列表数据
+  getList()
+}
+
 /** 提交按钮 */
 function submitForm() {
   proxy.$refs["performanceRef"].validate(valid => {
@@ -354,6 +361,12 @@ function handleExport() {
     ...queryParams.value
   }, `performance_${new Date().getTime()}.xlsx`)
 }
+
+// 获取状态标签文本
+const getStatusLabel = (status) => {
+  const statusItem = PERFORMANCE_STATUS_LIST.find(item => item.value === status);
+  return statusItem ? statusItem.label : status;
+};
 
 getList()
 getPeriodOptions()

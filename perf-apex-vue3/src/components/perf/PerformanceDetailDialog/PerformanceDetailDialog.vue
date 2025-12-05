@@ -223,7 +223,8 @@ import { parseTime } from '@/utils/ruoyi'
 
 export default {
   name: 'PerformanceDetailDialog',
-  setup() {
+  emits: ['appealSubmitted'], // 添加事件发射器
+  setup(props, { emit }) { // 添加emit参数
     const dialogVisible = ref(false)
     const activeTab = ref('basic')
     const filterText = ref('')
@@ -262,7 +263,7 @@ export default {
       const statusItem = PERFORMANCE_STATUS_LIST.find(item => item.value === status);
       return statusItem ? statusItem.label : status;
     };
-
+    
     // 获取指标类型标签样式
     const getItemTypeTagType = (type) => {
       const typeMap = {
@@ -396,6 +397,9 @@ export default {
             resetAppealForm()
             // 更新绩效状态为申诉中
             performanceData.value.status = PERFORMANCE_STATUS.APPEAL
+            
+            // 发射事件通知父组件刷新列表
+            emit('appealSubmitted', performanceData.value.id)
           } catch (error) {
             ElMessage.error('申诉提交失败: ' + error.message)
           }

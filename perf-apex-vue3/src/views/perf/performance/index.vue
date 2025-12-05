@@ -107,13 +107,14 @@
       <el-table-column label="部门" align="center" prop="deptName" width="100" />
       <el-table-column label="状态" align="center" prop="status" width="100">
         <template #default="{row}">
-          <el-tag type="primary" v-if="row.status === PERFORMANCE_STATUS.DRAFT">{{ PERFORMANCE_STATUS_LIST[0].label }}</el-tag>
-          <el-tag type="primary" v-if="row.status === PERFORMANCE_STATUS.PENDING_SUBMISSION">{{ PERFORMANCE_STATUS_LIST[1].label }}</el-tag>
-          <el-tag type="primary" v-if="row.status === PERFORMANCE_STATUS.PENDING_SCORE">{{ PERFORMANCE_STATUS_LIST[2].label }}</el-tag>
-          <el-tag type="warning" v-if="row.status === PERFORMANCE_STATUS.PENDING_AUDIT">{{ PERFORMANCE_STATUS_LIST[3].label }}</el-tag>
-          <el-tag type="success" v-if="row.status === PERFORMANCE_STATUS.CONFIRMED">{{ PERFORMANCE_STATUS_LIST[4].label }}</el-tag>
-          <el-tag type="danger" v-if="row.status === PERFORMANCE_STATUS.REJECTED">{{ PERFORMANCE_STATUS_LIST[5].label }}</el-tag>
-          <el-tag type="danger" v-if="row.status === PERFORMANCE_STATUS.APPEAL">{{ PERFORMANCE_STATUS_LIST[6].label }}</el-tag>
+          <el-tag type="primary" v-if="row.status === PERFORMANCE_STATUS.DRAFT">{{ getStatusLabel(PERFORMANCE_STATUS.DRAFT) }}</el-tag>
+          <el-tag type="primary" v-if="row.status === PERFORMANCE_STATUS.PENDING_SUBMISSION">{{ getStatusLabel(PERFORMANCE_STATUS.PENDING_SUBMISSION) }}</el-tag>
+          <el-tag type="primary" v-if="row.status === PERFORMANCE_STATUS.PENDING_SCORE">{{ getStatusLabel(PERFORMANCE_STATUS.PENDING_SCORE) }}</el-tag>
+          <el-tag type="warning" v-if="row.status === PERFORMANCE_STATUS.PENDING_AUDIT">{{ getStatusLabel(PERFORMANCE_STATUS.PENDING_AUDIT) }}</el-tag>
+          <el-tag type="success" v-if="row.status === PERFORMANCE_STATUS.CONFIRMED">{{ getStatusLabel(PERFORMANCE_STATUS.CONFIRMED) }}</el-tag>
+          <el-tag type="danger" v-if="row.status === PERFORMANCE_STATUS.REJECTED">{{ getStatusLabel(PERFORMANCE_STATUS.REJECTED) }}</el-tag>
+          <el-tag type="danger" v-if="row.status === PERFORMANCE_STATUS.CANCELLATION">{{ getStatusLabel(PERFORMANCE_STATUS.CANCELLATION) }}</el-tag>
+          <el-tag type="danger" v-if="row.status === PERFORMANCE_STATUS.APPEAL">{{ getStatusLabel(PERFORMANCE_STATUS.APPEAL) }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column label="自评总分" align="center" prop="selfScore" width="100" />
@@ -138,6 +139,9 @@
           @click="handleReject(scope.row)" 
           v-hasPermi="['perf:performance:edit']"
           >驳回</el-button>
+          <el-button link type="primary" icon="View"
+          @click="handleViewDetail(scope.row)"
+          >详情</el-button>
           <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)" v-hasPermi="['perf:performance:remove']">删除</el-button>
         </template>
       </el-table-column>
@@ -205,6 +209,9 @@
         </div>
       </template>
     </el-dialog>
+
+    <!-- 绩效详情弹窗 -->
+    <PerformanceDetailDialog ref="performanceDetailDialog" @appealSubmitted="handleAppealSubmitted" />
   </div>
 </template>
 
@@ -214,6 +221,8 @@ import { getPerfChooseList } from '@/api/perf/period'
 import { getTemplateChooseList } from '@/api/perf/template'
 import { getUserChooseList,deptTreeSelect } from '@/api/system/user'
 import { PERFORMANCE_STATUS, PERFORMANCE_STATUS_LIST, PERFORMANCE_STEP_STATUS, PERFORMANCE_STEP_STATUS_LIST } from '@/utils/perf/performanceEnum'
+// 引入绩效详情弹窗组件
+import PerformanceDetailDialog from '@/components/perf/PerformanceDetailDialog/PerformanceDetailDialog.vue'
 
 const { proxy } = getCurrentInstance()
 
@@ -230,6 +239,7 @@ const title = ref("")
 const rejectDialogVisible = ref(false)
 const rejectDialogTitle = ref("")
 const currentAuditRow = ref({})
+const performanceDetailDialog = ref() // 绩效详情弹窗引用
 
 const data = reactive({
   form: {},
@@ -504,6 +514,23 @@ function resetRejectForm() {
     rejectReason: ''
   }
   proxy.resetForm("rejectFormRef")
+}
+
+/** 查看详情按钮操作 */
+function handleViewDetail(row) {
+  performanceDetailDialog.value.openDialog(row.id)
+}
+
+// 获取状态标签文本
+const getStatusLabel = (status) => {
+  const statusItem = PERFORMANCE_STATUS_LIST.find(item => item.value === status);
+  return statusItem ? statusItem.label : status;
+};
+
+// 处理申诉提交后的回调
+function handleAppealSubmitted(performanceId) {
+  // 刷新列表数据
+  getList()
 }
 
 getList()
