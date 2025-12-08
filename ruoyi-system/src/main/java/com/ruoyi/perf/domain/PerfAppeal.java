@@ -49,6 +49,10 @@ public class PerfAppeal extends BaseEntity
     @Excel(name = "调整分数")
     private BigDecimal adjustScore;
 
+    /** 是否调整分数(0:否 1:是) */
+    @Excel(name = "是否调整分数(0:否 1:是)")
+    private Integer ifAdjustScore;
+
     /** 申诉时间 */
     @JsonFormat(pattern = "yyyy-MM-dd")
     @Excel(name = "申诉时间", width = 30, dateFormat = "yyyy-MM-dd")
@@ -140,6 +144,16 @@ public class PerfAppeal extends BaseEntity
     public BigDecimal getAdjustScore() 
     {
         return adjustScore;
+    }
+
+    public void setIfAdjustScore(Integer ifAdjustScore)
+    {
+        this.ifAdjustScore = ifAdjustScore;
+    }
+
+    public Integer getIfAdjustScore()
+    {
+        return ifAdjustScore;
     }
 
     public void setAppealTime(Date appealTime) 

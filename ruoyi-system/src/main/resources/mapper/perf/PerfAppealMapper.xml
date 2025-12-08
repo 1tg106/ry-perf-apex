@@ -43,6 +43,21 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <include refid="selectPerfAppealVo"/>
         where id = #{id}
     </select>
+    <select id="selectRelevancePerfAppealList" resultType="com.ruoyi.perf.domain.vo.PerfAppealVO">
+        SELECT
+            a.*,
+            c.period_name,
+            d.user_id,
+            d.nick_name
+        FROM
+            perf_appeal a
+                LEFT JOIN perf_performance b ON b.id = a.performance_id
+                LEFT JOIN perf_period c ON c.period_id = b.period_id
+                LEFT JOIN sys_user d ON d.user_id = b.user_id
+        where a.del_flag = '0'
+        <if test="appeal_status != null">and a.appeal_status = #{appealStatus}</if>
+        order by a.create_time desc
+    </select>
 
     <insert id="insertPerfAppeal" parameterType="PerfAppeal" useGeneratedKeys="true" keyProperty="id">
         insert into perf_appeal

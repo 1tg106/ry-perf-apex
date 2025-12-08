@@ -1,100 +1,41 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="绩效ID" prop="performanceId">
-        <el-input
-          v-model="queryParams.performanceId"
-          placeholder="请输入绩效ID"
-          clearable
-          @keyup.enter="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="处理人ID" prop="processorId">
-        <el-input
-          v-model="queryParams.processorId"
-          placeholder="请输入处理人ID"
-          clearable
-          @keyup.enter="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="调整分数" prop="adjustScore">
-        <el-input
-          v-model="queryParams.adjustScore"
-          placeholder="请输入调整分数"
-          clearable
-          @keyup.enter="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="申诉时间" prop="appealTime">
-        <el-date-picker clearable
-          v-model="queryParams.appealTime"
-          type="date"
-          value-format="YYYY-MM-DD"
-          placeholder="请选择申诉时间">
-        </el-date-picker>
-      </el-form-item>
-      <el-form-item label="处理时间" prop="processTime">
-        <el-date-picker clearable
-          v-model="queryParams.processTime"
-          type="date"
-          value-format="YYYY-MM-DD"
-          placeholder="请选择处理时间">
-        </el-date-picker>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
-        <el-button icon="Refresh" @click="resetQuery">重置</el-button>
-      </el-form-item>
-    </el-form>
-
-    <el-row :gutter="10" class="mb8">
+    <el-row :gutter="10">
       <el-col :span="1.5">
-        <el-button
-          type="primary"
-          plain
-          icon="Plus"
-          @click="handleAdd"
-          v-hasPermi="['perf:appeal:add']"
-        >新增</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="success"
-          plain
-          icon="Edit"
-          :disabled="single"
-          @click="handleUpdate"
-          v-hasPermi="['perf:appeal:edit']"
-        >修改</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="danger"
-          plain
-          icon="Delete"
-          :disabled="multiple"
-          @click="handleDelete"
-          v-hasPermi="['perf:appeal:remove']"
-        >删除</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="warning"
-          plain
-          icon="Download"
-          @click="handleExport"
-          v-hasPermi="['perf:appeal:export']"
-        >导出</el-button>
+        <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px">
+          <el-form-item label="处理状态" prop="appealStatus">
+            <el-select 
+              v-model="queryParams.appealStatus" 
+              placeholder="请选择处理状态" 
+              clearable 
+              style="width: 180px"
+            >
+              <el-option
+                v-for="item in APPEAL_STATUS_LIST"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
+            <el-button icon="Refresh" @click="resetQuery">重置</el-button>
+          </el-form-item>
+        </el-form>
       </el-col>
       <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
     <el-table v-loading="loading" :data="appealList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="申诉ID" align="center" prop="id" />
       <el-table-column label="绩效ID" align="center" prop="performanceId" />
       <el-table-column label="申诉理由" align="center" prop="appealReason" />
-      <el-table-column label="申诉状态(PENDING:待处理, PROCESSING:处理中, RESOLVED:已处理, REJECTED:已驳回)" align="center" prop="appealStatus" />
+      <el-table-column label="处理状态" align="center" prop="appealStatus">
+        <template #default="scope">
+          <dict-tag :options="APPEAL_STATUS_LIST" :value="scope.row.appealStatus" />
+        </template>
+      </el-table-column>
       <el-table-column label="处理人ID" align="center" prop="processorId" />
       <el-table-column label="处理意见" align="center" prop="processComment" />
       <el-table-column label="处理结果" align="center" prop="processResult" />
@@ -134,6 +75,16 @@
         <el-form-item label="申诉理由" prop="appealReason">
           <el-input v-model="form.appealReason" type="textarea" placeholder="请输入内容" />
         </el-form-item>
+        <el-form-item label="处理状态" prop="appealStatus">
+          <el-select v-model="form.appealStatus" placeholder="请选择处理状态">
+            <el-option
+              v-for="item in APPEAL_STATUS_LIST"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
         <el-form-item label="处理人ID" prop="processorId">
           <el-input v-model="form.processorId" placeholder="请输入处理人ID" />
         </el-form-item>
@@ -162,9 +113,6 @@
             placeholder="请选择处理时间">
           </el-date-picker>
         </el-form-item>
-        <el-form-item label="删除标志" prop="delFlag">
-          <el-input v-model="form.delFlag" placeholder="请输入删除标志" />
-        </el-form-item>
       </el-form>
       <template #footer>
         <div class="dialog-footer">
@@ -178,6 +126,7 @@
 
 <script setup name="Appeal">
 import { listAppeal, getAppeal, delAppeal, addAppeal, updateAppeal } from "@/api/perf/appeal"
+import { APPEAL_STATUS_LIST } from "@/utils/perf/appeal"
 
 const { proxy } = getCurrentInstance()
 
@@ -196,15 +145,7 @@ const data = reactive({
   queryParams: {
     pageNum: 1,
     pageSize: 10,
-    performanceId: null,
-    appealReason: null,
     appealStatus: null,
-    processorId: null,
-    processComment: null,
-    processResult: null,
-    adjustScore: null,
-    appealTime: null,
-    processTime: null,
   },
   rules: {
     performanceId: [
@@ -214,7 +155,7 @@ const data = reactive({
       { required: true, message: "申诉理由不能为空", trigger: "blur" }
     ],
     appealStatus: [
-      { required: true, message: "申诉状态(PENDING:待处理, PROCESSING:处理中, RESOLVED:已处理, REJECTED:已驳回)不能为空", trigger: "change" }
+      { required: true, message: "处理状态不能为空", trigger: "change" }
     ],
   }
 })
@@ -250,7 +191,6 @@ function reset() {
     adjustScore: null,
     appealTime: null,
     processTime: null,
-    delFlag: null,
     createTime: null,
     updateTime: null
   }

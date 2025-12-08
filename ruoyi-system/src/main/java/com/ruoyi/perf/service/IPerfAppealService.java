@@ -4,6 +4,8 @@ import java.util.List;
 import com.ruoyi.perf.domain.PerfAppeal;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ruoyi.perf.domain.dto.PerfAppealAddDTO;
+import com.ruoyi.perf.domain.dto.PerfAppealHandleDTO;
+import com.ruoyi.perf.domain.vo.PerfAppealVO;
 
 /**
  * 绩效申诉Service接口
@@ -29,6 +31,14 @@ public interface IPerfAppealService extends IService<PerfAppeal>
      * @return 绩效申诉集合
      */
     public List<PerfAppeal> selectPerfAppealList(PerfAppeal perfAppeal);
+
+    /**
+     * 关联查询绩效申诉列表
+     *
+     * @param perfAppeal 绩效申诉
+     * @return 绩效申诉集合
+     */
+    public List<PerfAppealVO> selectRelevancePerfAppealList(PerfAppeal perfAppeal);
 
     /**
      * 新增绩效申诉
@@ -61,4 +71,11 @@ public interface IPerfAppealService extends IService<PerfAppeal>
      * @return 结果
      */
     public int deletePerfAppealById(Long id);
+
+    /**
+     * 处理申诉
+     * @param handleDTO
+     * @return
+     */
+    public Boolean handlePerfAppeal(PerfAppealHandleDTO handleDTO);
 }

@@ -5,6 +5,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import com.ruoyi.perf.domain.dto.PerfAppealAddDTO;
+import com.ruoyi.perf.domain.dto.PerfAppealHandleDTO;
+import com.ruoyi.perf.domain.vo.PerfAppealVO;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -50,6 +52,18 @@ public class PerfAppealController extends BaseController
     }
 
     /**
+     * 关联查询绩效申诉列表
+     */
+    @PreAuthorize("@ss.hasPermi('perf:appeal:list')")
+    @GetMapping("/selectRelevancePerfAppealList")
+    public TableDataInfo selectRelevancePerfAppealList(PerfAppeal perfAppeal)
+    {
+        startPage();
+        List<PerfAppealVO> list = perfAppealService.selectRelevancePerfAppealList(perfAppeal);
+        return getDataTable(list);
+    }
+
+    /**
      * 导出绩效申诉列表
      */
     @PreAuthorize("@ss.hasPermi('perf:appeal:export')")
@@ -91,6 +105,17 @@ public class PerfAppealController extends BaseController
     public AjaxResult edit(@RequestBody PerfAppeal perfAppeal)
     {
         return toAjax(perfAppealService.updatePerfAppeal(perfAppeal));
+    }
+
+    /**
+     * 修改绩效申诉
+     */
+    @PreAuthorize("@ss.hasPermi('perf:appeal:edit')")
+    @Log(title = "绩效申诉", businessType = BusinessType.UPDATE)
+    @PutMapping("/handle")
+    public AjaxResult handlePerfAppeal(@Valid @RequestBody PerfAppealHandleDTO handleDTO)
+    {
+        return toAjax(perfAppealService.handlePerfAppeal(handleDTO));
     }
 
     /**

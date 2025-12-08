@@ -1,5 +1,6 @@
 package com.ruoyi.perf.service.impl;
 
+import java.util.Collections;
 import java.util.List;
 
 import com.ruoyi.common.enums.PerfAppealStatus;
@@ -8,6 +9,8 @@ import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.perf.domain.PerfPerformance;
 import com.ruoyi.perf.domain.dto.PerfAppealAddDTO;
+import com.ruoyi.perf.domain.dto.PerfAppealHandleDTO;
+import com.ruoyi.perf.domain.vo.PerfAppealVO;
 import com.ruoyi.perf.mapper.PerfPerformanceMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -54,6 +57,11 @@ public class PerfAppealServiceImpl extends ServiceImpl<PerfAppealMapper,PerfAppe
     public List<PerfAppeal> selectPerfAppealList(PerfAppeal perfAppeal)
     {
         return perfAppealMapper.selectPerfAppealList(perfAppeal);
+    }
+
+    @Override
+    public List<PerfAppealVO> selectRelevancePerfAppealList(PerfAppeal perfAppeal) {
+        return perfAppealMapper.selectRelevancePerfAppealList(perfAppeal);
     }
 
     /**
@@ -127,5 +135,39 @@ public class PerfAppealServiceImpl extends ServiceImpl<PerfAppealMapper,PerfAppe
     public int deletePerfAppealById(Long id)
     {
         return perfAppealMapper.deletePerfAppealById(id);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public Boolean handlePerfAppeal(PerfAppealHandleDTO handleDTO) {
+        if(handleDTO.getId() == null){
+            throw new RuntimeException("申诉ID不能为空");
+        }
+        PerfAppeal perfAppeal = this.getById(handleDTO.getId());
+        if(perfAppeal == null){
+            throw new RuntimeException("申诉不存在");
+        }
+        if(!perfAppeal.getAppealStatus().equals(PerfAppealStatus.PENDING.getCode())){
+            throw new RuntimeException("申诉状态错误");
+        }
+
+        perfAppeal.setAppealStatus(PerfAppealStatus.RESOLVED.getCode());
+        perfAppeal.setProcessTime(DateUtils.getNowDate());
+        perfAppeal.setProcessComment(handleDTO.getProcessComment());
+
+        // 获取绩效实例
+        PerfPerformance perfPerformance = perfPerformanceMapper.selectById(perfAppeal.getPerformanceId());
+        perfPerformance.setStatus(PerformanceStatus.CONFIRMED.getCode());
+        perfPerformance.setUpdateTime(DateUtils.getNowDate());
+
+        // 是否调整分数
+        if(handleDTO.getIfAdjustScore() != null && handleDTO.getIfAdjustScore() == 1){
+            perfAppeal.setAdjustScore(handleDTO.getAdjustScore());
+            perfAppeal.setIfAdjustScore(1);
+            perfPerformance.setFinalScore(handleDTO.getAdjustScore());
+        }
+        perfPerformanceMapper.updateById(perfPerformance);
+
+        return this.updateById(perfAppeal);
     }
 }
