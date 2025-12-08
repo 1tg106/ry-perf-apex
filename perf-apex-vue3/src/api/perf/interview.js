@@ -9,10 +9,27 @@ export function listInterview(query) {
   })
 }
 
+// 关联查询绩效面谈列表
+export function selectPerfInterviewListVO(query) {
+  return request({
+    url: '/perf/interview/relevanceList',
+    method: 'get',
+    params: query
+  })
+}
+
 // 查询绩效面谈详细
 export function getInterview(id) {
   return request({
     url: '/perf/interview/' + id,
+    method: 'get'
+  })
+}
+
+// 关联查询绩效面谈详情
+export function selectPerfInterviewVOById(id) {
+  return request({
+    url: '/perf/interview/relevance/' + id,
     method: 'get'
   })
 }

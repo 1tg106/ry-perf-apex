@@ -59,22 +59,25 @@
 
     <el-table v-loading="loading" :data="interviewList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="绩效编号" align="center" prop="performanceId" />
-      <el-table-column label="面谈人ID" align="center" prop="interviewerId" />
-      <el-table-column label="被面谈人ID" align="center" prop="intervieweeId" />
+      <el-table-column label="绩效ID" align="center" prop="performanceId" />
+      <el-table-column label="考核周期" align="center" prop="periodName" />
+      <el-table-column label="面谈人" align="center" prop="interviewerName" />
+      <el-table-column label="被面谈人" align="center" prop="intervieweeName" />
       <el-table-column label="面谈时间" align="center" prop="interviewTime" width="180">
         <template #default="scope">
           <span>{{ parseTime(scope.row.interviewTime, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="面谈要点" align="center" prop="keyPoints" />
-      <el-table-column label="优点与成绩" align="center" prop="strengths" />
-      <el-table-column label="待改进点" align="center" prop="improvements" />
-      <el-table-column label="行动计划" align="center" prop="actionPlan" />
-      <el-table-column label="员工反馈" align="center" prop="feedback" />
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" fixed="right" width="150px">
+      <el-table-column label="是否已面谈" align="center" prop="ifInterview">
         <template #default="scope">
-          <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['perf:interview:edit']">编辑</el-button>
+          <el-tag v-if="scope.row.ifInterview === 1" type="success">是</el-tag>
+          <el-tag v-else type="info">否</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" fixed="right" width="200px">
+        <template #default="scope">
+          <el-button link type="primary" icon="View" v-if="scope.row.ifInterview === 1" @click="handleViewDetail(scope.row)" v-hasPermi="['perf:interview:query']">详情</el-button>
+          <el-button link type="primary" icon="Edit" v-else @click="handleUpdate(scope.row)" v-hasPermi="['perf:interview:edit']">编辑</el-button>
           <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)" v-hasPermi="['perf:interview:remove']">删除</el-button>
         </template>
       </el-table-column>
@@ -178,18 +181,26 @@
         </div>
       </template>
     </el-dialog>
+    
+    <!-- 绩效面谈详情对话框 -->
+    <PerfInterviewDetailDialog
+      v-model="detailOpen"
+      :detail-data="detailData"
+    />
   </div>
 </template>
 
 <script setup name="Interview">
-import { listInterview, getInterview, delInterview, addInterview, updateInterview } from "@/api/perf/interview"
+import { selectPerfInterviewListVO, getInterview, selectPerfInterviewVOById, delInterview, addInterview, updateInterview } from "@/api/perf/interview"
 import { getUserChooseList } from "@/api/system/user"
 import { listPerformanceByUserId } from "@/api/perf/performance"
+import PerfInterviewDetailDialog from '@/components/perf/PerfInterviewDetailDialog/PerfInterviewDetailDialog.vue'
 
 const { proxy } = getCurrentInstance()
 
 const interviewList = ref([])
 const open = ref(false)
+const detailOpen = ref(false)
 const loading = ref(true)
 const showSearch = ref(true)
 const ids = ref([])
@@ -197,6 +208,7 @@ const single = ref(true)
 const multiple = ref(true)
 const total = ref(0)
 const title = ref("")
+const detailData = ref({})
 
 // 下拉选项相关
 const intervieweeOptions = ref([])
@@ -236,7 +248,7 @@ const { queryParams, form, rules } = toRefs(data)
 /** 查询绩效面谈列表 */
 function getList() {
   loading.value = true
-  listInterview(queryParams.value).then(response => {
+  selectPerfInterviewListVO(queryParams.value).then(response => {
     interviewList.value = response.rows
     total.value = response.total
     loading.value = false
@@ -311,6 +323,14 @@ async function handleUpdate(row) {
     await loadUserOptions()
     open.value = true
     title.value = "修改绩效面谈"
+  })
+}
+
+/** 查看详情按钮操作 */
+function handleViewDetail(row) {
+  selectPerfInterviewVOById(row.id).then(response => {
+    detailData.value = response.data
+    detailOpen.value = true
   })
 }
 
