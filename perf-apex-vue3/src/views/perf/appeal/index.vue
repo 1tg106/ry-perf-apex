@@ -29,30 +29,28 @@
 
     <el-table v-loading="loading" :data="appealList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="绩效ID" align="center" prop="performanceId" />
-      <el-table-column label="申诉理由" align="center" prop="appealReason" />
+      <el-table-column label="考核周期" align="center" prop="periodName" width="100" />
+      <el-table-column label="绩效编号" align="center" prop="performanceNo" width="200" />
+      <el-table-column label="申请人" align="center" prop="nickName" />
+      <el-table-column label="申诉理由" align="center" prop="appealReason" width="200" />
       <el-table-column label="处理状态" align="center" prop="appealStatus">
         <template #default="scope">
           <dict-tag :options="APPEAL_STATUS_LIST" :value="scope.row.appealStatus" />
         </template>
       </el-table-column>
-      <el-table-column label="处理人ID" align="center" prop="processorId" />
-      <el-table-column label="处理意见" align="center" prop="processComment" />
-      <el-table-column label="处理结果" align="center" prop="processResult" />
-      <el-table-column label="调整分数" align="center" prop="adjustScore" />
-      <el-table-column label="申诉时间" align="center" prop="appealTime" width="180">
+      <el-table-column label="处理人" align="center" prop="handleNickName" />
+      <el-table-column label="申诉时间" align="center" prop="appealTime" width="180" />
+      <el-table-column label="处理时间" align="center" prop="processTime" width="180" />
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" fixed="right" width="160">
         <template #default="scope">
-          <span>{{ parseTime(scope.row.appealTime, '{y}-{m}-{d}') }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="处理时间" align="center" prop="processTime" width="180">
-        <template #default="scope">
-          <span>{{ parseTime(scope.row.processTime, '{y}-{m}-{d}') }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-        <template #default="scope">
-          <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['perf:appeal:edit']">修改</el-button>
+          <el-button 
+            link 
+            type="primary" 
+            icon="Edit" 
+            @click="handleProcess(scope.row)" 
+            v-if="scope.row.appealStatus === 'PENDING'"
+            v-hasPermi="['perf:appeal:edit']"
+          >处理</el-button>
           <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)" v-hasPermi="['perf:appeal:remove']">删除</el-button>
         </template>
       </el-table-column>
@@ -121,17 +119,26 @@
         </div>
       </template>
     </el-dialog>
+    
+    <!-- 处理绩效申诉对话框 -->
+    <PerfAppealHandleDialog
+      v-model="processOpen"
+      :row-data="currentRow"
+      @success="handleProcessSuccess"
+    />
   </div>
 </template>
 
 <script setup name="Appeal">
-import { listAppeal, getAppeal, delAppeal, addAppeal, updateAppeal } from "@/api/perf/appeal"
+import { selectRelevancePerfAppealList, getAppeal, delAppeal, addAppeal, updateAppeal } from "@/api/perf/appeal"
 import { APPEAL_STATUS_LIST } from "@/utils/perf/appeal"
+import PerfAppealHandleDialog from "@/components/perf/PerfAppealHandleDialog/PerfAppealHandleDialog.vue"
 
 const { proxy } = getCurrentInstance()
 
 const appealList = ref([])
 const open = ref(false)
+const processOpen = ref(false)
 const loading = ref(true)
 const showSearch = ref(true)
 const ids = ref([])
@@ -139,6 +146,7 @@ const single = ref(true)
 const multiple = ref(true)
 const total = ref(0)
 const title = ref("")
+const currentRow = ref({})
 
 const data = reactive({
   form: {},
@@ -165,7 +173,7 @@ const { queryParams, form, rules } = toRefs(data)
 /** 查询绩效申诉列表 */
 function getList() {
   loading.value = true
-  listAppeal(queryParams.value).then(response => {
+  selectRelevancePerfAppealList(queryParams.value).then(response => {
     appealList.value = response.rows
     total.value = response.total
     loading.value = false
@@ -232,6 +240,17 @@ function handleUpdate(row) {
     open.value = true
     title.value = "修改绩效申诉"
   })
+}
+
+/** 处理按钮操作 */
+function handleProcess(row) {
+  currentRow.value = row
+  processOpen.value = true
+}
+
+/** 处理成功回调 */
+function handleProcessSuccess() {
+  getList()
 }
 
 /** 提交按钮 */

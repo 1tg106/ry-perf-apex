@@ -9,6 +9,15 @@ export function listAppeal(query) {
   })
 }
 
+// 关联查询绩效申诉列表
+export function selectRelevancePerfAppealList(query) {
+  return request({
+    url: '/perf/appeal/selectRelevancePerfAppealList',
+    method: 'get',
+    params: query
+  })
+}
+
 // 查询绩效申诉详细
 export function getAppeal(id) {
   return request({
@@ -30,6 +39,15 @@ export function addAppeal(data) {
 export function updateAppeal(data) {
   return request({
     url: '/perf/appeal',
+    method: 'put',
+    data: data
+  })
+}
+
+// 绩效申诉处理
+export function handlePerfAppeal(data) {
+  return request({
+    url: '/perf/appeal/handle',
     method: 'put',
     data: data
   })

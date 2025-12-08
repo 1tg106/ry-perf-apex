@@ -42,7 +42,7 @@ public class PerfAppealServiceImpl extends ServiceImpl<PerfAppealMapper,PerfAppe
      * @return 绩效申诉
      */
     @Override
-    public PerfAppeal selectPerfAppealById(Long id)
+    public PerfAppealVO selectPerfAppealById(Long id)
     {
         return perfAppealMapper.selectPerfAppealById(id);
     }
@@ -154,6 +154,7 @@ public class PerfAppealServiceImpl extends ServiceImpl<PerfAppealMapper,PerfAppe
         perfAppeal.setAppealStatus(PerfAppealStatus.RESOLVED.getCode());
         perfAppeal.setProcessTime(DateUtils.getNowDate());
         perfAppeal.setProcessComment(handleDTO.getProcessComment());
+        perfAppeal.setProcessorId(SecurityUtils.getUserId());
 
         // 获取绩效实例
         PerfPerformance perfPerformance = perfPerformanceMapper.selectById(perfAppeal.getPerformanceId());

@@ -22,7 +22,7 @@ public interface IPerfAppealService extends IService<PerfAppeal>
      * @param id 绩效申诉主键
      * @return 绩效申诉
      */
-    public PerfAppeal selectPerfAppealById(Long id);
+    public PerfAppealVO selectPerfAppealById(Long id);
 
     /**
      * 查询绩效申诉列表

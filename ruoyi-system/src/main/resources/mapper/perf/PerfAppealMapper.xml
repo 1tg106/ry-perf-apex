@@ -39,23 +39,34 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </where>
     </select>
     
-    <select id="selectPerfAppealById" parameterType="Long" resultMap="PerfAppealResult">
-        <include refid="selectPerfAppealVo"/>
-        where id = #{id}
-    </select>
-    <select id="selectRelevancePerfAppealList" resultType="com.ruoyi.perf.domain.vo.PerfAppealVO">
+    <select id="selectPerfAppealById" parameterType="Long" resultType="com.ruoyi.perf.domain.vo.PerfAppealVO">
         SELECT
             a.*,
+            b.performance_no,
             c.period_name,
             d.user_id,
             d.nick_name
         FROM
-            perf_appeal a
+            ( SELECT a.*, b.nick_name handle_nick_name FROM perf_appeal a LEFT JOIN sys_user b ON b.user_id = a.processor_id ) a
+                LEFT JOIN perf_performance b ON b.id = a.performance_id
+                LEFT JOIN perf_period c ON c.period_id = b.period_id
+                LEFT JOIN sys_user d ON d.user_id = b.user_id
+        where a.del_flag = '0' and a.id = #{id}
+    </select>
+    <select id="selectRelevancePerfAppealList" resultType="com.ruoyi.perf.domain.vo.PerfAppealVO">
+        SELECT
+            a.*,
+            b.performance_no,
+            c.period_name,
+            d.user_id,
+            d.nick_name
+        FROM
+            ( SELECT a.*, b.nick_name handle_nick_name FROM perf_appeal a LEFT JOIN sys_user b ON b.user_id = a.processor_id ) a
                 LEFT JOIN perf_performance b ON b.id = a.performance_id
                 LEFT JOIN perf_period c ON c.period_id = b.period_id
                 LEFT JOIN sys_user d ON d.user_id = b.user_id
         where a.del_flag = '0'
-        <if test="appeal_status != null">and a.appeal_status = #{appealStatus}</if>
+        <if test="appealStatus != null">and a.appeal_status = #{appealStatus}</if>
         order by a.create_time desc
     </select>
 

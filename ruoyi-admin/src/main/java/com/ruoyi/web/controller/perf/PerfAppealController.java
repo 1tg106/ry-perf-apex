@@ -108,10 +108,10 @@ public class PerfAppealController extends BaseController
     }
 
     /**
-     * 修改绩效申诉
+     * 绩效申诉处理
      */
     @PreAuthorize("@ss.hasPermi('perf:appeal:edit')")
-    @Log(title = "绩效申诉", businessType = BusinessType.UPDATE)
+    @Log(title = "绩效申诉处理", businessType = BusinessType.UPDATE)
     @PutMapping("/handle")
     public AjaxResult handlePerfAppeal(@Valid @RequestBody PerfAppealHandleDTO handleDTO)
     {

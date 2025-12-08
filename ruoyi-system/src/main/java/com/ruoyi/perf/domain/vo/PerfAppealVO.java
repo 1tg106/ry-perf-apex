@@ -29,6 +29,9 @@ public class PerfAppealVO implements Serializable
     @Excel(name = "绩效ID")
     private Long performanceId;
 
+    @Excel(name = "绩效编号")
+    private String performanceNo;
+
     /** 考核周期 */
     private String periodName;
 
@@ -50,6 +53,9 @@ public class PerfAppealVO implements Serializable
     @Excel(name = "处理人ID")
     private Long processorId;
 
+    /** 处理人 */
+    private String handleNickName;
+
     /** 处理意见 */
     @Excel(name = "处理意见")
     private String processComment;
@@ -67,13 +73,13 @@ public class PerfAppealVO implements Serializable
     private Integer ifAdjustScore;
 
     /** 申诉时间 */
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    @Excel(name = "申诉时间", width = 30, dateFormat = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @Excel(name = "申诉时间", width = 30, dateFormat = "yyyy-MM-dd HH:mm:ss")
     private Date appealTime;
 
     /** 处理时间 */
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    @Excel(name = "处理时间", width = 30, dateFormat = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @Excel(name = "处理时间", width = 30, dateFormat = "yyyy-MM-dd HH:mm:ss")
     private Date processTime;
 
     /** 创建者 */

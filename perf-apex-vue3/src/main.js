@@ -44,6 +44,8 @@ import ImageUpload from "@/components/ImageUpload"
 import ImagePreview from "@/components/ImagePreview"
 // 字典标签组件
 import DictTag from '@/components/DictTag'
+// 绩效申诉处理组件
+import PerfAppealHandleDialog from '@/components/perf/PerfAppealHandleDialog/PerfAppealHandleDialog.vue'
 
 const app = createApp(App)
 
@@ -66,6 +68,7 @@ app.component('ImageUpload', ImageUpload)
 app.component('ImagePreview', ImagePreview)
 app.component('RightToolbar', RightToolbar)
 app.component('Editor', Editor)
+app.component('PerfAppealHandleDialog', PerfAppealHandleDialog)
 
 app.use(router)
 app.use(store)
