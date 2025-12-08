@@ -25,8 +25,8 @@
         </el-col>
       </el-row>
       
-      <el-form-item label="绩效ID" prop="performanceId">
-        <el-input v-model="formData.performanceId" disabled />
+      <el-form-item label="绩效编号" prop="performanceId">
+        <el-input v-model="formData.performanceNo" disabled />
       </el-form-item>
       
       <el-form-item label="申诉理由" prop="appealReason">
@@ -112,6 +112,7 @@ const formData = reactive({
   periodName: '',
   nickName: '',
   performanceId: null,
+  performanceNo: null,
   appealReason: '',
   processComment: '',
   ifAdjustScore: 0,
@@ -135,6 +136,7 @@ watch(
       formData.periodName = newVal.periodName
       formData.nickName = newVal.nickName
       formData.performanceId = newVal.performanceId
+      formData.performanceNo = newVal.performanceNo
       formData.appealReason = newVal.appealReason
       formData.processComment = ''
       formData.ifAdjustScore = 0

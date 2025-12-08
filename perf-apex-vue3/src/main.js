@@ -46,6 +46,8 @@ import ImagePreview from "@/components/ImagePreview"
 import DictTag from '@/components/DictTag'
 // 绩效申诉处理组件
 import PerfAppealHandleDialog from '@/components/perf/PerfAppealHandleDialog/PerfAppealHandleDialog.vue'
+// 绩效申诉详情组件
+import PerfAppealDetailDialog from '@/components/perf/PerfAppealDetailDialog/PerfAppealDetailDialog.vue'
 
 const app = createApp(App)
 
@@ -69,6 +71,7 @@ app.component('ImagePreview', ImagePreview)
 app.component('RightToolbar', RightToolbar)
 app.component('Editor', Editor)
 app.component('PerfAppealHandleDialog', PerfAppealHandleDialog)
+app.component('PerfAppealDetailDialog', PerfAppealDetailDialog)
 
 app.use(router)
 app.use(store)

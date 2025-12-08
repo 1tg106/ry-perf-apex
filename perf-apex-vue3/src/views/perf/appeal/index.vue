@@ -28,7 +28,6 @@
     </el-row>
 
     <el-table v-loading="loading" :data="appealList" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="考核周期" align="center" prop="periodName" width="100" />
       <el-table-column label="绩效编号" align="center" prop="performanceNo" width="200" />
       <el-table-column label="申请人" align="center" prop="nickName" />
@@ -43,6 +42,14 @@
       <el-table-column label="处理时间" align="center" prop="processTime" width="180" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width" fixed="right" width="160">
         <template #default="scope">
+          <el-button 
+            link 
+            type="primary" 
+            icon="View"
+            @click="handleViewDetail(scope.row)" 
+            v-if="scope.row.appealStatus !== 'PENDING'"
+            v-hasPermi="['perf:appeal:query']"
+          >详情</el-button>
           <el-button 
             link 
             type="primary" 
@@ -126,6 +133,12 @@
       :row-data="currentRow"
       @success="handleProcessSuccess"
     />
+    
+    <!-- 绩效申诉详情对话框 -->
+    <PerfAppealDetailDialog
+      v-model="detailOpen"
+      :row-data="currentRow"
+    />
   </div>
 </template>
 
@@ -133,12 +146,14 @@
 import { selectRelevancePerfAppealList, getAppeal, delAppeal, addAppeal, updateAppeal } from "@/api/perf/appeal"
 import { APPEAL_STATUS_LIST } from "@/utils/perf/appeal"
 import PerfAppealHandleDialog from "@/components/perf/PerfAppealHandleDialog/PerfAppealHandleDialog.vue"
+import PerfAppealDetailDialog from "@/components/perf/PerfAppealDetailDialog/PerfAppealDetailDialog.vue"
 
 const { proxy } = getCurrentInstance()
 
 const appealList = ref([])
 const open = ref(false)
 const processOpen = ref(false)
+const detailOpen = ref(false)
 const loading = ref(true)
 const showSearch = ref(true)
 const ids = ref([])
@@ -246,6 +261,12 @@ function handleUpdate(row) {
 function handleProcess(row) {
   currentRow.value = row
   processOpen.value = true
+}
+
+/** 详情按钮操作 */
+function handleViewDetail(row) {
+  currentRow.value = row
+  detailOpen.value = true
 }
 
 /** 处理成功回调 */
