@@ -3,7 +3,6 @@ package com.ruoyi.web.controller.perf;
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 
-import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.perf.domain.dto.PerfPerformanceAuditDTO;
 import com.ruoyi.perf.domain.dto.PerfPerformanceSaveDTO;
 import com.ruoyi.perf.domain.vo.PerfPerformanceVO;
@@ -113,7 +112,7 @@ public class PerfPerformanceController extends BaseController
     {
         startPage();
         // 设置当前用户ID作为查询条件
-        perfPerformance.setUserId(SecurityUtils.getUserId());
+        perfPerformance.setUserId(getUserId());
         List<PerfPerformanceVO> list = perfPerformanceService.selectPerfPerformanceList(perfPerformance);
         return getDataTable(list);
     }
@@ -136,6 +135,17 @@ public class PerfPerformanceController extends BaseController
     public AjaxResult editMyPerformance(@RequestBody PerfPerformanceSaveDTO saveDTO)
     {
         return toAjax(perfPerformanceService.updateMyPerfPerformance(saveDTO));
+    }
+
+    // =================================根据用户ID获取绩效列表==================================
+
+    /**
+     * 根据用户ID获取绩效列表
+     */
+    @GetMapping("/listByUserId/{userId}")
+    public AjaxResult listByUserId(@PathVariable("userId") Long userId)
+    {
+        return success(perfPerformanceService.selectNotInterviewPerformanceListByUserId(userId));
     }
 
     // =================================审核==================================

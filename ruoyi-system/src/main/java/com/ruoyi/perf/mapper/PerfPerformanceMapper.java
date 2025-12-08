@@ -31,6 +31,14 @@ public interface PerfPerformanceMapper extends BaseMapper<PerfPerformance>
     public List<PerfPerformanceVO> selectPerfPerformanceList(PerfPerformance perfPerformance);
 
     /**
+     * 根据用户id获取还未进行面谈的绩效
+     * @param userId
+     * @return
+     */
+    public List<PerfPerformanceVO> selectNotInterviewPerformanceListByUserId(@Param("userId") Long userId);
+
+
+    /**
      * 新增绩效实例
      * 
      * @param perfPerformance 绩效实例

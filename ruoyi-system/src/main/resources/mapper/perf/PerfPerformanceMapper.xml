@@ -110,6 +110,20 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         LEFT JOIN sys_dept e ON a.dept_id = e.dept_id
         where a.del_flag = '0' and a.id = #{id}
     </select>
+    <select id="selectNotInterviewPerformanceListByUserId"
+            resultType="com.ruoyi.perf.domain.vo.PerfPerformanceVO">
+        SELECT
+            a.*,
+            c.period_name
+        FROM
+            perf_performance a
+                LEFT JOIN perf_interview b ON a.id = b.performance_id
+                LEFT JOIN perf_period c ON c.period_id = a.period_id
+        WHERE a.del_flag = '0'
+          AND a.status = 'CONFIRMED'
+          AND (b.performance_id IS NULL OR b.if_interview = 0)
+          AND a.user_id = #{userId};
+    </select>
 
     <insert id="insertPerfPerformance" parameterType="PerfPerformance" useGeneratedKeys="true" keyProperty="id">
         insert into perf_performance

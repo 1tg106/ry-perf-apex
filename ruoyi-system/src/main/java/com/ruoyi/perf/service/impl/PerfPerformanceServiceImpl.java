@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -82,6 +83,11 @@ public class PerfPerformanceServiceImpl extends ServiceImpl<PerfPerformanceMappe
     public List<PerfPerformanceVO> selectPerfPerformanceList(PerfPerformance perfPerformance)
     {
         return perfPerformanceMapper.selectPerfPerformanceList(perfPerformance);
+    }
+
+    @Override
+    public List<PerfPerformanceVO> selectNotInterviewPerformanceListByUserId(Long userId) {
+        return perfPerformanceMapper.selectNotInterviewPerformanceListByUserId(userId);
     }
 
     /**

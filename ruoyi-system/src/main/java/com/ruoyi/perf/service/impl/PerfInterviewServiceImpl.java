@@ -1,13 +1,21 @@
 package com.ruoyi.perf.service.impl;
 
+import java.util.Collections;
 import java.util.List;
+
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.perf.domain.PerfPerformance;
+import com.ruoyi.perf.domain.vo.PerfInterviewVO;
+import com.ruoyi.perf.mapper.PerfPerformanceMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.perf.mapper.PerfInterviewMapper;
 import com.ruoyi.perf.domain.PerfInterview;
 import com.ruoyi.perf.service.IPerfInterviewService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+
+import static com.ruoyi.common.utils.SecurityUtils.getUserId;
 
 /**
  * 绩效面谈Service业务层处理
@@ -20,6 +28,9 @@ public class PerfInterviewServiceImpl extends ServiceImpl<PerfInterviewMapper,Pe
 {
     @Autowired
     private PerfInterviewMapper perfInterviewMapper;
+
+    @Autowired
+    private PerfPerformanceMapper perfPerformanceMapper;
 
     /**
      * 查询绩效面谈
@@ -45,6 +56,16 @@ public class PerfInterviewServiceImpl extends ServiceImpl<PerfInterviewMapper,Pe
         return perfInterviewMapper.selectPerfInterviewList(perfInterview);
     }
 
+    @Override
+    public List<PerfInterviewVO> selectPerfInterviewListVO(PerfInterview perfInterview) {
+        return perfInterviewMapper.selectPerfInterviewListVO(perfInterview);
+    }
+
+    @Override
+    public PerfInterviewVO selectPerfInterviewVOById(Long id) {
+        return perfInterviewMapper.selectPerfInterviewVOById(id);
+    }
+
     /**
      * 新增绩效面谈
      * 
@@ -54,7 +75,24 @@ public class PerfInterviewServiceImpl extends ServiceImpl<PerfInterviewMapper,Pe
     @Override
     public int insertPerfInterview(PerfInterview perfInterview)
     {
+        if(perfInterview.getPerformanceId() == null){
+            throw new RuntimeException("绩效id不能为空");
+        }
+
+        Long performanceCount = perfPerformanceMapper.selectCount(Wrappers.lambdaQuery(PerfPerformance.class)
+                .eq(PerfPerformance::getId,perfInterview.getPerformanceId()));
+        if(performanceCount == 0){
+            throw new RuntimeException("绩效不存在");
+        }
+
+        Long count = perfInterviewMapper.selectCount(Wrappers.lambdaQuery(PerfInterview.class)
+                .eq(PerfInterview::getPerformanceId, perfInterview.getPerformanceId()));
+        if(count > 0){
+            throw new RuntimeException("该绩效已面谈");
+        }
+
         perfInterview.setCreateTime(DateUtils.getNowDate());
+        perfInterview.setCreateBy(getUserId().toString());
         return perfInterviewMapper.insertPerfInterview(perfInterview);
     }
 
@@ -67,8 +105,23 @@ public class PerfInterviewServiceImpl extends ServiceImpl<PerfInterviewMapper,Pe
     @Override
     public int updatePerfInterview(PerfInterview perfInterview)
     {
+        if(perfInterview.getId() == null){
+            throw new RuntimeException("id不能为空");
+        }
+        Long count = perfInterviewMapper.selectCount(Wrappers.lambdaQuery(PerfInterview.class)
+                .eq(PerfInterview::getIfInterview, 1));
+        if(count > 0){
+            throw new RuntimeException("该绩效已面谈");
+        }
+        perfInterview.setIfInterview(perfInterview.getIfInterview());
+        perfInterview.setFeedback(perfInterview.getFeedback());
+        perfInterview.setImprovements(perfInterview.getImprovements());
+        perfInterview.setActionPlan(perfInterview.getActionPlan());
+        perfInterview.setKeyPoints(perfInterview.getKeyPoints());
+        perfInterview.setStrengths(perfInterview.getStrengths());
         perfInterview.setUpdateTime(DateUtils.getNowDate());
-        return perfInterviewMapper.updatePerfInterview(perfInterview);
+        perfInterview.setUpdateBy(getUserId().toString());
+        return perfInterviewMapper.updateById(perfInterview);
     }
 
     /**

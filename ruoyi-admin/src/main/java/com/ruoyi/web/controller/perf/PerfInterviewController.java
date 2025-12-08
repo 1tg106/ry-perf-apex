@@ -2,6 +2,8 @@ package com.ruoyi.web.controller.perf;
 
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
+
+import com.ruoyi.perf.domain.vo.PerfInterviewVO;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,6 +46,28 @@ public class PerfInterviewController extends BaseController
         startPage();
         List<PerfInterview> list = perfInterviewService.selectPerfInterviewList(perfInterview);
         return getDataTable(list);
+    }
+
+    /**
+     * 关联查询绩效面谈列表
+     */
+    @PreAuthorize("@ss.hasPermi('perf:interview:list')")
+    @GetMapping("/relevanceList")
+    public TableDataInfo selectPerfInterviewListVO(PerfInterview perfInterview)
+    {
+        startPage();
+        List<PerfInterviewVO> list = perfInterviewService.selectPerfInterviewListVO(perfInterview);
+        return getDataTable(list);
+    }
+
+    /**
+     * 关联查询绩效面谈详情
+     */
+    @PreAuthorize("@ss.hasPermi('perf:interview:query')")
+    @GetMapping(value = "/relevance/{id}")
+    public AjaxResult selectPerfInterviewVOById(@PathVariable("id") Long id)
+    {
+        return success(perfInterviewService.selectPerfInterviewVOById(id));
     }
 
     /**

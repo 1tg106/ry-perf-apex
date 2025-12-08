@@ -83,3 +83,14 @@ export function auditPerformance(data) {
     data: data
   })
 }
+
+// =======================根据用户ID获取绩效列表=======================
+
+// 根据用户ID获取绩效列表
+export function listPerformanceByUserId(userId, query) {
+  return request({
+    url: '/perf/performance/listByUserId/' + userId,
+    method: 'get',
+    params: query
+  })
+}

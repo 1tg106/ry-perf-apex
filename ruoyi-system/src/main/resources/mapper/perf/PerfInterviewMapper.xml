@@ -43,6 +43,35 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <include refid="selectPerfInterviewVo"/>
         where id = #{id}
     </select>
+    <select id="selectPerfInterviewListVO" resultType="com.ruoyi.perf.domain.vo.PerfInterviewVO">
+        SELECT
+            pi.*,
+            pf.period_name,
+            su.nick_name interviewee_name,
+            sue.nick_name interviewer_name
+        FROM
+            perf_interview pi
+                LEFT JOIN ( SELECT pf.id,pr.period_name FROM perf_performance pf LEFT JOIN perf_period pr ON pr.period_id = pf.period_id ) pf ON pf.id = pi.performance_id
+                LEFT JOIN sys_user su ON su.user_id = pi.interviewee_id
+                LEFT JOIN sys_user sue ON sue.user_id = pi.interviewer_id
+        WHERE pi.del_flag = '0'
+        <if test="interviewTime != null "> and pi.interview_time = #{interviewTime}</if>
+        <if test="ifInterview != null "> and pi.if_interview = #{ifInterview}</if>
+        ORDER BY pi.create_time DESC
+    </select>
+    <select id="selectPerfInterviewVOById" resultType="com.ruoyi.perf.domain.vo.PerfInterviewVO">
+        SELECT
+            pi.*,
+            pf.period_name,
+            su.nick_name interviewee_name,
+            sue.nick_name interviewer_name
+        FROM
+            perf_interview pi
+                LEFT JOIN ( SELECT pf.id,pr.period_name FROM perf_performance pf LEFT JOIN perf_period pr ON pr.period_id = pf.period_id ) pf ON pf.id = pi.performance_id
+                LEFT JOIN sys_user su ON su.user_id = pi.interviewee_id
+                LEFT JOIN sys_user sue ON sue.user_id = pi.interviewer_id
+        WHERE pi.id = #{id}
+    </select>
 
     <insert id="insertPerfInterview" parameterType="PerfInterview" useGeneratedKeys="true" keyProperty="id">
         insert into perf_interview

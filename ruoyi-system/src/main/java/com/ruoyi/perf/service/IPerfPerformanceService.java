@@ -33,6 +33,13 @@ public interface IPerfPerformanceService extends IService<PerfPerformance>
     public List<PerfPerformanceVO> selectPerfPerformanceList(PerfPerformance perfPerformance);
 
     /**
+     * 根据用户id获取还未进行面谈的绩效
+     * @param userId
+     * @return
+     */
+    public List<PerfPerformanceVO> selectNotInterviewPerformanceListByUserId(Long userId);
+
+    /**
      * 新增绩效实例
      * 
      * @param saveDTO 绩效实例

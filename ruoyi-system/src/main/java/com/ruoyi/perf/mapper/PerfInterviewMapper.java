@@ -3,6 +3,7 @@ package com.ruoyi.perf.mapper;
 import java.util.List;
 import com.ruoyi.perf.domain.PerfInterview;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.ruoyi.perf.domain.vo.PerfInterviewVO;
 
 /**
  * 绩效面谈Mapper接口
@@ -27,6 +28,22 @@ public interface PerfInterviewMapper extends BaseMapper<PerfInterview>
      * @return 绩效面谈集合
      */
     public List<PerfInterview> selectPerfInterviewList(PerfInterview perfInterview);
+
+    /**
+     * 关联查询绩效面谈列表
+     *
+     * @param perfInterview 绩效面谈
+     * @return 绩效面谈集合
+     */
+    public List<PerfInterviewVO> selectPerfInterviewListVO(PerfInterview perfInterview);
+
+    /**
+     * 关联查询绩效面谈详情
+     *
+     * @param id 绩效面谈主键
+     * @return 绩效面谈
+     */
+    public PerfInterviewVO selectPerfInterviewVOById(Long id);
 
     /**
      * 新增绩效面谈

@@ -57,6 +57,9 @@ public class PerfInterview extends BaseEntity
     @Excel(name = "员工反馈")
     private String feedback;
 
+    /** 是否已面谈：0-否 1-是 */
+    private Integer ifInterview;
+
     /** 删除标志（0:存在 1:删除） */
     private String delFlag;
 
@@ -160,7 +163,15 @@ public class PerfInterview extends BaseEntity
         return feedback;
     }
 
-    public void setDelFlag(String delFlag) 
+    public Integer getIfInterview() {
+        return ifInterview;
+    }
+
+    public void setIfInterview(Integer ifInterview) {
+        this.ifInterview = ifInterview;
+    }
+
+    public void setDelFlag(String delFlag)
     {
         this.delFlag = delFlag;
     }

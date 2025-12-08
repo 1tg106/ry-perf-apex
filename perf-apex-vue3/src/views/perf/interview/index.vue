@@ -1,30 +1,6 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="绩效ID" prop="performanceId">
-        <el-input
-          v-model="queryParams.performanceId"
-          placeholder="请输入绩效ID"
-          clearable
-          @keyup.enter="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="面谈人ID" prop="interviewerId">
-        <el-input
-          v-model="queryParams.interviewerId"
-          placeholder="请输入面谈人ID"
-          clearable
-          @keyup.enter="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="被面谈人ID" prop="intervieweeId">
-        <el-input
-          v-model="queryParams.intervieweeId"
-          placeholder="请输入被面谈人ID"
-          clearable
-          @keyup.enter="handleQuery"
-        />
-      </el-form-item>
       <el-form-item label="面谈时间" prop="interviewTime">
         <el-date-picker clearable
           v-model="queryParams.interviewTime"
@@ -83,8 +59,7 @@
 
     <el-table v-loading="loading" :data="interviewList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="面谈ID" align="center" prop="id" />
-      <el-table-column label="绩效ID" align="center" prop="performanceId" />
+      <el-table-column label="绩效编号" align="center" prop="performanceId" />
       <el-table-column label="面谈人ID" align="center" prop="interviewerId" />
       <el-table-column label="被面谈人ID" align="center" prop="intervieweeId" />
       <el-table-column label="面谈时间" align="center" prop="interviewTime" width="180">
@@ -97,9 +72,9 @@
       <el-table-column label="待改进点" align="center" prop="improvements" />
       <el-table-column label="行动计划" align="center" prop="actionPlan" />
       <el-table-column label="员工反馈" align="center" prop="feedback" />
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" fixed="right" width="150px">
         <template #default="scope">
-          <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['perf:interview:edit']">修改</el-button>
+          <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['perf:interview:edit']">编辑</el-button>
           <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)" v-hasPermi="['perf:interview:remove']">删除</el-button>
         </template>
       </el-table-column>
@@ -115,22 +90,68 @@
 
     <!-- 添加或修改绩效面谈对话框 -->
     <el-dialog :title="title" v-model="open" width="500px" append-to-body>
-      <el-form ref="interviewRef" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="绩效ID" prop="performanceId">
-          <el-input v-model="form.performanceId" placeholder="请输入绩效ID" />
+      <el-form ref="interviewRef" :model="form" :rules="rules" label-width="100px">
+        <el-form-item label="被面谈人" prop="intervieweeId">
+          <el-select 
+            v-model="form.intervieweeId" 
+            placeholder="请选择被面谈人" 
+            clearable 
+            filterable
+            @change="handleIntervieweeChange"
+            :disabled="form.id"
+          >
+            <el-option
+              v-for="item in intervieweeOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
         </el-form-item>
-        <el-form-item label="面谈人ID" prop="interviewerId">
-          <el-input v-model="form.interviewerId" placeholder="请输入面谈人ID" />
+        
+        <el-form-item label="绩效" prop="performanceId">
+          <el-select 
+            v-model="form.performanceId" 
+            placeholder="请选择绩效" 
+            clearable 
+            filterable
+            :disabled="!form.intervieweeId || form.id"
+          >
+            <el-option
+              v-for="item in performanceOptions"
+              :key="item.id"
+              :label="item.performanceNo"
+              :value="item.id">
+              <span>{{ item.performanceNo }}</span>
+              <span style="float: right; color: #8492a6; font-size: 13px">考核周期: {{ item.periodName }}</span>
+            </el-option>
+          </el-select>
         </el-form-item>
-        <el-form-item label="被面谈人ID" prop="intervieweeId">
-          <el-input v-model="form.intervieweeId" placeholder="请输入被面谈人ID" />
+        
+        <el-form-item label="面谈人" prop="interviewerId">
+          <el-select 
+            v-model="form.interviewerId" 
+            placeholder="请选择面谈人" 
+            clearable 
+            filterable
+            :disabled="form.id"
+          >
+            <el-option
+              v-for="item in interviewerOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
         </el-form-item>
+        
         <el-form-item label="面谈时间" prop="interviewTime">
           <el-date-picker clearable
             v-model="form.interviewTime"
             type="date"
             value-format="YYYY-MM-DD"
-            placeholder="请选择面谈时间">
+            placeholder="请选择面谈时间"
+            :disabled="form.id">
           </el-date-picker>
         </el-form-item>
         <el-form-item label="面谈要点" prop="keyPoints">
@@ -148,13 +169,11 @@
         <el-form-item label="员工反馈" prop="feedback">
           <el-input v-model="form.feedback" type="textarea" placeholder="请输入内容" />
         </el-form-item>
-        <el-form-item label="删除标志" prop="delFlag">
-          <el-input v-model="form.delFlag" placeholder="请输入删除标志" />
-        </el-form-item>
       </el-form>
       <template #footer>
         <div class="dialog-footer">
-          <el-button type="primary" @click="submitForm">确 定</el-button>
+          <el-button type="primary" @click="submitForm(0)">保 存</el-button>
+          <el-button type="primary" @click="submitForm(1)">提 交</el-button>
           <el-button @click="cancel">取 消</el-button>
         </div>
       </template>
@@ -164,6 +183,8 @@
 
 <script setup name="Interview">
 import { listInterview, getInterview, delInterview, addInterview, updateInterview } from "@/api/perf/interview"
+import { getUserChooseList } from "@/api/system/user"
+import { listPerformanceByUserId } from "@/api/perf/performance"
 
 const { proxy } = getCurrentInstance()
 
@@ -176,6 +197,11 @@ const single = ref(true)
 const multiple = ref(true)
 const total = ref(0)
 const title = ref("")
+
+// 下拉选项相关
+const intervieweeOptions = ref([])
+const interviewerOptions = ref([])
+const performanceOptions = ref([])
 
 const data = reactive({
   form: {},
@@ -193,14 +219,14 @@ const data = reactive({
     feedback: null,
   },
   rules: {
+    intervieweeId: [
+      { required: true, message: "被面谈人不能为空", trigger: "change" }
+    ],
     performanceId: [
-      { required: true, message: "绩效ID不能为空", trigger: "blur" }
+      { required: true, message: "绩效不能为空", trigger: "change" }
     ],
     interviewerId: [
-      { required: true, message: "面谈人ID不能为空", trigger: "blur" }
-    ],
-    intervieweeId: [
-      { required: true, message: "被面谈人ID不能为空", trigger: "blur" }
+      { required: true, message: "面谈人不能为空", trigger: "change" }
     ],
   }
 })
@@ -236,11 +262,11 @@ function reset() {
     improvements: null,
     actionPlan: null,
     feedback: null,
-    delFlag: null,
-    createTime: null,
-    updateTime: null
+    ifInterview: 0,
   }
   proxy.resetForm("interviewRef")
+  // 清空下拉选项
+  performanceOptions.value = []
 }
 
 /** 搜索按钮操作 */
@@ -263,33 +289,73 @@ function handleSelectionChange(selection) {
 }
 
 /** 新增按钮操作 */
-function handleAdd() {
+async function handleAdd() {
   reset()
+  // 加载用户下拉选项
+  await loadUserOptions()
   open.value = true
   title.value = "添加绩效面谈"
 }
 
 /** 修改按钮操作 */
-function handleUpdate(row) {
+async function handleUpdate(row) {
   reset()
   const _id = row.id || ids.value
-  getInterview(_id).then(response => {
+  getInterview(_id).then(async response => {
     form.value = response.data
+    // 加载被面谈人和面谈人的绩效列表
+    if (form.value.intervieweeId) {
+      loadPerformanceOptions(form.value.intervieweeId)
+    }
+    // 加载用户下拉选项
+    await loadUserOptions()
     open.value = true
     title.value = "修改绩效面谈"
   })
 }
 
+/** 被面谈人改变时加载其绩效列表 */
+function handleIntervieweeChange(val) {
+  if (val) {
+    loadPerformanceOptions(val)
+  } else {
+    performanceOptions.value = []
+    form.value.performanceId = null
+  }
+}
+
+/** 加载绩效选项 */
+function loadPerformanceOptions(userId) {
+  listPerformanceByUserId(userId).then(response => {
+    performanceOptions.value = response.data
+  })
+}
+
+/** 加载用户选项 */
+async function loadUserOptions() {
+  try {
+    const response = await getUserChooseList()    
+    intervieweeOptions.value = response.data
+    interviewerOptions.value = response.data
+  } catch (error) {
+    console.error("加载用户列表失败:", error)
+  }
+}
+
 /** 提交按钮 */
-function submitForm() {
+function submitForm(value) {
   proxy.$refs["interviewRef"].validate(valid => {
     if (valid) {
       if (form.value.id != null) {
-        updateInterview(form.value).then(response => {
-          proxy.$modal.msgSuccess("修改成功")
-          open.value = false
-          getList()
-        })
+        if(value){
+          form.value.ifInterview = 1;
+          proxy.$modal.confirm('是否确认提交绩效面谈吗？').then(function() {
+            return submitInterview();
+          })
+        }else{
+          form.value.ifInterview = 0;
+          submitInterview();
+        }
       } else {
         addInterview(form.value).then(response => {
           proxy.$modal.msgSuccess("新增成功")
@@ -298,6 +364,14 @@ function submitForm() {
         })
       }
     }
+  })
+}
+
+function submitInterview(){
+  updateInterview(form.value).then(response => {
+    proxy.$modal.msgSuccess("修改成功")
+    open.value = false
+    getList()
   })
 }
 

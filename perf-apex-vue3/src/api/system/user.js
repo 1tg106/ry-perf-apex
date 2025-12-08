@@ -139,7 +139,8 @@ export function deptTreeSelect() {
 // 根据部门id获取用户选择列表
 export function getUserChooseList(deptId) {
   return request({
-    url: '/system/user/getUserChooseList?deptId=' + deptId,
+    
+    url: `/system/user/getUserChooseList${deptId ? '?deptId=' + deptId : ''}`,
     method: 'get'
   })
 }
