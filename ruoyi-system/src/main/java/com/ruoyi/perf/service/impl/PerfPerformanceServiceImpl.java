@@ -27,6 +27,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -262,6 +265,26 @@ public class PerfPerformanceServiceImpl extends ServiceImpl<PerfPerformanceMappe
 
     @Override
     public List<PerformanceDistributeVO> getPerformanceScoreDistributeList() {
-        return perfPerformanceMapper.getPerformanceScoreDistributeList();
+        // 获取总数
+        long count = this.count(Wrappers.lambdaQuery(PerfPerformance.class)
+                .eq(PerfPerformance::getStatus, PerformanceStatus.CONFIRMED.getCode()));
+        if(count == 0){
+            return new ArrayList<>();
+        }
+
+        // 获取数据
+        List<PerformanceDistributeVO> performanceScoreDistributeList = perfPerformanceMapper.getPerformanceScoreDistributeList();
+        if(performanceScoreDistributeList.isEmpty()){
+            return new ArrayList<>();
+        }
+
+        // 计算百分比
+        performanceScoreDistributeList.forEach(performanceScoreDistribute -> {
+            if(performanceScoreDistribute.getCount() != null){
+                BigDecimal divide = BigDecimal.valueOf(performanceScoreDistribute.getCount()).divide(BigDecimal.valueOf(count), 2, RoundingMode.HALF_UP);
+                performanceScoreDistribute.setPercentage(divide.multiply(BigDecimal.valueOf(100)));
+            }
+        });
+        return performanceScoreDistributeList;
     }
 }

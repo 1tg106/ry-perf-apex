@@ -6,72 +6,66 @@
           <el-icon><ChatLineRound /></el-icon>
           <span>面谈安排</span>
         </div>
-        <el-button link @click="viewAllInterviews">查看全部</el-button>
+        <!-- <el-button link @click="viewAllInterviews">查看全部</el-button> -->
       </div>
     </template>
     <div class="interview-list">
       <div
         v-for="interview in interviews"
-        :key="interview.id"
+        :key="interview.interviewId"
         class="interview-item"
       >
         <div class="interview-header">
           <div class="interview-person">
-            {{ interview.person }}
+            与 {{ interview.intervieweeName }} 的面谈
           </div>
           <el-tag
-            v-if="interview.status"
-            :type="interview.statusType"
+            v-if="interview.ifInterview === 0"
+            type="warning"
             size="small"
-            >{{ interview.status }}</el-tag
+            >待面谈</el-tag
           >
           <div v-else class="interview-time">
-            {{ interview.time }}
+            {{ interview.interviewTime }}
           </div>
         </div>
-        <div class="interview-points">{{ interview.points }}</div>
+        <div class="interview-points">{{ interview.keyPoints }}</div>
       </div>
     </div>
   </el-card>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { ChatLineRound } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
+import { getPerfInterviewList } from '@/api/perf/stat'
 
 // 面谈数据
-const interviews = ref([
-  {
-    id: 1,
-    person: '与 李明的面谈',
-    time: '',
-    points: '需讨论季度目标达成情况及下季度计划...',
-    status: '待安排',
-    statusType: 'warning'
-  },
-  {
-    id: 2,
-    person: '与 王芳的面谈',
-    time: '2024-08-15 14:30',
-    points: '讨论项目延期原因及改进措施...',
-    status: '',
-    statusType: ''
-  },
-  {
-    id: 3,
-    person: '与 赵雷的面谈',
-    time: '2024-08-18 10:00',
-    points: '绩效申诉处理结果反馈...',
-    status: '',
-    statusType: ''
+const interviews = ref([])
+
+// 获取面谈数据
+const loadInterviewData = async () => {
+  try {
+    const response = await getPerfInterviewList({ pageNum: 1, pageSize: 5, ifInterview: 0 })
+    if (response.code === 200) {
+      interviews.value = response.rows || []
+    }
+  } catch (err) {
+    console.error('获取面谈数据失败:', err)
+    ElMessage.error('获取面谈数据失败')
   }
-])
+}
 
 // 查看所有面谈
 const viewAllInterviews = () => {
   ElMessage.info('查看所有面谈')
 }
+
+// 页面加载时获取数据
+onMounted(() => {
+  loadInterviewData()
+})
 </script>
 
 <style scoped>

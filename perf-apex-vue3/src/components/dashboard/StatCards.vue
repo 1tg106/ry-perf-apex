@@ -66,7 +66,8 @@
 <script setup>
 import { Calendar, Check, Warning, ChatDotSquare } from '@element-plus/icons-vue'
 import { useTransition } from '@vueuse/core'
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { getStatCards } from '@/api/perf/stat'
 
 // 使用
 const { stat: periodStat, value: periodValue } = useAnimatedCounter(0) // 进行中周期数
@@ -74,11 +75,25 @@ const { stat: finishPerformanceStat, value: finishPerformanceValue } = useAnimat
 const { stat: appealStat, value: appealValue } = useAnimatedCounter(0) // 待处理申诉数
 const { stat: interviewStat, value: interviewValue } = useAnimatedCounter(0) // 待安排面谈数
 
-setTimeout(()=>{
-  periodStat.value = 200
-  finishPerformanceStat.value = 1200
-  appealStat.value = 85
-  interviewStat.value = 12
+// 获取统计数据
+const loadStatData = async () => {
+  try {
+    const response = await getStatCards()
+    if (response.code === 200) {
+      const data = response.data
+      periodStat.value = data.periodCount || 0
+      finishPerformanceStat.value = data.finishPerformanceCount || 0
+      appealStat.value = data.appealCount || 0
+      interviewStat.value = data.interviewCount || 0
+    }
+  } catch (err) {
+    console.error('获取统计卡片数据失败:', err)
+  }
+}
+
+// 页面加载时获取数据
+onMounted(() => {
+  loadStatData()
 })
 
 // 创建一个可复用的 hook

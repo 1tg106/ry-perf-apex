@@ -41,6 +41,9 @@ public class PerfAppealVO implements Serializable
     /** 申请人 */
     private String nickName;
 
+    /** 部门名称 */
+    private String deptName;
+
     /** 申诉理由 */
     @Excel(name = "申诉理由")
     private String appealReason;

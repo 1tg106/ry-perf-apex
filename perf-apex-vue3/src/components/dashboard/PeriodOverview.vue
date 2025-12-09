@@ -6,24 +6,24 @@
           <el-icon><Calendar /></el-icon>
           <span>绩效周期概览</span>
         </div>
-        <el-button link @click="viewAllPeriods">查看全部</el-button>
+        <!-- <el-button link @click="viewAllPeriods">查看全部</el-button> -->
       </div>
     </template>
     <div class="period-list">
       <div
         v-for="period in periods"
-        :key="period.id"
+        :key="period.periodId"
         class="period-item"
       >
         <div class="period-info">
-          <h4>{{ period.name }}</h4>
-          <div class="period-dates">{{ period.dates }}</div>
+          <h4>{{ period.periodName }}</h4>
+          <div class="period-dates">{{ period.submitDeadline }} 至 {{ period.scoreDeadline }}</div>
         </div>
         <el-tag
-          :type="period.statusType"
+          :type="getStatusType(period.status)"
           effect="light"
           class="period-status"
-          >{{ period.statusText }}</el-tag
+          >{{ getStatusText(period.status) }}</el-tag
         >
       </div>
     </div>
@@ -31,39 +31,54 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { Calendar } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
+import { getPerfPeriodList } from '@/api/perf/stat'
 
 // 绩效周期数据
-const periods = ref([
-  {
-    id: 1,
-    name: '2024年第三季度绩效',
-    dates: '2024-07-01 至 2024-09-30',
-    statusType: 'success',
-    statusText: '进行中'
-  },
-  {
-    id: 2,
-    name: '2024年第二季度绩效',
-    dates: '2024-04-01 至 2024-06-30',
-    statusType: 'info',
-    statusText: '已结束'
-  },
-  {
-    id: 3,
-    name: '2024年年度绩效',
-    dates: '2024-01-01 至 2024-12-31',
-    statusType: 'success',
-    statusText: '进行中'
+const periods = ref([])
+
+// 获取绩效周期数据
+const loadPeriodData = async () => {
+  try {
+    const response = await getPerfPeriodList({ pageNum: 1, pageSize: 5 })
+    if (response.code === 200) {
+      periods.value = response.rows || []
+    }
+  } catch (err) {
+    console.error('获取绩效周期数据失败:', err)
+    ElMessage.error('获取绩效周期数据失败')
   }
-])
+}
+
+// 获取状态类型
+const getStatusType = (status) => {
+  switch (status) {
+    case '1': return 'success' // 进行中
+    case '2': return 'info'    // 已结束
+    default: return 'info'
+  }
+}
+
+// 获取状态文本
+const getStatusText = (status) => {
+  switch (status) {
+    case '1': return '进行中'
+    case '2': return '已结束'
+    default: return '未知'
+  }
+}
 
 // 查看所有周期
 const viewAllPeriods = () => {
   ElMessage.info('查看所有绩效周期')
 }
+
+// 页面加载时获取数据
+onMounted(() => {
+  loadPeriodData()
+})
 </script>
 
 <style scoped>

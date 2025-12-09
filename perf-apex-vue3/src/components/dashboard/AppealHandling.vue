@@ -6,7 +6,7 @@
           <el-icon><ScaleToOriginal /></el-icon>
           <span>申诉处理</span>
         </div>
-        <el-button link @click="viewAllAppeals">查看全部</el-button>
+        <!-- <el-button link @click="viewAllAppeals">查看全部</el-button> -->
       </div>
     </template>
     <el-table
@@ -18,15 +18,15 @@
         <template #default="{ row }">
           <div class="appeal-row">
             <div class="appeal-info">
-              <div class="appeal-title">{{ row.title }}</div>
-              <div class="appeal-meta">{{ row.meta }}</div>
+              <div class="appeal-title">绩效编号: {{ row.performanceNo }}</div>
+              <div class="appeal-meta">{{ row.nickName }} · {{ row.deptName }} · {{ row.createTime }}</div>
             </div>
-            <el-button
+            <!-- <el-button
               type="primary"
               size="small"
               @click="handleAppeal(row)"
               >处理</el-button
-            >
+            > -->
           </div>
         </template>
       </el-table-column>
@@ -35,44 +35,47 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { ScaleToOriginal } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { getPerfAppealList } from '@/api/perf/stat'
 
 // 申诉数据
-const appeals = ref([
-  {
-    id: 1,
-    title: '绩效编号: PF202407023',
-    meta: '张三 · 技术部 · 2024-08-12'
-  },
-  {
-    id: 2,
-    title: '绩效编号: PF202407045',
-    meta: '李四 · 市场部 · 2024-08-10'
-  },
-  {
-    id: 3,
-    title: '绩效编号: PF202407018',
-    meta: '王五 · 产品部 · 2024-08-08'
+const appeals = ref([])
+
+// 获取申诉数据
+const loadAppealData = async () => {
+  try {
+    const response = await getPerfAppealList({ pageNum: 1, pageSize: 5 })
+    if (response.code === 200) {
+      appeals.value = response.rows || []
+    }
+  } catch (err) {
+    console.error('获取申诉数据失败:', err)
+    ElMessage.error('获取申诉数据失败')
   }
-])
+}
 
 // 处理申诉
-const handleAppeal = (row) => {
-  ElMessageBox.confirm(`确定要处理申诉 ${row.title} 吗？`, '处理申诉', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'primary'
-  }).then(() => {
-    ElMessage.success(`开始处理: ${row.title}`)
-  })
-}
+// const handleAppeal = (row) => {
+//   ElMessageBox.confirm(`确定要处理申诉 ${row.performanceNo} 吗？`, '处理申诉', {
+//     confirmButtonText: '确定',
+//     cancelButtonText: '取消',
+//     type: 'primary'
+//   }).then(() => {
+//     ElMessage.success(`开始处理: ${row.performanceNo}`)
+//   })
+// }
 
 // 查看所有申诉
 const viewAllAppeals = () => {
   ElMessage.info('查看所有申诉')
 }
+
+// 页面加载时获取数据
+onMounted(() => {
+  loadAppealData()
+})
 </script>
 
 <style scoped>

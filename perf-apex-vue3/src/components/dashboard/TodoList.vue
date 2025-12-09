@@ -12,19 +12,13 @@
     <div class="todo-list">
       <div
         v-for="todo in todos"
-        :key="todo.id"
+        :key="todo.performanceId"
         class="todo-item"
         @click="toggleTodo(todo)"
       >
-        <div
-          class="todo-checkbox"
-          :class="{ checked: todo.completed }"
-        >
-          <el-icon v-if="todo.completed"><Check /></el-icon>
-        </div>
         <div class="todo-content">
-          <h4>{{ todo.title }}</h4>
-          <div class="todo-meta">{{ todo.meta }}</div>
+          <h4>{{ todo.periodName }}</h4>
+          <div class="todo-meta">{{ todo.nickName }} · {{ todo.deptName }} · {{ formatDate(todo.createTime) }}</div>
         </div>
       </div>
     </div>
@@ -32,49 +26,56 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { List, Check } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
+import { waitMyScorePerformanceList } from '@/api/perf/stat'
+
+const router = useRouter()
 
 // 待办事项数据
-const todos = ref([
-  {
-    id: 1,
-    title: '审批张三的绩效评分',
-    meta: '技术部 · 2024-08-12 前完成',
-    completed: true
-  },
-  {
-    id: 2,
-    title: '处理李四的绩效申诉',
-    meta: '市场部 · 逾期2天',
-    completed: false
-  },
-  {
-    id: 3,
-    title: '与王五进行绩效面谈',
-    meta: '产品部 · 2024-08-15 14:30',
-    completed: false
-  },
-  {
-    id: 4,
-    title: '确认2024Q3绩效模板',
-    meta: 'HR部门 · 2024-08-20 前完成',
-    completed: false
+const todos = ref([])
+
+// 获取待评分列表数据
+const loadTodoData = async () => {
+  try {
+    const response = await waitMyScorePerformanceList({ pageNum: 1, pageSize: 10, ifScore: 0 })
+    if (response.code === 200) {
+      todos.value = response.rows || []
+      // 初始化completed状态
+      todos.value.forEach(todo => {
+        todo.completed = false
+      })
+    }
+  } catch (err) {
+    console.error('获取待办事项数据失败:', err)
+    ElMessage.error('获取待办事项数据失败')
   }
-])
+}
+
+// 格式化日期
+const formatDate = (dateString) => {
+  if (!dateString) return ''
+  const date = new Date(dateString)
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+}
 
 // 切换待办状态
 const toggleTodo = (todo) => {
   todo.completed = !todo.completed
   const action = todo.completed ? '完成' : '取消完成'
-  ElMessage.success(`${action}: ${todo.title}`)
+  ElMessage.success(`${action}: ${todo.periodName}`)
 }
 
 // 查看所有待办
 const viewAllTodos = () => {
-  ElMessage.info('查看所有待办事项')
+  router.push('/myPerf/backlog')
 }
+
+// 页面加载时获取数据
+onMounted(() => {
+  loadTodoData()
+})
 </script>
 
 <style scoped>

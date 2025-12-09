@@ -2,13 +2,15 @@ package com.ruoyi.perf.domain.vo;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Data
 public class PerformanceDistributeVO {
 
     /**
-     * 类型：excellent-优秀 good-良好 standard-合格 bad-需改进
+     * 类型：1-优秀(90+) 2-良好(80-89) 3-合格(70-79) 4-需改进(<70)
      */
-    private String type;
+    private Integer scoreLevel;
 
     /**
      * 分数
@@ -19,5 +21,10 @@ public class PerformanceDistributeVO {
      * 数量
      */
     private Integer count;
+
+    /**
+     * 百分比
+     */
+    private BigDecimal percentage;
 
 }

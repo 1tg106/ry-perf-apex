@@ -1,8 +1,8 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="是否评分" prop="templateId">
-        <el-select v-model="queryParams.templateId" placeholder="请选择" clearable style="width: 220px" @keyup.enter="handleQuery">
+      <el-form-item label="是否评分" prop="ifScore">
+        <el-select v-model="queryParams.ifScore" placeholder="请选择" clearable style="width: 220px" @keyup.enter="handleQuery">
           <el-option label="未评分" :value="0" />
           <el-option label="已评分" :value="1" />
         </el-select>

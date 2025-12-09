@@ -127,17 +127,17 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="getPerformanceScoreDistributeList"
             resultType="com.ruoyi.perf.domain.vo.PerformanceDistributeVO">
         SELECT
-        type,
+        score_level,
         score,
         COUNT(*) as count
         FROM (
         SELECT
         CASE
-        WHEN final_score >= 90 THEN 'excellent'
-        WHEN final_score >= 80 THEN 'good'
-        WHEN final_score >= 70 THEN 'standard'
-        ELSE 'improvement'
-        END as type,
+        WHEN final_score >= 90 THEN 1
+        WHEN final_score >= 80 THEN 2
+        WHEN final_score >= 70 THEN 3
+        ELSE 4
+        END as score_level,
         CASE
         WHEN final_score >= 90 THEN '90+'
         WHEN final_score >= 80 THEN '80-89'
@@ -149,14 +149,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         AND status = 'CONFIRMED'
         AND final_score IS NOT NULL
         ) t
-        GROUP BY type, score
-        ORDER BY
-        CASE type
-        WHEN 'excellent' THEN 1
-        WHEN 'good' THEN 2
-        WHEN 'standard' THEN 3
-        ELSE 4
-        END
+        GROUP BY score_level, score
+        ORDER BY score_level
     </select>
 
     <insert id="insertPerfPerformance" parameterType="PerfPerformance" useGeneratedKeys="true" keyProperty="id">
