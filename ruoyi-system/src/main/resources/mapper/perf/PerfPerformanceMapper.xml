@@ -124,6 +124,40 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
           AND (b.performance_id IS NULL OR b.if_interview = 0)
           AND a.user_id = #{userId};
     </select>
+    <select id="getPerformanceScoreDistributeList"
+            resultType="com.ruoyi.perf.domain.vo.PerformanceDistributeVO">
+        SELECT
+        type,
+        score,
+        COUNT(*) as count
+        FROM (
+        SELECT
+        CASE
+        WHEN final_score >= 90 THEN 'excellent'
+        WHEN final_score >= 80 THEN 'good'
+        WHEN final_score >= 70 THEN 'standard'
+        ELSE 'improvement'
+        END as type,
+        CASE
+        WHEN final_score >= 90 THEN '90+'
+        WHEN final_score >= 80 THEN '80-89'
+        WHEN final_score >= 70 THEN '70-79'
+        ELSE '70'
+        END as score
+        FROM perf_performance
+        WHERE del_flag = '0'
+        AND status = 'CONFIRMED'
+        AND final_score IS NOT NULL
+        ) t
+        GROUP BY type, score
+        ORDER BY
+        CASE type
+        WHEN 'excellent' THEN 1
+        WHEN 'good' THEN 2
+        WHEN 'standard' THEN 3
+        ELSE 4
+        END
+    </select>
 
     <insert id="insertPerfPerformance" parameterType="PerfPerformance" useGeneratedKeys="true" keyProperty="id">
         insert into perf_performance

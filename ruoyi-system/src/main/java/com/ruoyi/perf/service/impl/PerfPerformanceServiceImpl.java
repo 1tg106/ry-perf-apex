@@ -16,6 +16,7 @@ import com.ruoyi.perf.domain.dto.PerfPerformanceAuditDTO;
 import com.ruoyi.perf.domain.dto.PerfPerformanceSaveDTO;
 import com.ruoyi.perf.domain.vo.PerfPerformanceVO;
 import com.ruoyi.perf.domain.vo.PerformanceContentItemVO;
+import com.ruoyi.perf.domain.vo.PerformanceDistributeVO;
 import com.ruoyi.perf.mapper.PerfPerformanceContentMapper;
 import com.ruoyi.perf.mapper.PerfPerformanceContentScoreMapper;
 import com.ruoyi.perf.mapper.PerfPerformanceMapper;
@@ -252,5 +253,15 @@ public class PerfPerformanceServiceImpl extends ServiceImpl<PerfPerformanceMappe
         }
 
         return Boolean.FALSE;
+    }
+
+    @Override
+    public Long getFinishPerformanceStatCount() {
+        return this.count(Wrappers.lambdaQuery(PerfPerformance.class).eq(PerfPerformance::getStatus, PerformanceStatus.CONFIRMED.getCode()));
+    }
+
+    @Override
+    public List<PerformanceDistributeVO> getPerformanceScoreDistributeList() {
+        return perfPerformanceMapper.getPerformanceScoreDistributeList();
     }
 }

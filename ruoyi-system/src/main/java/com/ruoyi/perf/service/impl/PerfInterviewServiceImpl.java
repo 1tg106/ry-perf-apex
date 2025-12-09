@@ -147,4 +147,9 @@ public class PerfInterviewServiceImpl extends ServiceImpl<PerfInterviewMapper,Pe
     {
         return perfInterviewMapper.deletePerfInterviewById(id);
     }
+
+    @Override
+    public Long getPerfInterviewStatCount() {
+        return this.count(Wrappers.lambdaQuery(PerfInterview.class).eq(PerfInterview::getIfInterview, 0));
+    }
 }

@@ -7,9 +7,10 @@
             <el-icon><Calendar /></el-icon>
           </div>
           <div class="stat-info">
-            <h3>进行中周期</h3>
-            <div class="stat-value">3</div>
-            <p>2个季度，1个年度</p>
+            <div class="stat-value">
+              <el-statistic title="进行中周期" :value="periodValue" />
+            </div>
+            <!-- <p>2个季度，1个年度</p> -->
           </div>
         </div>
       </el-card>
@@ -21,9 +22,10 @@
             <el-icon><Check /></el-icon>
           </div>
           <div class="stat-info">
-            <h3>已完成绩效</h3>
-            <div class="stat-value">1,014</div>
-            <p>占总绩效的85%</p>
+            <div class="stat-value">
+              <el-statistic title="已完成绩效" :value="finishPerformanceValue" />
+            </div>
+            <!-- <p>占总绩效的85%</p> -->
           </div>
         </div>
       </el-card>
@@ -35,9 +37,10 @@
             <el-icon><Warning /></el-icon>
           </div>
           <div class="stat-info">
-            <h3>待处理申诉</h3>
-            <div class="stat-value">7</div>
-            <p>平均处理时间2.3天</p>
+            <div class="stat-value">
+              <el-statistic title="待处理申诉" :value="appealValue" />
+            </div>
+            <!-- <p>平均处理时间2.3天</p> -->
           </div>
         </div>
       </el-card>
@@ -49,9 +52,10 @@
             <el-icon><ChatDotSquare /></el-icon>
           </div>
           <div class="stat-info">
-            <h3>待安排面谈</h3>
-            <div class="stat-value">12</div>
-            <p>其中3个已逾期</p>
+            <div class="stat-value">
+              <el-statistic title="待安排面谈" :value="interviewValue" />
+            </div>
+            <!-- <p>其中3个已逾期</p> -->
           </div>
         </div>
       </el-card>
@@ -61,9 +65,36 @@
 
 <script setup>
 import { Calendar, Check, Warning, ChatDotSquare } from '@element-plus/icons-vue'
+import { useTransition } from '@vueuse/core'
+import { ref } from 'vue'
+
+// 使用
+const { stat: periodStat, value: periodValue } = useAnimatedCounter(0) // 进行中周期数
+const { stat: finishPerformanceStat, value: finishPerformanceValue } = useAnimatedCounter(0) // 已完成绩效数
+const { stat: appealStat, value: appealValue } = useAnimatedCounter(0) // 待处理申诉数
+const { stat: interviewStat, value: interviewValue } = useAnimatedCounter(0) // 待安排面谈数
+
+setTimeout(()=>{
+  periodStat.value = 200
+  finishPerformanceStat.value = 1200
+  appealStat.value = 85
+  interviewStat.value = 12
+})
+
+// 创建一个可复用的 hook
+function useAnimatedCounter(initialValue = 0, duration = 500) {
+  const stat = ref(initialValue)
+  const value = useTransition(stat, { duration })
+  return { stat, value }
+}
+
 </script>
 
 <style scoped>
+::v-deep .el-statistic__content{
+  font-size: 28px;
+  font-weight: 700;
+}
 .stats-row {
   margin-bottom: 20px;
 }

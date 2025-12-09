@@ -67,4 +67,10 @@ public interface IPerfPeriodService extends IService<PerfPeriod>
      * @return
      */
     public List<CommonChooseVO> getPerfChooseList();
+
+    /**
+     * 获取周期状态数量
+     * @return
+     */
+    public Long getPeriodStatCount();
 }

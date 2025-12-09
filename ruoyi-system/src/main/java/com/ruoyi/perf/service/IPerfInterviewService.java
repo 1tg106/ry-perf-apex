@@ -77,4 +77,10 @@ public interface IPerfInterviewService extends IService<PerfInterview>
      * @return 结果
      */
     public int deletePerfInterviewById(Long id);
+
+    /**
+     * 获取待面谈状态数量
+     * @return
+     */
+    public Long getPerfInterviewStatCount();
 }

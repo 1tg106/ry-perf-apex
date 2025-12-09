@@ -2,6 +2,9 @@ package com.ruoyi.perf.service.impl;
 
 import java.util.Collections;
 import java.util.List;
+
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.ruoyi.common.enums.PerfPeriodEnum;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.perf.domain.vo.CommonChooseVO;
@@ -103,5 +106,10 @@ public class PerfPeriodServiceImpl extends ServiceImpl<PerfPeriodMapper,PerfPeri
     @Override
     public List<CommonChooseVO> getPerfChooseList() {
         return perfPeriodMapper.getPerfChooseList();
+    }
+
+    @Override
+    public Long getPeriodStatCount() {
+        return this.count(Wrappers.lambdaQuery(PerfPeriod.class).eq(PerfPeriod::getStatus, PerfPeriodEnum.UNDERWAY.getCode()));
     }
 }

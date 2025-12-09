@@ -3,6 +3,7 @@ package com.ruoyi.perf.service.impl;
 import java.util.Collections;
 import java.util.List;
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.ruoyi.common.enums.PerfAppealStatus;
 import com.ruoyi.common.enums.PerformanceStatus;
 import com.ruoyi.common.utils.DateUtils;
@@ -170,5 +171,10 @@ public class PerfAppealServiceImpl extends ServiceImpl<PerfAppealMapper,PerfAppe
         perfPerformanceMapper.updateById(perfPerformance);
 
         return this.updateById(perfAppeal);
+    }
+
+    @Override
+    public Long getPerfAppealStatCount() {
+        return this.count(Wrappers.lambdaQuery(PerfAppeal.class).eq(PerfAppeal::getAppealStatus, PerfAppealStatus.PENDING.getCode()));
     }
 }

@@ -35,20 +35,6 @@
 
 <script setup>
 import { ref, reactive } from 'vue'
-import {
-  Search,
-  Calendar,
-  Check,
-  Warning,
-  ChatDotSquare,
-  ScaleToOriginal,
-  ChatLineRound,
-  Histogram,
-  List,
-  Lightning,
-  Plus,
-  DocumentCopy
-} from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
 // 引入组件
@@ -61,14 +47,6 @@ import TodoList from '@/components/dashboard/TodoList.vue'
 
 // 搜索查询
 const searchQuery = ref('')
-
-// 快速操作数据
-const quickActions = ref([
-  { id: 1, icon: 'Plus', label: '新建绩效', command: 'newPerformance' },
-  { id: 2, icon: 'UserChecked', label: '批量评分', command: 'batchScore' },
-  { id: 3, icon: 'CalendarPlus', label: '创建周期', command: 'createPeriod' },
-  { id: 4, icon: 'DocumentCopy', label: '导出数据', command: 'exportData' }
-])
 
 // 搜索处理
 const handleSearch = () => {

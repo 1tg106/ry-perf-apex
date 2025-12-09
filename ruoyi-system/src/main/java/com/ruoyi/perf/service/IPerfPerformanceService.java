@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.ruoyi.perf.domain.dto.PerfPerformanceAuditDTO;
 import com.ruoyi.perf.domain.dto.PerfPerformanceSaveDTO;
 import com.ruoyi.perf.domain.vo.PerfPerformanceVO;
+import com.ruoyi.perf.domain.vo.PerformanceDistributeVO;
 
 /**
  * 绩效实例Service接口
@@ -94,4 +95,16 @@ public interface IPerfPerformanceService extends IService<PerfPerformance>
      * @return 状态
      */
     public Boolean auditPerfPerformance(PerfPerformanceAuditDTO auditDTO);
+
+    /**
+     * 获取已完成状态数量
+     * @return
+     */
+    public Long getFinishPerformanceStatCount();
+
+    /**
+     * 获取绩效评分分布
+     * @return
+     */
+    public List<PerformanceDistributeVO> getPerformanceScoreDistributeList();
 }

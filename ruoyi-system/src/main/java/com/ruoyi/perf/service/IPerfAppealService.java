@@ -78,4 +78,10 @@ public interface IPerfAppealService extends IService<PerfAppeal>
      * @return
      */
     public Boolean handlePerfAppeal(PerfAppealHandleDTO handleDTO);
+
+    /**
+     * 获取申诉数量
+     * @return
+     */
+    public Long getPerfAppealStatCount();
 }
