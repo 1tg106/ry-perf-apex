@@ -29,6 +29,14 @@ public interface PerfTemplateMapper extends BaseMapper<PerfTemplate>
     public List<PerfTemplate> selectPerfTemplateList(PerfTemplate perfTemplate);
 
     /**
+     * 查询绩效模板总数
+     *
+     * @param perfTemplate 绩效模板
+     * @return 绩效模板集合
+     */
+    public Long selectPerfTemplateCount(PerfTemplate perfTemplate);
+
+    /**
      * 新增绩效模板
      * 
      * @param perfTemplate 绩效模板

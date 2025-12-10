@@ -3,6 +3,11 @@ package com.ruoyi.web.controller.perf;
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 
+import com.github.pagehelper.PageHelper;
+import com.ruoyi.common.constant.HttpStatus;
+import com.ruoyi.common.utils.ServletUtils;
+import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.utils.sql.SqlUtil;
 import com.ruoyi.perf.domain.dto.PerfTemplateSaveDTO;
 import com.ruoyi.perf.domain.vo.CommonChooseVO;
 import com.ruoyi.perf.domain.vo.PerfTemplateVO;
@@ -45,9 +50,39 @@ public class PerfTemplateController extends BaseController
     @GetMapping("/list")
     public TableDataInfo list(PerfTemplate perfTemplate)
     {
-        startPage();
+        // 获取分页参数
+        Integer pageNum = ServletUtils.getParameterToInt("pageNum", 1);
+        Integer pageSize = ServletUtils.getParameterToInt("pageSize", 10);
+        String orderByColumn = ServletUtils.getParameter("orderByColumn");
+        String isAsc = ServletUtils.getParameter("isAsc");
+
+        // 构建排序
+        String orderBy = "";
+        if (StringUtils.isNotEmpty(orderByColumn) && StringUtils.isNotEmpty(isAsc)) {
+            orderBy = SqlUtil.escapeOrderBySql(orderByColumn + " " + isAsc);
+        }
+
+        // 1. 查询总数（必须清除PageHelper的ThreadLocal）
+        PageHelper.clearPage();
+        long total = perfTemplateService.selectPerfTemplateCount(perfTemplate);
+
+        // 2. 执行分页查询
+        PageHelper.clearPage();  // 再次清除确保干净
+        if (StringUtils.isNotEmpty(orderBy)) {
+            PageHelper.startPage(pageNum, pageSize, orderBy);
+        } else {
+            PageHelper.startPage(pageNum, pageSize);
+        }
+
         List<PerfTemplateVO> list = perfTemplateService.selectPerfTemplateList(perfTemplate);
-        return getDataTable(list);
+
+        // 3. 返回结果
+        TableDataInfo rspData = new TableDataInfo();
+        rspData.setCode(HttpStatus.SUCCESS);
+        rspData.setMsg("查询成功");
+        rspData.setRows(list);
+        rspData.setTotal(total);
+        return rspData;
     }
 
     /**

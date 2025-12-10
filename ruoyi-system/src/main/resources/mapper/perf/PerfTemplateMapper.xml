@@ -41,6 +41,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <include refid="selectPerfTemplateVo"/>
         where id = #{templateId}
     </select>
+    <select id="selectPerfTemplateCount" resultType="java.lang.Long">
+        select count(1) from perf_template where del_flag = '0'
+        <if test="templateName != null  and templateName != ''"> and template_name like concat('%', #{templateName}, '%')</if>
+        <if test="templateType != null  and templateType != ''"> and template_type = #{templateType}</if>
+        <if test="deptId != null "> and dept_id = #{deptId}</if>
+        <if test="postIds != null  and postIds != ''"> and post_ids = #{postIds}</if>
+        <if test="status != null  and status != ''"> and status = #{status}</if>
+    </select>
 
     <insert id="insertPerfTemplate" parameterType="PerfTemplate" useGeneratedKeys="true" keyProperty="templateId">
         insert into perf_template

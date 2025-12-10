@@ -1,5 +1,6 @@
 package com.ruoyi.perf.domain;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.ruoyi.common.annotation.Excel;
 import com.ruoyi.common.core.domain.BaseEntity;
 import lombok.Data;
@@ -46,4 +47,5 @@ public class PerfTemplate extends BaseEntity
 
     /** 删除标志（0:存在 1:删除） */
     private String delFlag;
+
 }

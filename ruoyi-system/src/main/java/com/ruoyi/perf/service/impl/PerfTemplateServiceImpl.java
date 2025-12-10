@@ -18,6 +18,7 @@ import com.ruoyi.system.service.ISysDeptService;
 import com.ruoyi.system.service.ISysPostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -89,10 +90,37 @@ public class PerfTemplateServiceImpl extends ServiceImpl<PerfTemplateMapper,Perf
     public List<PerfTemplateVO> selectPerfTemplateList(PerfTemplate perfTemplate)
     {
         List<PerfTemplate> list = perfTemplateMapper.selectPerfTemplateList(perfTemplate);
-        List<Long> deptIds = list.stream().map(PerfTemplate::getDeptId).collect(Collectors.toList());
-        List<SysDept> deptList = sysDeptService.selectDeptListByIds(deptIds);
+        return convertToVO(list);
+    }
 
-        // 收集所有岗位ID并一次性查询
+    @Override
+    public Long selectPerfTemplateCount(PerfTemplate perfTemplate) {
+        return perfTemplateMapper.selectPerfTemplateCount(perfTemplate);
+    }
+
+    /**
+     * 通用的VO转换方法
+     */
+    private List<PerfTemplateVO> convertToVO(List<PerfTemplate> list) {
+        if (CollectionUtils.isEmpty(list)) {
+            return new ArrayList<>();
+        }
+
+        // 批量查询部门信息
+        List<Long> deptIds = list.stream()
+                .map(PerfTemplate::getDeptId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList());
+
+        List<SysDept> deptList = CollectionUtils.isEmpty(deptIds) ?
+                new ArrayList<>() :
+                sysDeptService.selectDeptListByIds(deptIds);
+
+        Map<Long, String> deptMap = deptList.stream()
+                .collect(Collectors.toMap(SysDept::getDeptId, SysDept::getDeptName));
+
+        // 批量查询岗位信息
         Set<Long> allPostIds = list.stream()
                 .filter(t -> StringUtils.isNotEmpty(t.getPostIds()))
                 .flatMap(t -> Arrays.stream(t.getPostIds().split(","))
@@ -101,42 +129,37 @@ public class PerfTemplateServiceImpl extends ServiceImpl<PerfTemplateMapper,Perf
                         .map(Long::valueOf))
                 .collect(Collectors.toSet());
 
-        // 获取所有相关岗位信息
-        List<SysPost> allPosts = sysPostService.selectPostListByIds(new ArrayList<>(allPostIds));
+        List<SysPost> allPosts = CollectionUtils.isEmpty(allPostIds) ?
+                new ArrayList<>() :
+                sysPostService.selectPostListByIds(new ArrayList<>(allPostIds));
+
         Map<Long, String> postMap = allPosts.stream()
                 .collect(Collectors.toMap(SysPost::getPostId, SysPost::getPostName));
 
-        List<PerfTemplateVO> perfTemplateVOS = new ArrayList<>();
+        // 转换为VO
+        return list.stream().map(template -> {
+            PerfTemplateVO vo = new PerfTemplateVO();
+            BeanUtils.copyProperties(template, vo);
 
-        for (PerfTemplate template : list){
-            PerfTemplateVO perfTemplateVO = new PerfTemplateVO();
-            BeanUtils.copyProperties(template,perfTemplateVO);
-            if(template.getDeptId() != null) {
-                SysDept sysDept = deptList.stream().filter(dept -> dept.getDeptId().equals(template.getDeptId())).findFirst().orElse(null);
-                perfTemplateVO.setDeptName(sysDept.getDeptName());
+            // 设置部门名称
+            if (template.getDeptId() != null) {
+                vo.setDeptName(deptMap.get(template.getDeptId()));
             }
 
             // 设置岗位名称
             if (StringUtils.isNotEmpty(template.getPostIds())) {
-                List<Long> postIds = Arrays.stream(template.getPostIds().split(","))
+                List<String> postNames = Arrays.stream(template.getPostIds().split(","))
                         .map(String::trim)
                         .filter(s -> !s.isEmpty())
                         .map(Long::valueOf)
-                        .collect(Collectors.toList());
-
-                // 从已查询的映射中获取岗位名称
-                List<String> postNames = postIds.stream()
                         .map(postMap::get)
-                        .filter(java.util.Objects::nonNull)
+                        .filter(Objects::nonNull)
                         .collect(Collectors.toList());
-                perfTemplateVO.setPostNames(postNames);
+                vo.setPostNames(postNames);
             }
 
-            perfTemplateVOS.add(perfTemplateVO);
-        }
-
-
-        return perfTemplateVOS;
+            return vo;
+        }).collect(Collectors.toList());
     }
 
     /**
