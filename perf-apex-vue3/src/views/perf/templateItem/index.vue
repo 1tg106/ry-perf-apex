@@ -83,7 +83,7 @@
 
     <el-table v-loading="loading" :data="templateItemList" @selection-change="handleSelectionChange" row-key="id" :tree-props="{children: 'children', hasChildren: 'hasChildren'}" lazy :load="loadChildren" :key="tableKey">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="指标名称" align="left" prop="itemName" width="200" />
+      <el-table-column label="指标名称" align="left" prop="itemName" width="230" />
       <el-table-column label="模版名称" align="center" prop="templateName" />
       <el-table-column label="指标类型" align="center" prop="itemType">
         <template #default="scope">

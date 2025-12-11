@@ -40,7 +40,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where period_id = #{periodId}
     </select>
     <select id="getPerfChooseList" resultType="com.ruoyi.perf.domain.vo.CommonChooseVO">
-        select period_id as value, period_name as label from perf_period where del_flag = '0'
+        select period_id as value, period_name as label from perf_period where del_flag = '0' and status = '1'
     </select>
 
     <insert id="insertPerfPeriod" parameterType="PerfPeriod" useGeneratedKeys="true" keyProperty="periodId">

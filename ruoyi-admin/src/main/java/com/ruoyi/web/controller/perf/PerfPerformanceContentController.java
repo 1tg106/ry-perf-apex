@@ -90,7 +90,6 @@ public class PerfPerformanceContentController extends BaseController
     /**
      * 提交/保存绩效
      */
-    @PreAuthorize("@ss.hasPermi('perf:content:edit')")
     @Log(title = "绩效内容", businessType = BusinessType.UPDATE)
     @PutMapping("/batch")
     public AjaxResult editBatch(@Valid @RequestBody PerfContentBatchUpdateDTO updateDTO)
