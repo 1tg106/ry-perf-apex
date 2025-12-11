@@ -1,4 +1,6 @@
-# Perf Apex
+# PerfApex
+
+PerfApex：结合Performance（绩效）和Apex（顶点），寓意助力员工与团队攀登绩效顶峰。
 
 - 基于 RuoYi 3.9（Spring Boot + Spring Security + MyBatis-plus + Redis）与 Vue3 + Element Plus + Vite 的前后端分离绩效管理模块。
 - 核心业务：绩效周期、模板与指标、绩效实例（自评/评分/审核）、绩效面谈、绩效申诉、统计看板与待办。
@@ -48,40 +50,6 @@
   - 视图：`perf-apex-vue3/src/views/perf/`、`src/views/myPerf/`
   - 绩效组件：`perf-apex-vue3/src/components/perf/`
   - 绩效工具/枚举：`perf-apex-vue3/src/utils/perf/`
-
-## 核心数据模型
-- 绩效周期 `PerfPeriod`：定义周期名称、类型（月/季/半年/年）、提交与评分截止、状态（准备中/进行中/已结束）。
-```22:45:ruoyi-system/src/main/java/com/ruoyi/perf/domain/PerfPeriod.java
-    /** 周期名称(如：2024年Q1) */
-    private String periodName;
-    /** 周期类型(MONTH:月度, QUARTER:季度, HALF_YEAR:半年度, YEAR:年度) */
-    private String periodType;
-    /** 提交截止时间 */
-    private Date submitDeadline;
-    /** 状态(0:准备中 1:进行中 2:已结束) */
-    private String status;
-```
-- 绩效模板与指标 `PerfTemplate` / `PerfTemplateItem`：模板类型（KPI/OKR/COMPETENCY）、适用部门岗位、默认评分人，指标树含权重、评分标准、评分人。
-```22:47:ruoyi-system/src/main/java/com/ruoyi/perf/domain/PerfTemplate.java
-    private Long id;
-    private String templateName;
-    private String templateType;
-    private Long defaultScoreId;
-    private Long deptId;
-```
-- 绩效实例 `PerfPerformance`：绑定周期/模板/员工/部门，记录自评分、最终分、当前步骤、状态（草稿/待提交/待评分/待审核/已确认/驳回/作废/申诉中），含提交/确认/评分/审核时间。
-```24:84:ruoyi-system/src/main/java/com/ruoyi/perf/domain/PerfPerformance.java
-    private String performanceNo;
-    private Long periodId;
-    private Long templateId;
-    private Long userId;
-    private BigDecimal selfScore;
-    private BigDecimal finalScore;
-    private String status;
-```
-- 绩效内容与评分：`PerfPerformanceContent`（自评目标/成果/分数、最终分与评语，按模板指标展开）；评分人列表与得分在 `perf_performance_content_score`（mapper/service 同目录）。
-- 面谈 `PerfInterview`：面谈人/被访人、时间、要点、改进与行动计划、反馈，支持标记已面谈。
-- 申诉 `PerfAppeal`：申诉理由、处理意见与结果，可调整分数，状态（待处理/已处理/已驳回）。
 
 ## 前后端主要功能
 - 周期管理：创建周期、设定提交/评分截止与状态流转，提供选择列表 `GET /perf/period/getPerfChooseList`。
@@ -135,6 +103,40 @@ export const PERFORMANCE_STATUS = {
 ## 权限与接口约定
 - 统一前缀 `/perf/**`，遵循 RuoYi 权限注解 `@PreAuthorize("@ss.hasPermi('perf:xxx:op')")`，需在菜单中为角色分配按钮权限。
 - 分页查询采用后台 `startPage()` + `TableDataInfo` 响应，前端表格统一使用分页组件。
+
+## 核心数据模型
+- 绩效周期 `PerfPeriod`：定义周期名称、类型（月/季/半年/年）、提交与评分截止、状态（准备中/进行中/已结束）。
+```22:45:ruoyi-system/src/main/java/com/ruoyi/perf/domain/PerfPeriod.java
+    /** 周期名称(如：2024年Q1) */
+    private String periodName;
+    /** 周期类型(MONTH:月度, QUARTER:季度, HALF_YEAR:半年度, YEAR:年度) */
+    private String periodType;
+    /** 提交截止时间 */
+    private Date submitDeadline;
+    /** 状态(0:准备中 1:进行中 2:已结束) */
+    private String status;
+```
+- 绩效模板与指标 `PerfTemplate` / `PerfTemplateItem`：模板类型（KPI/OKR/COMPETENCY）、适用部门岗位、默认评分人，指标树含权重、评分标准、评分人。
+```22:47:ruoyi-system/src/main/java/com/ruoyi/perf/domain/PerfTemplate.java
+    private Long id;
+    private String templateName;
+    private String templateType;
+    private Long defaultScoreId;
+    private Long deptId;
+```
+- 绩效实例 `PerfPerformance`：绑定周期/模板/员工/部门，记录自评分、最终分、当前步骤、状态（草稿/待提交/待评分/待审核/已确认/驳回/作废/申诉中），含提交/确认/评分/审核时间。
+```24:84:ruoyi-system/src/main/java/com/ruoyi/perf/domain/PerfPerformance.java
+    private String performanceNo;
+    private Long periodId;
+    private Long templateId;
+    private Long userId;
+    private BigDecimal selfScore;
+    private BigDecimal finalScore;
+    private String status;
+```
+- 绩效内容与评分：`PerfPerformanceContent`（自评目标/成果/分数、最终分与评语，按模板指标展开）；评分人列表与得分在 `perf_performance_content_score`（mapper/service 同目录）。
+- 面谈 `PerfInterview`：面谈人/被访人、时间、要点、改进与行动计划、反馈，支持标记已面谈。
+- 申诉 `PerfAppeal`：申诉理由、处理意见与结果，可调整分数，状态（待处理/已处理/已驳回）。
 
 ## 二次开发指引
 - 新增评分角色或步骤：扩展绩效状态枚举、内容评分表与状态机（service 层）；同步更新前端 `performanceEnum.js`。
