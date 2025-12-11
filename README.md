@@ -35,7 +35,7 @@ PerfApex：结合Performance（绩效）和Apex（顶点），寓意助力员工
 - 后端：JDK 8+、Maven、MySQL、Redis。
 - 前端：Vue3 + Element Plus + Vite，代码在 `perf-apex-vue3/`。
 - 快速启动
-  - 初始化库表：导入 `sql/ry_20250522.sql`（包含系统与绩效表）。
+  - 初始化库表：导入 `sql/ry-perf-apex1.0.sql`（包含系统与绩效表）。
   - 配置数据库与 Redis：`ruoyi-admin/src/main/resources/application-druid.yml`、`application.yml`（按需修改）。
   - 后端启动：`mvn clean package -DskipTests` 后运行 `ruoyi-admin`（可用 `ry.bat`/`ry.sh` 或 `java -jar ruoyi-admin/target/*.jar`）。
   - 前端启动：进入 `perf-apex-vue3`，执行 `yarn install --registry=https://registry.npmmirror.com`后，再执行`npm run dev`或`yarn dev`。
